@@ -1,0 +1,31 @@
+﻿teamId,teamCity,teamName,games,mean_delta,median_delta,total_delta
+1610612747,Los Angeles,Lakers,46,497.2,232.1,22870.9
+1610612744,Golden State,Warriors,41,341.6,146.5,14006.8
+1610612759,San Antonio,Spurs,53,279.9,0.0,14837.2
+1610612738,Boston,Celtics,44,259.4,78.3,11413.5
+1610612765,Detroit,Pistons,47,247.5,46.5,11634.7
+1610612766,Charlotte,Hornets,41,175.2,145.8,7182.5
+1610612745,Houston,Rockets,44,75.3,0.0,3314.2
+1610612755,Philadelphia,76ers,47,60.2,0.0,2830.5
+1610612752,New York,Knicks,52,60.0,0.0,3118.6
+1610612760,Oklahoma City,Thunder,47,55.8,0.0,2623.5
+1610612761,Toronto,Raptors,45,48.9,0.0,2201.7
+1610612753,Orlando,Magic,43,24.2,0.0,1040.6
+1610612742,Dallas,Mavericks,40,7.1,0.0,283.5
+1610612746,LA,Clippers,41,5.8,0.0,238.4
+1610612750,Minnesota,Timberwolves,47,-0.8,0.0,-36.1
+1610612748,Miami,Heat,41,-15.2,0.0,-623.6
+1610612743,Denver,Nuggets,43,-26.3,8.4,-1131.9
+1610612751,Brooklyn,Nets,41,-38.4,0.0,-1573.8
+1610612741,Chicago,Bulls,41,-53.3,0.0,-2186.2
+1610612756,Phoenix,Suns,43,-96.4,0.0,-4144.7
+1610612739,Cleveland,Cavaliers,50,-102.7,0.0,-5132.7
+1610612749,Milwaukee,Bucks,41,-125.2,-3.1,-5134.5
+1610612762,Utah,Jazz,41,-132.4,0.0,-5428.7
+1610612757,Portland,Trail Blazers,44,-191.8,0.0,-8437.3
+1610612740,New Orleans,Pelicans,40,-198.3,-17.3,-7932.0
+1610612763,Memphis,Grizzlies,40,-205.8,-1.5,-8231.7
+1610612754,Indiana,Pacers,41,-234.5,0.0,-9614.6
+1610612764,Washington,Wizards,41,-261.9,0.0,-10737.5
+1610612758,Sacramento,Kings,41,-263.4,-3.1,-10798.4
+1610612737,Atlanta,Hawks,44,-373.9,-7.1,-16453.1
