@@ -22,8 +22,10 @@ const seasons = (a, b) => a === b ? String(a) : a + "–" + b;
 /* ---------- entity links (relative, work from index or detail pages) ---------- */
 const playerHref = id => "player.html?id=" + encodeURIComponent(id);
 const arenaHref = slug => "arena.html?slug=" + encodeURIComponent(slug);
+const cityHref = slug => "city.html?slug=" + encodeURIComponent(slug);
 const playerLink = (id, name) => '<a href="' + playerHref(id) + '">' + esc(name) + "</a>";
 const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(name) + "</a>";
+const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
 const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 /* ---------- sortable table ----------
@@ -140,3 +142,112 @@ function autocomplete(input, box, items, opts) {
 
 /* ---------- query param ---------- */
 const qp = k => new URLSearchParams(window.location.search).get(k);
+
+/* ---------- All-Star flags + leaderboard default toggle ----------
+   Every player leaderboard defaults to All-Star players only; a "show all
+   players" toggle expands to the full field. allstarMode is shared across the
+   page so a single toggle re-renders whatever is on screen. */
+let ALLSTAR = null;          // Set of personId strings
+let ALLSTAR_META = {};       // personId -> {times_selected, first_year, last_year}
+let allstarMode = true;      // default: All-Stars only
+
+async function loadAllstar() {
+  if (ALLSTAR) return ALLSTAR;
+  try {
+    const d = await getJSON(DATA + "/allstar.json");
+    ALLSTAR = new Set((d.personIds || []).map(String));
+    ALLSTAR_META = d.players || {};
+  } catch (e) { ALLSTAR = new Set(); }
+  return ALLSTAR;
+}
+const isAllstar = pid => !!(ALLSTAR && ALLSTAR.has(String(pid)));
+/* keep only All-Stars when allstarMode is on; getPid(row)->personId */
+function filterAllstar(rows, getPid) {
+  if (!allstarMode) return rows;
+  return rows.filter(r => isAllstar(getPid(r)));
+}
+/* Render an All-Stars / all-players segmented toggle into `mount`. onChange()
+   fires after allstarMode flips so the caller can re-render its tables. */
+function makeAllstarToggle(mount, onChange) {
+  const wrap = document.createElement("div");
+  wrap.className = "controls allstar-controls";
+  wrap.innerHTML =
+    '<div class="field"><span class="lbl">Leaderboards</span>' +
+    '<div class="toggle allstar-toggle">' +
+    '<button data-as="1" class="' + (allstarMode ? "active" : "") + '">★ All-Stars only</button>' +
+    '<button data-as="0" class="' + (allstarMode ? "" : "active") + '">Show all players</button>' +
+    "</div></div>";
+  mount.appendChild(wrap);
+  wrap.addEventListener("click", e => {
+    const b = e.target.closest("button[data-as]");
+    if (!b) return;
+    allstarMode = b.dataset.as === "1";
+    wrap.querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+    onChange();
+  });
+  return wrap;
+}
+
+/* ---------- persistent site search (players, teams, arenas, cities) ----------
+   Injected at the top and bottom of every page from search.json. */
+const searchHref = it =>
+  it.type === "player" ? playerHref(it.id) :
+  it.type === "arena" ? arenaHref(it.slug) :
+  it.type === "city" ? cityHref(it.slug) :
+  "index.html?tab=draw";               // teams live on the Attendance Draw tab
+
+function siteSearchBar(pos, items) {
+  const bar = document.createElement("div");
+  bar.className = "site-search " + pos;
+  bar.innerHTML =
+    '<div class="ss-inner">' +
+    '<input type="text" autocomplete="off" placeholder="Search players, teams, arenas, cities…">' +
+    '<div class="gsearch-results"></div></div>';
+  const input = bar.querySelector("input");
+  const box = bar.querySelector(".gsearch-results");
+  let matches = [], sel = -1;
+  const close = () => { box.classList.remove("open"); sel = -1; };
+  function render(q) {
+    const s = q.toLowerCase();
+    const starts = [], contains = [];
+    for (const it of items) {
+      const n = it.name.toLowerCase();
+      if (n.startsWith(s)) starts.push(it);
+      else if (n.includes(s)) contains.push(it);
+      if (starts.length >= 40) break;
+    }
+    matches = starts.concat(contains).slice(0, 25);
+    if (!matches.length) { close(); return; }
+    box.innerHTML = matches.map((m, i) =>
+      '<a class="gs-item" href="' + searchHref(m) + '" data-i="' + i + '">' +
+      '<span class="gs-main">' + esc(m.name) + "</span>" +
+      (m.sub ? '<span class="gs-sub">' + esc(m.sub) + "</span>" : "") +
+      '<span class="gs-type">' + esc(m.type) + "</span></a>").join("");
+    box.classList.add("open"); sel = -1;
+  }
+  const highlight = () => [...box.children].forEach((c, i) => c.classList.toggle("sel", i === sel));
+  input.addEventListener("input", () => {
+    const q = input.value.trim();
+    if (!q) { close(); return; }
+    render(q);
+  });
+  input.addEventListener("keydown", e => {
+    if (!box.classList.contains("open")) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(sel + 1, matches.length - 1); highlight(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(sel - 1, 0); highlight(); }
+    else if (e.key === "Enter") { e.preventDefault(); const m = matches[sel >= 0 ? sel : 0]; if (m) window.location.href = searchHref(m); }
+    else if (e.key === "Escape") close();
+  });
+  document.addEventListener("click", e => { if (!bar.contains(e.target)) close(); });
+  return bar;
+}
+
+async function initSiteSearch() {
+  let items;
+  try { items = await getJSON(DATA + "/search.json"); }
+  catch (e) { return; }               // no search index → skip silently
+  document.body.classList.add("has-site-search");
+  document.body.insertBefore(siteSearchBar("top", items), document.body.firstChild);
+  document.body.appendChild(siteSearchBar("bottom", items));
+}
+document.addEventListener("DOMContentLoaded", initSiteSearch);

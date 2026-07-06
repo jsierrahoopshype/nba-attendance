@@ -3,17 +3,17 @@
 
    Structure, component classes and the sortable table.lb pattern are lifted
    from the sibling nba-polymarket tracker so this reads as the same family of
-   tools; the color tokens are a dark theme. Tables stay visible and scroll
-   horizontally on mobile (this is a table-heavy tool), rather than collapsing
-   to cards.
+   tools; the color tokens are the polymarket light theme, fetched from that
+   repo and mirrored exactly. Tables stay visible and scroll horizontally on
+   mobile (this is a table-heavy tool), rather than collapsing to cards.
    ========================================================================== */
 
 :root{
-  --bg:#0d1117;--surface:#161b22;--surface-hover:#1c2230;--border:#2a313c;
-  --text:#e6edf3;--text-secondary:#8b949e;--accent:#58a6ff;--accent-dim:rgba(88,166,255,.16);
-  --green:#3fb950;--green-dim:rgba(63,185,80,.16);
-  --red:#f85149;--red-dim:rgba(248,81,73,.15);
-  --orange:#d29922;--orange-dim:rgba(210,153,34,.16);
+  --bg:#f5f5f7;--surface:#fff;--surface-hover:#f0f0f2;--border:#d1d1d6;
+  --text:#1d1d1f;--text-secondary:#6e6e73;--accent:#3b82f6;--accent-dim:rgba(59,130,246,.15);
+  --green:#1d8a40;--green-dim:rgba(52,199,89,.16);--green-bar:#34c759;
+  --red:#d12c2c;--red-dim:rgba(239,68,68,.13);--red-bar:#ef4444;
+  --orange:#b26b00;--orange-dim:rgba(245,158,11,.16);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:112%}
@@ -30,7 +30,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
   border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-secondary);
   cursor:pointer;transition:.12s;text-decoration:none}
 .tabs a:hover,.tabs button:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.tabs a.active,.tabs button.active{background:var(--accent);border-color:var(--accent);color:#04101f}
+.tabs a.active,.tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* header */
 .hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.35rem;flex-wrap:wrap}
@@ -53,7 +53,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .toggle button{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;padding:.4rem .8rem;
   border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:.12s}
 .toggle button:hover{border-color:var(--accent);color:var(--accent)}
-.toggle button.active{background:var(--accent);border-color:var(--accent);color:#04101f;font-weight:600}
+.toggle button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
 /* table */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow-x:auto}
@@ -71,7 +71,7 @@ table.lb tbody tr[data-href]{cursor:pointer}
 table.lb tbody tr:last-child{border-bottom:none}
 table.lb tbody tr:hover{background:var(--surface-hover)}
 table.lb td{padding:.5rem .6rem;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500;white-space:nowrap}
-table.lb td.sorted-by{background:rgba(88,166,255,.06)}
+table.lb td.sorted-by{background:rgba(59,130,246,.06)}
 table.lb td.name{text-align:left;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap}
 table.lb td.rank{color:var(--text-secondary);font-size:.78rem;width:2.2rem;text-align:right}
 table.lb td.name a{color:var(--text)}
@@ -121,7 +121,7 @@ table.lb td.sub{color:var(--text-secondary)}
   border-radius:10px;background:var(--surface);color:var(--text)}
 .gsearch:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.25rem;background:var(--surface);
-  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
   max-height:22rem;overflow-y:auto;z-index:200;display:none}
 .gsearch-results.open{display:block}
 .gs-item{display:flex;align-items:center;gap:.55rem;padding:.5rem .8rem;border-bottom:1px solid var(--border);
@@ -139,6 +139,37 @@ table.lb td.sub{color:var(--text-secondary)}
 
 /* in-page tab views */
 .view{display:none}.view.active{display:block}
+
+/* ---------- persistent site search (fixed top + bottom, every page) ---------- */
+body.has-site-search{padding-top:3.2rem;padding-bottom:3.2rem}
+.site-search{position:fixed;left:0;right:0;z-index:300;background:var(--surface);
+  border-bottom:1px solid var(--border);padding:.45rem 1rem}
+.site-search.top{top:0}
+.site-search.bottom{bottom:0;border-bottom:none;border-top:1px solid var(--border)}
+.site-search .ss-inner{max-width:1400px;margin:0 auto;position:relative}
+.site-search input{width:100%;padding:.5rem .8rem;font-size:16px;font-family:inherit;
+  border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text)}
+.site-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.site-search .gsearch-results{position:absolute;left:0;right:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
+  max-height:20rem;overflow-y:auto;z-index:310;display:none}
+.site-search.top .gsearch-results{top:100%;margin-top:.25rem}
+.site-search.bottom .gsearch-results{bottom:100%;margin-bottom:.25rem}
+.site-search .gsearch-results.open{display:block}
+.gs-item .gs-type{font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--accent);border:1px solid var(--border);border-radius:20px;
+  padding:.05rem .45rem;flex-shrink:0}
+
+/* ---------- All-Star / all-players toggle ---------- */
+.allstar-controls{margin:.2rem 0 1rem}
+.allstar-note{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-secondary);
+  text-transform:uppercase;letter-spacing:.04em;align-self:center}
+
+/* city page: building chips */
+.city-buildings{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+.city-buildings a{font-family:'JetBrains Mono',monospace;font-size:.66rem;padding:.3rem .6rem;
+  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text-secondary)}
+.city-buildings a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 
 @media(max-width:860px){
   .container{padding:1rem 1rem 3rem}

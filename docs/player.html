@@ -84,6 +84,29 @@ function render() {
   ];
   sortableTable(tableMount, cols, rows, { key: "games", dir: "desc" });
   wireRowNav(tableMount);
+
+  renderArenaDraw(mount);
+}
+
+/* This player's road-attendance draw at each arena they visited (2026 only). */
+function renderArenaDraw(mount) {
+  const draw = (player.arena_draw || []).slice();
+  if (!draw.length) return;
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Attendance draw by arena " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
+    esc(player.draw_label || "2026 season only") + "</span></div>");
+  const dm = document.createElement("div");
+  mount.appendChild(dm);
+  const rows = draw.map(r => ({ ...r, _href: arenaHref(r.slug) }));
+  const cols = [
+    { key: "arena", label: "Arena", align: "left", defaultDir: "asc", get: r => r.arena, cell: r => arenaLink(r.slug, r.arena) },
+    { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "mean_delta", label: "Avg Draw vs Baseline", defaultDir: "desc", get: r => r.mean_delta,
+      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+  ];
+  sortableTable(dm, cols, rows, { key: "mean_delta", dir: "desc" });
+  wireRowNav(dm);
 }
 
 boot();

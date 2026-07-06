@@ -25,6 +25,7 @@
     <button data-tab="players" class="active">Player Lookup</button>
     <button data-tab="draw">Attendance Draw 2026</button>
     <button data-tab="records">Arena Records</button>
+    <button data-tab="cities">City Records</button>
   </div>
 
   <!-- TAB 1: PLAYER LOOKUP -->
@@ -37,6 +38,7 @@
       </div>
     </div>
     <div class="block-head"><h2>All players</h2><span class="sub" id="playerCount"></span></div>
+    <div id="playerAllstarMount"></div>
     <div id="playerDir"><div class="loading">Loading players…</div></div>
   </section>
 
@@ -49,6 +51,7 @@
     </div>
     <div class="block">
       <div class="block-head"><h2>Players</h2><span class="sub">visiting players with 20+ qualifying road games</span></div>
+      <div id="drawAllstarMount"></div>
       <div id="playerDrawTable"></div>
     </div>
   </section>
@@ -60,6 +63,15 @@
       <span class="sub">tap an arena for full leaderboards</span>
     </div>
     <div id="overviewTable"><div class="loading">Loading arenas…</div></div>
+  </section>
+
+  <!-- TAB 4: CITY RECORDS -->
+  <section class="view" id="view-cities">
+    <div class="block-head">
+      <h2>Every city, 2007–2026</h2>
+      <span class="sub">all arenas in a city combined · tap for full leaderboards</span>
+    </div>
+    <div id="cityTable"><div class="loading">Loading cities…</div></div>
   </section>
 
   <div class="foot">
@@ -88,6 +100,15 @@ function init(tab) {
   if (tab === "players") initPlayers();
   else if (tab === "draw") initDraw();
   else if (tab === "records") initRecords();
+  else if (tab === "cities") initCities();
+}
+function activateTab(tab) {
+  const btn = document.querySelector('#tabs button[data-tab="' + tab + '"]');
+  if (!btn) return;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b === btn));
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + tab).classList.add("active");
+  init(tab);
 }
 
 /* ---------- TAB 1: player directory + autocomplete ---------- */
@@ -95,7 +116,7 @@ async function initPlayers() {
   let players;
   try { players = await getJSON(DATA + "/players/index.json"); }
   catch (err) { document.getElementById("playerDir").innerHTML = '<div class="err">Failed to load players: ' + esc(err.message) + "</div>"; return; }
-  document.getElementById("playerCount").textContent = players.length.toLocaleString() + " players";
+  await loadAllstar();
 
   const rows = players.map(p => ({ ...p, _href: playerHref(p.personId) }));
   const cols = [
@@ -106,19 +127,27 @@ async function initPlayers() {
     { key: "points", label: "Total Pts", defaultDir: "desc", get: r => r.points, cell: r => fmtInt(r.points) },
   ];
   const mount = document.getElementById("playerDir");
-  const table = sortableTable(mount, cols, rows, { key: "games", dir: "desc" });
+  const table = sortableTable(mount, cols, [], { key: "games", dir: "desc" });
   wireRowNav(mount);
 
   const input = document.getElementById("playerSearch");
+  const apply = () => {
+    const q = input.value.trim().toLowerCase();
+    let r = filterAllstar(rows, x => x.personId);
+    if (q) r = r.filter(x => x.name.toLowerCase().includes(q));
+    table.setRows(r);
+    document.getElementById("playerCount").textContent =
+      r.length.toLocaleString() + (allstarMode ? " All-Star" : "") + " players";
+  };
+  makeAllstarToggle(document.getElementById("playerAllstarMount"), apply);
+  apply();
+
   autocomplete(input, document.getElementById("playerAC"), players, {
     href: p => playerHref(p.personId),
     sub: p => fmtInt(p.games) + " g",
-    onInput: q => {
-      const s = q.toLowerCase();
-      table.setRows(rows.filter(r => r.name.toLowerCase().includes(s)));
-    },
+    onInput: apply,
   });
-  input.addEventListener("input", () => { if (!input.value.trim()) table.setRows(rows); });
+  input.addEventListener("input", () => { if (!input.value.trim()) apply(); });
 }
 
 /* ---------- TAB 2: attendance draw ---------- */
@@ -148,12 +177,16 @@ async function initDraw() {
     attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) }),
     teamRows, { key: "diff", dir: "desc" });
 
+  await loadAllstar();
   const playerRows = draw.players.map(p => ({ ...p, _href: playerHref(p.personId) }));
   const pmount = document.getElementById("playerDrawTable");
-  sortableTable(pmount,
+  const ptable = sortableTable(pmount,
     attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
-    playerRows, { key: "diff", dir: "desc" });
+    [], { key: "diff", dir: "desc" });
   wireRowNav(pmount);
+  const applyDraw = () => ptable.setRows(filterAllstar(playerRows, r => r.personId));
+  makeAllstarToggle(document.getElementById("drawAllstarMount"), applyDraw);
+  applyDraw();
 }
 
 /* ---------- TAB 3: arena overview ---------- */
@@ -166,7 +199,8 @@ async function initRecords() {
   const cols = [
     { key: "name", label: "Arena", align: "left", defaultDir: "asc", get: r => r.name,
       cell: r => arenaLink(r.slug, r.name) + '<span class="pill">' + esc(r.buildingType) + "</span>" },
-    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city, cell: r => '<span class="sub">' + esc(r.city) + "</span>" },
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city,
+      cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city) + "</span>" },
     { key: "total_games", label: "Games", defaultDir: "desc", get: r => r.total_games, cell: r => fmtInt(r.total_games) },
     { key: "top_scorer", label: "Top Scorer", align: "left", defaultDir: "desc",
       get: r => r.top_scorer ? r.top_scorer.points : -1,
@@ -186,8 +220,33 @@ async function initRecords() {
   wireRowNav(mount);
 }
 
-/* boot: first tab */
-init("players");
+/* ---------- TAB 4: city overview ---------- */
+async function initCities() {
+  let ov;
+  try { ov = await getJSON(DATA + "/cities/overview.json"); }
+  catch (err) { document.getElementById("cityTable").innerHTML = '<div class="err">Failed to load cities: ' + esc(err.message) + "</div>"; return; }
+
+  const rows = ov.map(c => ({ ...c, _href: cityHref(c.slug) }));
+  const cols = [
+    { key: "name", label: "City", align: "left", defaultDir: "asc", get: r => r.name, cell: r => cityLink(r.slug, r.name) },
+    { key: "arenas", label: "Arenas", defaultDir: "desc", get: r => (r.buildings || []).length, cell: r => fmtInt((r.buildings || []).length) },
+    { key: "total_games", label: "Games", defaultDir: "desc", get: r => r.total_games, cell: r => fmtInt(r.total_games) },
+    { key: "top_scorer", label: "Top Scorer", align: "left", defaultDir: "desc",
+      get: r => r.top_scorer ? r.top_scorer.points : -1,
+      cell: r => r.top_scorer ? playerLink(r.top_scorer.personId, r.top_scorer.name) + ' <span class="sub">' + fmtInt(r.top_scorer.points) + " pts</span>" : '<span class="dash">—</span>' },
+    { key: "winningest_player", label: "Winningest Player", align: "left", defaultDir: "desc",
+      get: r => r.winningest_player ? r.winningest_player.win_pct : -1,
+      cell: r => r.winningest_player ? playerLink(r.winningest_player.personId, r.winningest_player.name) + ' <span class="sub">' + pct(r.winningest_player.win_pct) + "</span>" : '<span class="dash">—</span>' },
+  ];
+  const mount = document.getElementById("cityTable");
+  sortableTable(mount, cols, rows, { key: "total_games", dir: "desc" });
+  wireRowNav(mount);
+}
+
+/* boot: honor ?tab=, else the first tab */
+const startTab = qp("tab");
+if (startTab && document.querySelector('#tabs button[data-tab="' + startTab + '"]')) activateTab(startTab);
+else init("players");
 </script>
 </body>
 </html>

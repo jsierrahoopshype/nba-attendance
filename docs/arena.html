@@ -46,15 +46,20 @@ async function boot() {
   }
 
   document.title = building.name + " — NBA Arena Records";
+  const cityCell = building.city_slug
+    ? cityLink(building.city_slug, building.city) : esc(building.city);
   document.getElementById("head").innerHTML =
     '<div class="ehead"><h1>' + esc(building.name) + "</h1>" +
     '<div class="esub"><span class="pill" style="margin-left:0">' + esc(building.buildingType) + "</span>" +
-    "<span>" + esc(building.city) + '</span><span class="sep">·</span>' +
+    "<span>" + cityCell + '</span><span class="sep">·</span>' +
     "<span>" + seasons(building.first_season, building.last_season) + '</span><span class="sep">·</span>' +
-    "<span>" + fmtInt(building.total_games) + " player-game records</span></div></div>";
+    "<span>" + fmtInt(building.total_games) + " games hosted</span><span class=\"sep\">·</span>" +
+    "<span>" + fmtInt(building.player_game_rows) + " player-game records</span></div></div>";
 
+  await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
+  makeAllstarToggle(document.getElementById("controls"), render);
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
       document.querySelectorAll("#gtToggle button").forEach(x => x.classList.toggle("active", x === b));
@@ -94,11 +99,15 @@ const LB_DEFS = [
 ];
 
 function render() {
-  const lbs = building.leaderboards[gt];
+  const lbSet = (allstarMode && building.leaderboards_allstar)
+    ? building.leaderboards_allstar : building.leaderboards;
+  const lbs = lbSet[gt];
   const gtLabel = gt === "regular" ? "Regular Season" : "Playoffs";
+  const scope = allstarMode ? "All-Stars" : "all players";
   const mount = document.getElementById("result");
   mount.innerHTML = "<div class='section-title'>" + esc(building.name) +
-    " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + gtLabel + "</span></div>";
+    " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
+    gtLabel + " · " + scope + "</span></div>";
 
   const grid = document.createElement("div");
   grid.className = "lb-grid";
@@ -123,10 +132,14 @@ function render() {
     sortableTable(tm, cols.slice(1), rows, { key: def.key, dir: "desc" });
     wireRowNav(tm);
   });
-  if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel + " records at this building.</div>");
+  if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
+    (allstarMode ? " All-Star" : "") + " records at this building.</div>");
+
+  // visiting-player attendance draw (2026 only) — who moved the gate the most here
+  renderVisitingDraw(mount);
 
   // full records table for this game type
-  const recs = building.records.filter(r => r.gameType === gtLabel);
+  const recs = filterAllstar(building.records.filter(r => r.gameType === gtLabel), r => r.personId);
   if (recs.length) {
     mount.insertAdjacentHTML("beforeend", "<div class='section-title'>All " + gtLabel + " records <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>(" + recs.length + ")</span></div>");
     const am = document.createElement("div");
@@ -146,6 +159,28 @@ function render() {
     sortableTable(am, cols, rows, { key: "total_points", dir: "desc" });
     wireRowNav(am);
   }
+}
+
+function renderVisitingDraw(mount) {
+  const all = building.visiting_draw || [];
+  if (!all.length) return;
+  const rows = filterAllstar(all, r => r.personId).map(r => ({ ...r, _href: playerHref(r.personId) }));
+  const scope = allstarMode ? "All-Stars" : "all players";
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Who drew the most here " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— visiting players · " +
+    esc(building.draw_label || "2026 season only") + " · " + scope + "</span></div>");
+  const dm = document.createElement("div");
+  mount.appendChild(dm);
+  if (!rows.length) { dm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; return; }
+  const cols = [
+    { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+    { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "mean_delta", label: "Avg Draw vs Baseline", defaultDir: "desc", get: r => r.mean_delta,
+      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+  ];
+  sortableTable(dm, cols, rows, { key: "mean_delta", dir: "desc" });
+  wireRowNav(dm);
 }
 
 boot();
