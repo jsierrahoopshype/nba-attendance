@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player — NBA Arena Records</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container narrow">
+  <a class="back" href="index.html">← All players &amp; arenas</a>
+  <div id="head"></div>
+  <div class="controls" id="controls" style="display:none">
+    <div class="field">
+      <span class="lbl">Game type</span>
+      <div class="toggle" id="gtToggle">
+        <button data-gt="Regular Season" class="active">Regular Season</button>
+        <button data-gt="Playoffs">Playoffs</button>
+      </div>
+    </div>
+  </div>
+  <div id="result"><div class="loading">Loading…</div></div>
+  <div class="foot">Records span the 2007–2026 seasons · one row per building where the player logged minutes.</div>
+</div>
+
+<script src="app.js"></script>
+<script>
+"use strict";
+let player = null, gt = "Regular Season";
+
+async function boot() {
+  const id = qp("id");
+  if (!id) { document.getElementById("result").innerHTML = '<div class="err">No player id given.</div>'; return; }
+  try { player = await getJSON(DATA + "/players/" + encodeURIComponent(id) + ".json"); }
+  catch (err) { document.getElementById("result").innerHTML = '<div class="err">Could not load player: ' + esc(err.message) + "</div>"; return; }
+
+  document.title = player.name + " — NBA Arena Records";
+  const buildings = new Set(player.records.map(r => r.building)).size;
+  const fs = Math.min(...player.records.map(r => r.first_season));
+  const ls = Math.max(...player.records.map(r => r.last_season));
+  document.getElementById("head").innerHTML =
+    '<div class="ehead"><h1>' + esc(player.name) + "</h1>" +
+    '<div class="esub"><span>' + buildings + " buildings</span><span class=\"sep\">·</span>" +
+    "<span>" + seasons(fs, ls) + "</span></div></div>";
+  document.getElementById("controls").style.display = "";
+
+  document.querySelectorAll("#gtToggle button").forEach(b =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#gtToggle button").forEach(x => x.classList.toggle("active", x === b));
+      gt = b.dataset.gt; render();
+    }));
+  render();
+}
+
+function render() {
+  const recs = player.records.filter(r => r.gameType === gt);
+  const mount = document.getElementById("result");
+  mount.innerHTML = "";
+  const h = document.createElement("div");
+  h.className = "section-title";
+  h.innerHTML = "Record at every building <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + esc(gt) + "</span>";
+  mount.appendChild(h);
+  if (!recs.length) { mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + esc(gt) + " games on record.</div>"); return; }
+
+  const tableMount = document.createElement("div");
+  mount.appendChild(tableMount);
+  const rows = recs.map(r => ({ ...r, _href: arenaHref(r.slug) }));
+  const cols = [
+    { key: "building", label: "Building", align: "left", defaultDir: "asc", get: r => r.building,
+      cell: r => arenaLink(r.slug, r.building) + '<span class="pill">' + esc(r.buildingType) + "</span>" },
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city, cell: r => '<span class="sub">' + esc(r.city) + "</span>" },
+    { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "wins", label: "W", defaultDir: "desc", get: r => r.wins, cell: r => fmtInt(r.wins) },
+    { key: "losses", label: "L", defaultDir: "desc", get: r => r.losses, cell: r => fmtInt(r.losses) },
+    { key: "win_pct", label: "Win%", defaultDir: "desc", get: r => r.win_pct, cell: r => pct(r.win_pct) },
+    { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) },
+    { key: "ppg", label: "PPG", defaultDir: "desc", get: r => r.ppg, cell: r => fmt1(r.ppg) },
+    { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) },
+    { key: "seasons", label: "Seasons", align: "left", defaultDir: "asc", get: r => r.first_season, cell: r => '<span class="sub">' + seasons(r.first_season, r.last_season) + "</span>" },
+  ];
+  sortableTable(tableMount, cols, rows, { key: "games", dir: "desc" });
+  wireRowNav(tableMount);
+}
+
+boot();
+</script>
+</body>
+</html>

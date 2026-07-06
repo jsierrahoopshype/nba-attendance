@@ -314,6 +314,73 @@ def build_player_tables(
     return player_draw, player_arena_records, total_rows
 
 
+def build_player_arena_draw(
+    player_path: str, games_ctx: pd.DataFrame, chunksize: int
+) -> pd.DataFrame:
+    """Additive table: per (arenaName, personId) among visiting players
+    (home==0, minutes>0) in qualifying games, the mean leave-one-out attendance
+    delta and the game count.
+
+    This reuses the exact games_ctx / loo_baseline logic that feeds player_draw;
+    the only difference is the grouping — per arena here, rather than league-wide
+    per player. It does not read or mutate any of the other accumulators, so the
+    existing outputs are unchanged.
+    """
+    game_cols = ["gameId", "arenaName", "attendance", "loo_baseline", "loo_ok"]
+    gctx = games_ctx[game_cols]
+
+    # (arenaName, personId) -> {deltas sum, count}; plus a name lookup.
+    deltas = defaultdict(list)
+    name = {}
+
+    usecols = ["personId", "firstName", "lastName", "gameId", "home", "numMinutes"]
+    reader = pd.read_csv(
+        player_path, usecols=usecols, chunksize=chunksize, low_memory=False
+    )
+    for chunk in reader:
+        chunk = chunk.merge(gctx, on="gameId", how="inner")
+        if chunk.empty:
+            continue
+        chunk["numMinutes"] = pd.to_numeric(chunk["numMinutes"], errors="coerce")
+        chunk["home"] = pd.to_numeric(chunk["home"], errors="coerce")
+        sub = chunk[(chunk["numMinutes"] > 0) & (chunk["home"] == 0) & chunk["loo_ok"]]
+        if sub.empty:
+            continue
+        sub = sub.copy()
+        sub["delta"] = sub["attendance"] - sub["loo_baseline"]
+        sub["playerName"] = (
+            sub["firstName"].fillna("").str.strip()
+            + " "
+            + sub["lastName"].fillna("").str.strip()
+        ).str.strip()
+        for arena, pid, pname, delta in zip(
+            sub["arenaName"], sub["personId"], sub["playerName"], sub["delta"]
+        ):
+            deltas[(arena, pid)].append(float(delta))
+            name[pid] = pname
+
+    rows = []
+    for (arena, pid), ds in deltas.items():
+        s = pd.Series(ds)
+        rows.append(
+            {
+                "arenaName": arena,
+                "personId": pid,
+                "playerName": name.get(pid, ""),
+                "games": len(ds),
+                "mean_delta": round(s.mean(), 1),
+            }
+        )
+    cols = ["arenaName", "personId", "playerName", "games", "mean_delta"]
+    if not rows:
+        return pd.DataFrame(columns=cols)
+    return (
+        pd.DataFrame(rows)
+        .sort_values(["arenaName", "mean_delta"], ascending=[True, False])
+        .reset_index(drop=True)
+    )
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("data_dir", help="Folder containing Games.csv and PlayerStatistics.csv")
@@ -358,11 +425,19 @@ def main():
         f" | player_arena_records: {len(player_arena_records)}"
     )
 
+    # Additive: per (arena, player) visiting-draw table. Independent pass over
+    # the same games_ctx; does not touch the accumulators above.
+    player_arena_draw = build_player_arena_draw(
+        player_path, games_ctx, args.chunksize
+    )
+    print(f"  player_arena_draw rows (arena x visiting player): {len(player_arena_draw)}")
+
     outputs = {
         "arena_baselines.csv": baselines,
         "team_draw.csv": team_draw,
         "player_draw.csv": player_draw,
         "player_arena_records.csv": player_arena_records,
+        "player_arena_draw.csv": player_arena_draw,
     }
     for name, df in outputs.items():
         path = os.path.join(args.out_dir, name)

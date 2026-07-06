@@ -1,433 +1,193 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NBA Arena Records &amp; Attendance Draw</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
-<style>
-  :root{
-    --bg:#0d1117; --panel:#161b22; --panel-2:#1c2230; --border:#2a313c;
-    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --accent-dim:#1f6feb;
-    --pos:#3fb950; --pos-bg:rgba(63,185,80,.14);
-    --neg:#f85149; --neg-bg:rgba(248,81,73,.14);
-    --row-hover:#1f2733;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    background:var(--bg); color:var(--text);
-    font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    -webkit-text-size-adjust:100%;
-  }
-  a{color:var(--accent);text-decoration:none}
-  header{
-    padding:18px 16px 10px; border-bottom:1px solid var(--border);
-    background:linear-gradient(180deg,#12182100,#0d1117);
-  }
-  h1{margin:0;font-size:20px;letter-spacing:.2px}
-  .sub{color:var(--muted);font-size:13px;margin-top:3px}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 16px 60px}
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 18px}
-  .tab{
-    background:var(--panel); border:1px solid var(--border); color:var(--muted);
-    padding:9px 14px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;
-  }
-  .tab.active{color:var(--text);border-color:var(--accent-dim);background:var(--panel-2)}
-  .tab:hover{color:var(--text)}
-  .view{display:none}
-  .view.active{display:block}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 14px 6px;margin-bottom:16px}
-  label.fld{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-  input,select{
-    width:100%;background:var(--panel-2);color:var(--text);border:1px solid var(--border);
-    border-radius:9px;padding:11px 12px;font-size:15px;outline:none;
-  }
-  input:focus,select:focus{border-color:var(--accent-dim)}
-  .toggle{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin:2px 0}
-  .toggle button{background:var(--panel-2);color:var(--muted);border:0;padding:8px 16px;cursor:pointer;font-size:14px;font-weight:600}
-  .toggle button.active{background:var(--accent-dim);color:#fff}
-  .row-flex{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
-  .grow{flex:1 1 260px;position:relative}
-  .muted{color:var(--muted)}
-  .hint{color:var(--muted);font-size:13px;padding:24px 4px}
-  /* autocomplete */
-  .ac{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--panel-2);
-     border:1px solid var(--border);border-top:0;border-radius:0 0 9px 9px;max-height:320px;overflow:auto;display:none}
-  .ac.open{display:block}
-  .ac-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:14px}
-  .ac-item:last-child{border-bottom:0}
-  .ac-item.sel,.ac-item:hover{background:var(--row-hover)}
-  /* tables */
-  .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
-  th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border)}
-  th:first-child,td:first-child{text-align:left}
-  thead th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;background:var(--panel)}
-  th.sortable{cursor:pointer;user-select:none}
-  th.sortable:hover{color:var(--text)}
-  th.sortable .arrow{opacity:.5;font-size:11px}
-  tbody tr:hover{background:var(--row-hover)}
-  td.pos{color:var(--pos);background:var(--pos-bg)}
-  td.neg{color:var(--neg);background:var(--neg-bg)}
-  td.name{font-weight:600;color:var(--text)}
-  .pill{display:inline-block;font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:1px 8px;margin-left:6px;text-transform:capitalize}
-  .lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
-  .lb h3{margin:2px 0 8px;font-size:14px;color:var(--text)}
-  .lb .cap{color:var(--muted);font-weight:400;font-size:12px}
-  .section-title{font-size:16px;margin:22px 0 8px}
-  .meta-line{color:var(--muted);font-size:13px;margin:2px 0 12px}
-  .err{color:var(--neg);padding:16px 4px}
-  .idx{color:var(--muted);width:26px;text-align:right;padding-right:6px}
-  @media (max-width:560px){
-    th,td{padding:7px 8px}
-    .lb-grid{grid-template-columns:1fr}
-  }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <div class="wrap" style="padding-bottom:0">
-    <h1>NBA Arena Records &amp; Attendance Draw</h1>
-    <div class="sub">Player performance by building (2007–2026) &amp; 2026 attendance draw</div>
-  </div>
-</header>
+<div class="container">
 
-<div class="wrap">
-  <div class="tabs">
-    <div class="tab active" data-tab="players">Player Lookup</div>
-    <div class="tab" data-tab="draw">Attendance Draw 2026</div>
-    <div class="tab" data-tab="records">Arena Records</div>
+  <div class="hdr">
+    <h1>NBA Arena Records &amp; Attendance Draw</h1>
+    <span class="brand">HoopsHype</span>
+  </div>
+  <div class="subtitle">
+    Player and team performance by building (2007–2026), plus who moves the turnstiles on the road.
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="players" class="active">Player Lookup</button>
+    <button data-tab="draw">Attendance Draw 2026</button>
+    <button data-tab="records">Arena Records</button>
   </div>
 
   <!-- TAB 1: PLAYER LOOKUP -->
   <section class="view active" id="view-players">
-    <div class="card">
-      <div class="row-flex">
-        <div class="grow">
-          <label class="fld" for="playerSearch">Search player</label>
-          <input id="playerSearch" type="text" autocomplete="off" placeholder="Start typing a name…" />
-          <div class="ac" id="playerAC"></div>
-        </div>
-        <div>
-          <label class="fld">Game type</label>
-          <div class="toggle" id="playerToggle">
-            <button data-gt="Regular Season" class="active">Regular</button>
-            <button data-gt="Playoffs">Playoffs</button>
-          </div>
-        </div>
+    <div class="controls">
+      <div class="field grow searchbox">
+        <span class="lbl">Search player</span>
+        <input class="gsearch" id="playerSearch" type="text" autocomplete="off" placeholder="Start typing a name…">
+        <div class="gsearch-results" id="playerAC"></div>
       </div>
     </div>
-    <div id="playerResult"></div>
+    <div class="block-head"><h2>All players</h2><span class="sub" id="playerCount"></span></div>
+    <div id="playerDir"><div class="loading">Loading players…</div></div>
   </section>
 
   <!-- TAB 2: ATTENDANCE DRAW -->
   <section class="view" id="view-draw">
-    <div class="card">
-      <div class="meta-line">
-        Attendance <strong>delta</strong> = actual attendance minus the arena/season baseline for games involving that team or player.
-        <span class="pos" style="color:var(--pos)">Green</span> draws above baseline,
-        <span class="neg" style="color:var(--neg)">red</span> below. Click a column header to sort.
-      </div>
+    <p class="explainer" id="drawExplainer"></p>
+    <div class="block">
+      <div class="block-head"><h2>Teams</h2><span class="sub" id="teamCount"></span></div>
+      <div id="teamTable"><div class="loading">Loading…</div></div>
     </div>
-    <h2 class="section-title">Teams <span class="muted" id="teamCount"></span></h2>
-    <div class="card"><div class="tbl-scroll"><table id="teamTable"></table></div></div>
-    <h2 class="section-title">Players <span class="muted">(20+ road/draw games)</span> <span class="muted" id="playerDrawCount"></span></h2>
-    <div class="card"><div class="tbl-scroll"><table id="playerDrawTable"></table></div></div>
+    <div class="block">
+      <div class="block-head"><h2>Players</h2><span class="sub">visiting players with 20+ qualifying road games</span></div>
+      <div id="playerDrawTable"></div>
+    </div>
   </section>
 
   <!-- TAB 3: ARENA RECORDS -->
   <section class="view" id="view-records">
-    <div class="card">
-      <div class="row-flex">
-        <div class="grow">
-          <label class="fld" for="buildingSelect">Building</label>
-          <select id="buildingSelect"></select>
-        </div>
-        <div>
-          <label class="fld">Game type</label>
-          <div class="toggle" id="buildingToggle">
-            <button data-gt="regular" class="active">Regular</button>
-            <button data-gt="playoffs">Playoffs</button>
-          </div>
-        </div>
-      </div>
-      <div class="meta-line" id="buildingMeta"></div>
+    <div class="block-head">
+      <h2>Every building, 2007–2026</h2>
+      <span class="sub">tap an arena for full leaderboards</span>
     </div>
-    <div id="buildingResult"></div>
+    <div id="overviewTable"><div class="loading">Loading arenas…</div></div>
   </section>
+
+  <div class="foot">
+    Records span the 2007–2026 seasons. Attendance figures and the road-draw tables are
+    <strong>2026-season only</strong> (the only season carrying attendance in the source data).
+  </div>
 </div>
 
+<script src="app.js"></script>
 <script>
 "use strict";
-const DATA = "./data";
 
-/* ---------- helpers ---------- */
-const $ = s => document.querySelector(s);
-const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
-const fmt = n => (n==null||n==="") ? "" : n.toLocaleString();
-const fmtF = (n,d=1) => (n==null) ? "" : Number(n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
-const pct = n => (n==null) ? "" : (Number(n)*100).toFixed(1)+"%";
-const signed = n => (n>0?"+":"") + Number(n).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1});
-const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
-async function getJSON(path){
-  const r = await fetch(path);
-  if(!r.ok) throw new Error(path+" → "+r.status);
-  return r.json();
-}
-function deltaCell(v){
-  const td = el("td", v>0?"pos":(v<0?"neg":""), signed(v));
-  return td;
-}
-
-/* ---------- tabs ---------- */
-document.querySelectorAll(".tab").forEach(t=>{
-  t.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");
-    $("#view-"+t.dataset.tab).classList.add("active");
-    if(t.dataset.tab==="draw") initDraw();
-    if(t.dataset.tab==="records") initRecords();
-  });
+/* ---------- tab switching (lazy init) ---------- */
+const inited = {};
+document.getElementById("tabs").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-tab]");
+  if (!btn) return;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b === btn));
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + btn.dataset.tab).classList.add("active");
+  init(btn.dataset.tab);
 });
-
-/* ================= TAB 1: PLAYER LOOKUP ================= */
-let playerIndex=null, curPlayer=null, playerGT="Regular Season";
-const acBox=$("#playerAC"), searchInput=$("#playerSearch");
-let acItems=[], acSel=-1;
-
-async function loadPlayerIndex(){
-  if(playerIndex) return playerIndex;
-  playerIndex = await getJSON(DATA+"/players/index.json");
-  return playerIndex;
+function init(tab) {
+  if (inited[tab]) return;
+  inited[tab] = true;
+  if (tab === "players") initPlayers();
+  else if (tab === "draw") initDraw();
+  else if (tab === "records") initRecords();
 }
-function renderAC(matches){
-  acBox.innerHTML=""; acItems=matches; acSel=-1;
-  if(!matches.length){ acBox.classList.remove("open"); return; }
-  matches.forEach((m,i)=>{
-    const it=el("div","ac-item",m.name);
-    it.addEventListener("mousedown",e=>{e.preventDefault();pickPlayer(m);});
-    it.addEventListener("mouseenter",()=>{acSel=i;highlightAC();});
-    acBox.appendChild(it);
+
+/* ---------- TAB 1: player directory + autocomplete ---------- */
+async function initPlayers() {
+  let players;
+  try { players = await getJSON(DATA + "/players/index.json"); }
+  catch (err) { document.getElementById("playerDir").innerHTML = '<div class="err">Failed to load players: ' + esc(err.message) + "</div>"; return; }
+  document.getElementById("playerCount").textContent = players.length.toLocaleString() + " players";
+
+  const rows = players.map(p => ({ ...p, _href: playerHref(p.personId) }));
+  const cols = [
+    { key: "name", label: "Player", align: "left", defaultDir: "asc",
+      get: r => r.name, cell: r => playerLink(r.personId, r.name) },
+    { key: "buildings", label: "Buildings", get: r => r.buildings, cell: r => fmtInt(r.buildings) },
+    { key: "games", label: "Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "points", label: "Total Pts", defaultDir: "desc", get: r => r.points, cell: r => fmtInt(r.points) },
+  ];
+  const mount = document.getElementById("playerDir");
+  const table = sortableTable(mount, cols, rows, { key: "games", dir: "desc" });
+  wireRowNav(mount);
+
+  const input = document.getElementById("playerSearch");
+  autocomplete(input, document.getElementById("playerAC"), players, {
+    href: p => playerHref(p.personId),
+    sub: p => fmtInt(p.games) + " g",
+    onInput: q => {
+      const s = q.toLowerCase();
+      table.setRows(rows.filter(r => r.name.toLowerCase().includes(s)));
+    },
   });
-  acBox.classList.add("open");
-}
-function highlightAC(){
-  [...acBox.children].forEach((c,i)=>c.classList.toggle("sel",i===acSel));
-}
-searchInput.addEventListener("input", async ()=>{
-  const q=searchInput.value.trim().toLowerCase();
-  if(q.length<1){ acBox.classList.remove("open"); return; }
-  await loadPlayerIndex();
-  const starts=[], contains=[];
-  for(const p of playerIndex){
-    const n=p.name.toLowerCase();
-    if(n.startsWith(q)) starts.push(p);
-    else if(n.includes(q)) contains.push(p);
-    if(starts.length>=25) break;
-  }
-  renderAC(starts.concat(contains).slice(0,25));
-});
-searchInput.addEventListener("keydown",e=>{
-  if(!acBox.classList.contains("open")) return;
-  if(e.key==="ArrowDown"){e.preventDefault();acSel=Math.min(acSel+1,acItems.length-1);highlightAC();scrollSel();}
-  else if(e.key==="ArrowUp"){e.preventDefault();acSel=Math.max(acSel-1,0);highlightAC();scrollSel();}
-  else if(e.key==="Enter"){e.preventDefault(); if(acSel>=0)pickPlayer(acItems[acSel]); else if(acItems.length)pickPlayer(acItems[0]);}
-  else if(e.key==="Escape"){acBox.classList.remove("open");}
-});
-function scrollSel(){ const c=acBox.children[acSel]; if(c)c.scrollIntoView({block:"nearest"}); }
-document.addEventListener("click",e=>{ if(!acBox.contains(e.target)&&e.target!==searchInput) acBox.classList.remove("open"); });
-
-document.querySelectorAll("#playerToggle button").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.querySelectorAll("#playerToggle button").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active"); playerGT=b.dataset.gt;
-    if(curPlayer) renderPlayer();
-  });
-});
-
-async function pickPlayer(p){
-  searchInput.value=p.name; acBox.classList.remove("open");
-  $("#playerResult").innerHTML='<div class="hint">Loading…</div>';
-  try{
-    curPlayer = await getJSON(DATA+"/players/"+p.personId+".json");
-    renderPlayer();
-  }catch(err){ $("#playerResult").innerHTML='<div class="err">Could not load player ('+err.message+')</div>'; }
-}
-function renderPlayer(){
-  const recs=curPlayer.records.filter(r=>r.gameType===playerGT)
-    .sort((a,b)=> b.games-a.games || b.total_points-a.total_points);
-  const box=$("#playerResult"); box.innerHTML="";
-  const h=el("h2","section-title",curPlayer.name+' <span class="muted" style="font-size:13px;font-weight:400">— '+playerGT+"</span>");
-  box.appendChild(h);
-  if(!recs.length){ box.appendChild(el("div","hint","No "+playerGT+" games on record.")); return; }
-  const card=el("div","card"); const sc=el("div","tbl-scroll"); const t=el("table");
-  t.innerHTML="<thead><tr>"+
-    "<th>Building</th><th>City</th><th>GP</th><th>W</th><th>L</th><th>Win%</th>"+
-    "<th>Pts</th><th>PPG</th><th>Hi</th><th>Seasons</th></tr></thead>";
-  const tb=el("tbody");
-  for(const r of recs){
-    const tr=el("tr");
-    const seasons = r.first_season===r.last_season ? r.first_season : r.first_season+"–"+r.last_season;
-    tr.innerHTML=
-      '<td class="name">'+r.building+'<span class="pill">'+r.buildingType+'</span></td>'+
-      "<td>"+r.city+"</td><td>"+r.games+"</td><td>"+r.wins+"</td><td>"+r.losses+"</td>"+
-      "<td>"+pct(r.win_pct)+"</td><td>"+fmt(r.total_points)+"</td><td>"+fmtF(r.ppg)+"</td>"+
-      "<td>"+r.career_high+"</td><td>"+seasons+"</td>";
-    tb.appendChild(tr);
-  }
-  t.appendChild(tb); sc.appendChild(t); card.appendChild(sc); box.appendChild(card);
+  input.addEventListener("input", () => { if (!input.value.trim()) table.setRows(rows); });
 }
 
-/* ================= TAB 2: ATTENDANCE DRAW ================= */
-let drawData=null;
-const teamSort={key:"total_delta",dir:-1}, playerDrawSort={key:"total_delta",dir:-1};
+/* ---------- TAB 2: attendance draw ---------- */
+async function initDraw() {
+  let draw;
+  try { draw = await getJSON(DATA + "/draw.json"); }
+  catch (err) { document.getElementById("teamTable").innerHTML = '<div class="err">Failed to load draw data: ' + esc(err.message) + "</div>"; return; }
 
-async function initDraw(){
-  if(drawData) return;
-  try{ drawData = await getJSON(DATA+"/draw.json"); }
-  catch(err){ $("#view-draw").insertAdjacentHTML("beforeend",'<div class="err">Failed to load draw data: '+err.message+'</div>'); return; }
-  $("#teamCount").textContent="("+drawData.teams.length+")";
-  $("#playerDrawCount").textContent="("+drawData.players.length+")";
-  renderTeamTable(); renderPlayerDrawTable();
-}
-const TEAM_COLS=[
-  {key:"team",label:"Team",num:false},
-  {key:"games",label:"Games",num:true},
-  {key:"mean_delta",label:"Mean Δ",num:true,delta:true},
-  {key:"median_delta",label:"Median Δ",num:true,delta:true},
-  {key:"total_delta",label:"Total Δ",num:true,delta:true},
-];
-const PLAYER_DRAW_COLS=[
-  {key:"playerName",label:"Player",num:false},
-  {key:"games",label:"Games",num:true},
-  {key:"mean_delta",label:"Mean Δ",num:true,delta:true},
-  {key:"median_delta",label:"Median Δ",num:true,delta:true},
-  {key:"total_delta",label:"Total Δ",num:true,delta:true},
-];
-function sortableTable(tableEl, cols, rows, sortState, rowFn){
-  function draw(){
-    const arr=rows.slice().sort((a,b)=>{
-      let x=a[sortState.key], y=b[sortState.key];
-      if(typeof x==="string"){ return sortState.dir*x.localeCompare(y); }
-      return sortState.dir*((x||0)-(y||0));
-    });
-    const thead=el("thead"); const htr=el("tr");
-    cols.forEach(c=>{
-      const th=el("th","sortable");
-      const arrow = sortState.key===c.key ? (sortState.dir<0?" ▼":" ▲") : "";
-      th.innerHTML=c.label+'<span class="arrow">'+arrow+'</span>';
-      th.addEventListener("click",()=>{
-        if(sortState.key===c.key) sortState.dir*=-1;
-        else { sortState.key=c.key; sortState.dir = c.num? -1 : 1; }
-        draw();
-      });
-      htr.appendChild(th);
-    });
-    thead.appendChild(htr);
-    const tb=el("tbody");
-    arr.forEach(r=>tb.appendChild(rowFn(r)));
-    tableEl.innerHTML=""; tableEl.appendChild(thead); tableEl.appendChild(tb);
-  }
-  draw();
-}
-function renderTeamTable(){
-  const rows=drawData.teams.map(t=>({...t,team:t.teamCity+" "+t.teamName}));
-  sortableTable($("#teamTable"),TEAM_COLS,rows,teamSort,r=>{
-    const tr=el("tr");
-    tr.appendChild(el("td","name",r.team));
-    tr.appendChild(el("td",null,fmt(r.games)));
-    tr.appendChild(deltaCell(r.mean_delta));
-    tr.appendChild(deltaCell(r.median_delta));
-    tr.appendChild(deltaCell(r.total_delta));
-    return tr;
-  });
-}
-function renderPlayerDrawTable(){
-  sortableTable($("#playerDrawTable"),PLAYER_DRAW_COLS,drawData.players,playerDrawSort,r=>{
-    const tr=el("tr");
-    tr.appendChild(el("td","name",r.playerName));
-    tr.appendChild(el("td",null,fmt(r.games)));
-    tr.appendChild(deltaCell(r.mean_delta));
-    tr.appendChild(deltaCell(r.median_delta));
-    tr.appendChild(deltaCell(r.total_delta));
-    return tr;
-  });
+  document.getElementById("drawExplainer").innerHTML =
+    "How much a team or player moves the gate on the road: their <strong>actual average road attendance</strong> " +
+    "versus the <strong>arena baseline</strong> (what those same buildings normally draw), and the " +
+    '<span class="pos">difference</span> / <span class="neg">shortfall</span>. ' +
+    "Baseline uses a leave-one-out average per game · " + esc(draw.baseline_label) + ".";
+  document.getElementById("teamCount").textContent = draw.teams.length + " teams";
+
+  const attCols = (nameCol) => [
+    nameCol,
+    { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "actual", label: "Avg Road Attendance", defaultDir: "desc", get: r => r.actual, cell: r => fmtInt(r.actual) },
+    { key: "baseline", label: "Arena Baseline", defaultDir: "desc", get: r => r.baseline, cell: r => fmtInt(r.baseline) },
+    { key: "diff", label: "Difference", defaultDir: "desc", get: r => r.diff,
+      cell: r => '<span class="delta ' + deltaCls(r.diff) + '">' + signed(r.diff) + "</span>" },
+  ];
+
+  const teamRows = draw.teams.map(t => ({ ...t, team: t.teamCity + " " + t.teamName }));
+  sortableTable(document.getElementById("teamTable"),
+    attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) }),
+    teamRows, { key: "diff", dir: "desc" });
+
+  const playerRows = draw.players.map(p => ({ ...p, _href: playerHref(p.personId) }));
+  const pmount = document.getElementById("playerDrawTable");
+  sortableTable(pmount,
+    attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
+    playerRows, { key: "diff", dir: "desc" });
+  wireRowNav(pmount);
 }
 
-/* ================= TAB 3: ARENA RECORDS ================= */
-let buildingIndex=null, curBuilding=null, buildingGT="regular";
-async function initRecords(){
-  if(buildingIndex) return;
-  try{ buildingIndex = await getJSON(DATA+"/buildings/index.json"); }
-  catch(err){ $("#buildingResult").innerHTML='<div class="err">Failed to load buildings: '+err.message+'</div>'; return; }
-  const sel=$("#buildingSelect"); sel.innerHTML="";
-  buildingIndex.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(b=>{
-    const o=el("option",null,b.name+" — "+b.city);
-    o.value=b.slug; sel.appendChild(o);
-  });
-  sel.addEventListener("change",()=>loadBuilding(sel.value));
-  loadBuilding(sel.value);
-}
-document.querySelectorAll("#buildingToggle button").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.querySelectorAll("#buildingToggle button").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active"); buildingGT=b.dataset.gt;
-    if(curBuilding) renderBuilding();
-  });
-});
-async function loadBuilding(slug){
-  $("#buildingResult").innerHTML='<div class="hint">Loading…</div>';
-  try{ curBuilding = await getJSON(DATA+"/buildings/"+slug+".json"); renderBuilding(); }
-  catch(err){ $("#buildingResult").innerHTML='<div class="err">Could not load building ('+err.message+')</div>'; }
-}
-const LB_DEFS=[
-  {key:"total_points",title:"Most Points",cap:"total points scored",val:r=>fmt(r.total_points),col:"Pts"},
-  {key:"wins",title:"Most Wins",cap:"games won",val:r=>fmt(r.wins),col:"W"},
-  {key:"win_pct",title:"Best Win %",cap:"min 15 games",val:r=>pct(r.win_pct),col:"Win%"},
-  {key:"career_high",title:"Highest Single Game",cap:"career high here",val:r=>fmt(r.career_high),col:"Hi"},
-];
-function renderBuilding(){
-  const b=curBuilding;
-  const seasons=b.first_season===b.last_season?b.first_season:b.first_season+"–"+b.last_season;
-  $("#buildingMeta").innerHTML=
-    '<span class="pill" style="margin-left:0">'+b.buildingType+"</span> "+
-    b.city+" · "+seasons+" · "+fmt(b.total_games)+" player-game records";
-  const lbs=b.leaderboards[buildingGT];
-  const box=$("#buildingResult"); box.innerHTML="";
-  const gtLabel = buildingGT==="regular"?"Regular Season":"Playoffs";
-  box.appendChild(el("h2","section-title",b.name+' <span class="muted" style="font-size:13px;font-weight:400">— '+gtLabel+" leaders</span>"));
-  const grid=el("div","lb-grid");
-  let anyData=false;
-  LB_DEFS.forEach(def=>{
-    const rows=lbs[def.key]||[];
-    if(rows.length) anyData=true;
-    const card=el("div","card lb");
-    card.appendChild(el("h3",null,def.title+' <span class="cap">('+def.cap+")</span>"));
-    const sc=el("div","tbl-scroll"); const t=el("table"); t.style.minWidth="300px";
-    t.innerHTML="<thead><tr><th></th><th>Player</th><th>GP</th><th>"+def.col+"</th></tr></thead>";
-    const tb=el("tbody");
-    if(!rows.length){
-      const tr=el("tr"); tr.innerHTML='<td></td><td class="muted" colspan="3">No data</td>'; tb.appendChild(tr);
-    }
-    rows.forEach((r,i)=>{
-      const tr=el("tr");
-      tr.innerHTML='<td class="idx">'+(i+1)+'</td><td class="name">'+r.playerName+"</td>"+
-        "<td>"+r.games+"</td><td>"+def.val(r)+"</td>";
-      tb.appendChild(tr);
-    });
-    t.appendChild(tb); sc.appendChild(t); card.appendChild(sc); grid.appendChild(card);
-  });
-  box.appendChild(grid);
-  if(!anyData){
-    box.appendChild(el("div","hint","No "+gtLabel+" records at this building."));
-  }
+/* ---------- TAB 3: arena overview ---------- */
+async function initRecords() {
+  let ov;
+  try { ov = await getJSON(DATA + "/buildings/overview.json"); }
+  catch (err) { document.getElementById("overviewTable").innerHTML = '<div class="err">Failed to load arenas: ' + esc(err.message) + "</div>"; return; }
+
+  const rows = ov.map(b => ({ ...b, _href: arenaHref(b.slug) }));
+  const cols = [
+    { key: "name", label: "Arena", align: "left", defaultDir: "asc", get: r => r.name,
+      cell: r => arenaLink(r.slug, r.name) + '<span class="pill">' + esc(r.buildingType) + "</span>" },
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city, cell: r => '<span class="sub">' + esc(r.city) + "</span>" },
+    { key: "total_games", label: "Games", defaultDir: "desc", get: r => r.total_games, cell: r => fmtInt(r.total_games) },
+    { key: "top_scorer", label: "Top Scorer", align: "left", defaultDir: "desc",
+      get: r => r.top_scorer ? r.top_scorer.points : -1,
+      cell: r => r.top_scorer ? playerLink(r.top_scorer.personId, r.top_scorer.name) + ' <span class="sub">' + fmtInt(r.top_scorer.points) + " pts</span>" : '<span class="dash">—</span>' },
+    { key: "winningest_player", label: "Winningest Player", align: "left", defaultDir: "desc",
+      get: r => r.winningest_player ? r.winningest_player.win_pct : -1,
+      cell: r => r.winningest_player ? playerLink(r.winningest_player.personId, r.winningest_player.name) + ' <span class="sub">' + pct(r.winningest_player.win_pct) + "</span>" : '<span class="dash">—</span>' },
+    { key: "winningest_team", label: "Winningest Team", align: "left", defaultDir: "desc",
+      get: r => r.winningest_team ? r.winningest_team.win_pct : -1,
+      cell: r => r.winningest_team ? esc(r.winningest_team.team) + ' <span class="sub">' + pct(r.winningest_team.win_pct) + "</span>" : '<span class="dash">—</span>' },
+    { key: "avg_attendance", label: "Avg Att. (2026)", defaultDir: "desc",
+      get: r => r.avg_attendance == null ? -1 : r.avg_attendance,
+      cell: r => r.avg_attendance == null ? '<span class="dash">—</span>' : fmtInt(r.avg_attendance) },
+  ];
+  const mount = document.getElementById("overviewTable");
+  sortableTable(mount, cols, rows, { key: "name", dir: "asc" });
+  wireRowNav(mount);
 }
 
-/* ---------- boot ---------- */
-loadPlayerIndex().catch(()=>{});
+/* boot: first tab */
+init("players");
 </script>
 </body>
 </html>

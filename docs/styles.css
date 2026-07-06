@@ -1,0 +1,153 @@
+/* ==========================================================================
+   NBA Arena Records & Attendance Draw — shared stylesheet.
+
+   Structure, component classes and the sortable table.lb pattern are lifted
+   from the sibling nba-polymarket tracker so this reads as the same family of
+   tools; the color tokens are a dark theme. Tables stay visible and scroll
+   horizontally on mobile (this is a table-heavy tool), rather than collapsing
+   to cards.
+   ========================================================================== */
+
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface-hover:#1c2230;--border:#2a313c;
+  --text:#e6edf3;--text-secondary:#8b949e;--accent:#58a6ff;--accent-dim:rgba(88,166,255,.16);
+  --green:#3fb950;--green-dim:rgba(63,185,80,.16);
+  --red:#f85149;--red-dim:rgba(248,81,73,.15);
+  --orange:#d29922;--orange-dim:rgba(210,153,34,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:112%}
+body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
+.container{max-width:1400px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.container.narrow{max-width:1100px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* nav / tabs (both the <a> nav and the in-page tab buttons share this look) */
+.tabs{display:flex;gap:.3rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.tabs a,.tabs button{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;padding:.45rem .85rem;
+  border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:.12s;text-decoration:none}
+.tabs a:hover,.tabs button:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+.tabs a.active,.tabs button.active{background:var(--accent);border-color:var(--accent);color:#04101f}
+
+/* header */
+.hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.35rem;flex-wrap:wrap}
+.hdr h1{font-size:1.45rem;font-weight:700;letter-spacing:-.03em}
+.hdr .brand{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-secondary);
+  text-transform:uppercase;letter-spacing:.08em}
+.subtitle{color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem;max-width:62rem}
+
+/* section blocks */
+.block{margin-bottom:1.6rem}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.6rem;flex-wrap:wrap}
+.block-head h2{font-size:.98rem;font-weight:700;letter-spacing:-.01em}
+.block-head .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);
+  text-transform:uppercase;letter-spacing:.05em}
+.explainer{color:var(--text-secondary);font-size:.84rem;margin-bottom:.9rem;max-width:60rem}
+.explainer .pos{color:var(--green);font-weight:600}.explainer .neg{color:var(--red);font-weight:600}
+
+/* segmented toggle */
+.toggle{display:inline-flex;gap:.3rem;flex-wrap:wrap}
+.toggle button{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;padding:.4rem .8rem;
+  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:.12s}
+.toggle button:hover{border-color:var(--accent);color:var(--accent)}
+.toggle button.active{background:var(--accent);border-color:var(--accent);color:#04101f;font-weight:600}
+
+/* table */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow-x:auto}
+table.lb{width:100%;border-collapse:collapse;font-size:.86rem}
+table.lb thead th{background:var(--surface-hover);color:var(--text-secondary);text-transform:uppercase;
+  letter-spacing:.04em;font-size:.64rem;font-weight:600;padding:.7rem .6rem;text-align:right;
+  border-bottom:1px solid var(--border);white-space:nowrap;user-select:none;transition:color .15s;position:sticky;top:0}
+table.lb thead th.sortable{cursor:pointer}
+table.lb thead th.sortable:hover{color:var(--accent)}
+table.lb thead th.sorted-by{background:var(--accent-dim);color:var(--accent);font-weight:700}
+table.lb thead th.left{text-align:left}
+table.lb thead th .arr{font-size:.6rem;opacity:.8;margin-left:.15rem}
+table.lb tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+table.lb tbody tr[data-href]{cursor:pointer}
+table.lb tbody tr:last-child{border-bottom:none}
+table.lb tbody tr:hover{background:var(--surface-hover)}
+table.lb td{padding:.5rem .6rem;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500;white-space:nowrap}
+table.lb td.sorted-by{background:rgba(88,166,255,.06)}
+table.lb td.name{text-align:left;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap}
+table.lb td.rank{color:var(--text-secondary);font-size:.78rem;width:2.2rem;text-align:right}
+table.lb td.name a{color:var(--text)}
+table.lb td.name a:hover{color:var(--accent)}
+table.lb td.sub{color:var(--text-secondary)}
+.delta{font-weight:600}
+.delta.pos{color:var(--green)}.delta.neg{color:var(--red)}.delta.flat{color:var(--text-secondary)}
+.dash{color:var(--text-secondary)}
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text-secondary);
+  border:1px solid var(--border);border-radius:20px;padding:.05rem .5rem;text-transform:capitalize;margin-left:.4rem;vertical-align:middle}
+
+/* stat cards (detail pages) */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;min-width:0}
+.stat-card .lbl{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.3rem}
+.stat-card .num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;letter-spacing:-.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-card .num.pos{color:var(--green)}.stat-card .num.neg{color:var(--red)}
+.stat-card .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);margin-top:.25rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-card a{color:var(--text)}.stat-card a:hover{color:var(--accent)}
+
+/* detail-page header */
+.back{font-size:.76rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);display:inline-block;margin-bottom:1rem}
+.back:hover{color:var(--accent);text-decoration:none}
+.ehead{border-bottom:1px solid var(--border);padding-bottom:1rem;margin-bottom:1.2rem}
+.ehead h1{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.ehead .esub{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--text-secondary);
+  text-transform:uppercase;letter-spacing:.05em;margin-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.ehead .esub .sep{opacity:.5}
+
+/* leaderboard grid on arena page */
+.lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:1.2rem}
+.lb-card h3{font-size:.8rem;font-weight:700;margin:0 0 .5rem}
+.lb-card h3 .cap{color:var(--text-secondary);font-weight:400;font-size:.7rem;text-transform:none;letter-spacing:0}
+.section-title{font-size:1.02rem;font-weight:700;margin:1.4rem 0 .7rem}
+
+/* controls row */
+.controls{display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem}
+.field{display:flex;flex-direction:column;gap:.35rem}
+.field .lbl{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.grow{flex:1 1 300px;min-width:0}
+
+/* search */
+.searchbox{position:relative}
+.gsearch{width:100%;padding:.6rem .9rem;font-size:16px;font-family:inherit;border:1px solid var(--border);
+  border-radius:10px;background:var(--surface);color:var(--text)}
+.gsearch:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.25rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  max-height:22rem;overflow-y:auto;z-index:200;display:none}
+.gsearch-results.open{display:block}
+.gs-item{display:flex;align-items:center;gap:.55rem;padding:.5rem .8rem;border-bottom:1px solid var(--border);
+  text-decoration:none;color:var(--text);cursor:pointer}
+.gs-item:last-child{border-bottom:none}
+.gs-item:hover,.gs-item.sel{background:var(--surface-hover);text-decoration:none}
+.gs-main{flex:1;font-size:.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gs-sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);flex-shrink:0}
+
+.empty{text-align:center;padding:3rem 1rem;color:var(--text-secondary)}
+.loading{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-family:'JetBrains Mono',monospace;font-size:.8rem}
+.err{color:var(--red);padding:1.2rem .2rem;font-size:.85rem}
+.foot{text-align:center;font-size:.7rem;color:var(--text-secondary);margin-top:1.8rem;
+  font-family:'JetBrains Mono',monospace;line-height:1.7}
+
+/* in-page tab views */
+.view{display:none}.view.active{display:block}
+
+@media(max-width:860px){
+  .container{padding:1rem 1rem 3rem}
+  .hdr h1{font-size:1.2rem}.hdr .brand{display:none}
+  .stat-cards{grid-template-columns:1fr 1fr;gap:.6rem}
+  .stat-card .num{font-size:1.15rem}
+  .ehead h1{font-size:1.3rem}
+  table.lb thead th{position:static}
+}
+@media(max-width:520px){
+  .stat-cards{grid-template-columns:1fr 1fr}
+}
