@@ -29,6 +29,8 @@ import sys
 import unicodedata
 from collections import defaultdict
 
+from build_allstar_aliases import get_aliases
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, "data")
 OUTPUT_DIR = os.path.join(HERE, "output")
@@ -166,6 +168,20 @@ def main():
     allstars = aggregate_allstars()
     print(f"All-Star recipients (distinct names): {len(allstars)}")
 
+    # Third-pass alias table, keyed by normalized awards spelling.
+    aliases_norm = {norm_name(k): v for k, v in get_aliases().items()}
+
+    def alias_candidates(name):
+        """personIds for a name's alias target (exact, then suffix), or []."""
+        official = aliases_norm.get(norm_name(name))
+        if not official:
+            return []
+        okey = norm_name(official)
+        cands = exact_index.get(okey, [])
+        if not cands:
+            cands = suffix_index.get(strip_suffix(okey), [])
+        return cands
+
     def near_misses(name):
         """Candidate '(personId) Full Name' strings for a name that didn't match
         cleanly — suffix-stripped candidates plus same-surname/same-initial ones."""
@@ -182,7 +198,7 @@ def main():
         return [f"({pid}) {nm}" for pid, nm in sorted(cands.items(), key=lambda x: x[1])][:6]
 
     rows = []
-    resolved_dash, resolved_suffix, review = [], [], []
+    resolved_dash, resolved_suffix, resolved_alias, review = [], [], [], []
     for key in sorted(allstars, key=lambda k: allstars[k]["name"].lower()):
         a = allstars[key]
         name = a["name"]
@@ -199,15 +215,22 @@ def main():
                 review.append((name, "ambiguous (exact)", near_misses(name)))
                 continue
         else:
-            # No exact match — fall back to suffix stripping, but only auto-merge
-            # when exactly one distinct personId remains (never when two real
-            # players could both match).
+            # Pass 2 — generational-suffix strip. Only auto-merge when exactly
+            # one distinct personId remains (never when two real players match).
             spids = suffix_index.get(strip_suffix(key), [])
+            # Pass 3 — hand-seeded nickname/shortened-name aliases, same guard.
+            apids = alias_candidates(name)
             if len(spids) == 1:
                 pid = spids[0]
                 resolved_suffix.append((name, pid))
+            elif len(apids) == 1:
+                pid = apids[0]
+                resolved_alias.append((name, pid))
             elif len(spids) > 1:
                 review.append((name, "ambiguous (suffix strip)", near_misses(name)))
+                continue
+            elif len(apids) > 1:
+                review.append((name, "ambiguous (alias target)", near_misses(name)))
                 continue
             else:
                 review.append((name, "no match", near_misses(name)))
@@ -228,6 +251,10 @@ def main():
     if resolved_suffix:
         print(f"\nResolved {len(resolved_suffix)} name(s) via generational-suffix strip:")
         for name, pid in resolved_suffix:
+            print(f"  {name} -> ({pid}) {pid_name.get(pid, '')}")
+    if resolved_alias:
+        print(f"\nResolved {len(resolved_alias)} name(s) via the nickname alias table:")
+        for name, pid in resolved_alias:
             print(f"  {name} -> ({pid}) {pid_name.get(pid, '')}")
 
     # ---- consolidated review list: every name still unmatched/ambiguous ----
