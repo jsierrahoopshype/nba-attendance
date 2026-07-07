@@ -160,6 +160,12 @@ body.has-site-search{padding-top:3.2rem;padding-bottom:3.2rem}
   letter-spacing:.05em;color:var(--accent);border:1px solid var(--border);border-radius:20px;
   padding:.05rem .45rem;flex-shrink:0}
 
+/* ---------- season picker (detail pages) ---------- */
+.season-field .season-select{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;
+  padding:.4rem .8rem;border:1px solid var(--border);border-radius:7px;background:var(--surface);
+  color:var(--text);cursor:pointer;min-width:9.5rem}
+.season-field .season-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+
 /* ---------- All-Star / all-players toggle ---------- */
 .allstar-controls{margin:.2rem 0 1rem}
 .allstar-note{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-secondary);

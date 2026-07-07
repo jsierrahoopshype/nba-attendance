@@ -143,6 +143,51 @@ function autocomplete(input, box, items, opts) {
 /* ---------- query param ---------- */
 const qp = k => new URLSearchParams(window.location.search).get(k);
 
+/* ---------- season filter (detail pages) ----------
+   Detail pages embed a records_by_season array alongside their all-time data.
+   "All Seasons" (season === null) keeps the existing all-time render untouched;
+   picking a season re-renders that page's leaderboard/table from the embedded
+   array client-side (no new fetch). */
+const WIN_PCT_MIN_GAMES = 15;   // must match generate_dashboard_data.py
+const LEADERBOARD_SIZE = 25;
+const seasonLabel = y => (Number(y) - 1) + "-" + String(Number(y)).slice(-2); // 2007 -> "2006-07"
+
+function seasonsIn(rows) {
+  return [...new Set((rows || []).map(r => r.season))].sort((a, b) => b - a);
+}
+/* Build the season <select> (mount is a container). onChange(seasonOrNull). */
+function makeSeasonPicker(mount, rows, onChange) {
+  const yrs = seasonsIn(rows);
+  const wrap = document.createElement("div");
+  wrap.className = "field season-field";
+  wrap.innerHTML = '<span class="lbl">Season</span>' +
+    '<select class="season-select"><option value="">All Seasons</option>' +
+    yrs.map(y => '<option value="' + y + '">' + seasonLabel(y) + "</option>").join("") +
+    "</select>";
+  mount.appendChild(wrap);
+  wrap.querySelector("select").addEventListener("change", e => {
+    const v = e.target.value;
+    onChange(v === "" ? null : Number(v));
+  });
+  return wrap;
+}
+const leaderEntry = r => ({
+  personId: r.personId, playerName: r.playerName, games: r.games, wins: r.wins,
+  losses: r.losses, win_pct: r.win_pct, total_points: r.total_points,
+  ppg: r.ppg, career_high: r.career_high,
+});
+/* Client-side equivalent of generate_dashboard_data.leaderboards_for(). */
+function computeLeaderboards(recs) {
+  const cmpName = (a, b) => String(a.playerName).localeCompare(String(b.playerName));
+  const byPts = [...recs].sort((a, b) => (b.total_points - a.total_points) || cmpName(a, b));
+  const byWins = [...recs].sort((a, b) => (b.wins - a.wins) || cmpName(a, b));
+  const wpPool = recs.filter(r => r.games >= WIN_PCT_MIN_GAMES)
+    .sort((a, b) => (b.win_pct - a.win_pct) || (b.games - a.games) || cmpName(a, b));
+  const byHi = [...recs].sort((a, b) => (b.career_high - a.career_high) || cmpName(a, b));
+  const top = arr => arr.slice(0, LEADERBOARD_SIZE).map(leaderEntry);
+  return { total_points: top(byPts), wins: top(byWins), win_pct: top(wpPool), career_high: top(byHi) };
+}
+
 /* ---------- All-Star flags + leaderboard default toggle ----------
    Every player leaderboard defaults to All-Star players only; a "show all
    players" toggle expands to the full field. allstarMode is shared across the

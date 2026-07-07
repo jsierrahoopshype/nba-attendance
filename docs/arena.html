@@ -31,7 +31,7 @@
 <script src="app.js"></script>
 <script>
 "use strict";
-let building = null, over = null, gt = "regular";
+let building = null, over = null, gt = "regular", season = null;
 
 async function boot() {
   const slug = qp("slug");
@@ -59,6 +59,7 @@ async function boot() {
   await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
+  makeSeasonPicker(document.getElementById("controls"), building.records_by_season, s => { season = s; render(); });
   makeAllstarToggle(document.getElementById("controls"), render);
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
@@ -66,6 +67,23 @@ async function boot() {
       gt = b.dataset.gt; render();
     }));
   render();
+}
+
+/* Leaderboards + full-records rows for the current gameType, honoring the season
+   filter. season === null keeps the untouched all-time path (precomputed
+   leaderboards + all-time records). */
+function currentView(gtLabel) {
+  if (season == null) {
+    const lbSet = (allstarMode && building.leaderboards_allstar)
+      ? building.leaderboards_allstar : building.leaderboards;
+    const recs = filterAllstar(building.records.filter(r => r.gameType === gtLabel), r => r.personId);
+    return { lbs: lbSet[gt], recs };
+  }
+  let srecs = (building.records_by_season || [])
+    .filter(r => r.gameType === gtLabel && r.season === season);
+  srecs = filterAllstar(srecs, r => r.personId);
+  const recs = srecs.map(r => ({ ...r, first_season: r.season, last_season: r.season }));
+  return { lbs: computeLeaderboards(srecs), recs };
 }
 
 function renderCards() {
@@ -99,15 +117,14 @@ const LB_DEFS = [
 ];
 
 function render() {
-  const lbSet = (allstarMode && building.leaderboards_allstar)
-    ? building.leaderboards_allstar : building.leaderboards;
-  const lbs = lbSet[gt];
   const gtLabel = gt === "regular" ? "Regular Season" : "Playoffs";
+  const { lbs, recs: fullRecs } = currentView(gtLabel);
   const scope = allstarMode ? "All-Stars" : "all players";
+  const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
   const mount = document.getElementById("result");
   mount.innerHTML = "<div class='section-title'>" + esc(building.name) +
     " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
-    gtLabel + " · " + scope + "</span></div>";
+    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>";
 
   const grid = document.createElement("div");
   grid.className = "lb-grid";
@@ -142,10 +159,10 @@ function render() {
   // players who only ever visited here (never suited up for the home team)
   renderNeverHome(mount);
 
-  // full records table for this game type
-  const recs = filterAllstar(building.records.filter(r => r.gameType === gtLabel), r => r.personId);
+  // full records table for this game type (season-aware)
+  const recs = fullRecs;
   if (recs.length) {
-    mount.insertAdjacentHTML("beforeend", "<div class='section-title'>All " + gtLabel + " records <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>(" + recs.length + ")</span></div>");
+    mount.insertAdjacentHTML("beforeend", "<div class='section-title'>All " + gtLabel + " records <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>(" + recs.length + " · " + seasonScope + ")</span></div>");
     const am = document.createElement("div");
     mount.appendChild(am);
     const rows = recs.map(r => ({ ...r, _href: playerHref(r.personId) }));

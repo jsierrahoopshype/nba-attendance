@@ -30,7 +30,7 @@
 <script src="app.js"></script>
 <script>
 "use strict";
-let player = null, gt = "Regular Season";
+let player = null, gt = "Regular Season", season = null;
 
 async function boot() {
   const id = qp("id");
@@ -47,6 +47,7 @@ async function boot() {
     '<div class="esub"><span>' + buildings + " buildings</span><span class=\"sep\">·</span>" +
     "<span>" + seasons(fs, ls) + "</span></div></div>";
   document.getElementById("controls").style.display = "";
+  makeSeasonPicker(document.getElementById("controls"), player.records_by_season, s => { season = s; render(); });
 
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
@@ -57,14 +58,19 @@ async function boot() {
 }
 
 function render() {
-  const recs = player.records.filter(r => r.gameType === gt);
+  const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
+  const recs = season == null
+    ? player.records.filter(r => r.gameType === gt)
+    : (player.records_by_season || [])
+        .filter(r => r.gameType === gt && r.season === season)
+        .map(r => ({ ...r, first_season: r.season, last_season: r.season }));
   const mount = document.getElementById("result");
   mount.innerHTML = "";
   const h = document.createElement("div");
   h.className = "section-title";
-  h.innerHTML = "Record at every building <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + esc(gt) + "</span>";
+  h.innerHTML = "Record at every building <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + esc(gt) + " · " + esc(seasonScope) + "</span>";
   mount.appendChild(h);
-  if (!recs.length) { mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + esc(gt) + " games on record.</div>"); return; }
+  if (!recs.length) { mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + esc(gt) + " games on record for " + esc(seasonScope) + ".</div>"); renderArenaDraw(mount); return; }
 
   const tableMount = document.createElement("div");
   mount.appendChild(tableMount);
