@@ -58,23 +58,60 @@ def norm_name(name):
     return " ".join(s.split())
 
 
+# Generational suffixes to strip when a plain match fails (never used to *replace*
+# the exact index — only as a fallback, and only when it leaves one candidate).
+SUFFIX_TOKENS = {"jr", "sr", "ii", "iii", "iv"}
+
+
+def strip_suffix(norm):
+    """Drop a single trailing generational-suffix token from a normalized name."""
+    parts = norm.split()
+    if len(parts) >= 2 and parts[-1] in SUFFIX_TOKENS:
+        parts = parts[:-1]
+    return " ".join(parts)
+
+
 def read_csv(path):
     with open(path, encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
 
 
 def load_players_index():
-    """norm(fullname) -> sorted list of distinct personId strings."""
-    index = defaultdict(set)
+    """Returns:
+      exact:   norm(fullname)         -> sorted list of distinct personIds
+      suffix:  strip_suffix(norm)     -> sorted list of distinct personIds
+      names:   personId               -> display "First Last"
+      surname: norm(lastName)         -> list of (personId, first_initial, display)
+    """
+    exact = defaultdict(set)
+    suffix = defaultdict(set)
+    names = {}
+    surname = defaultdict(list)
+    seen_surname = set()
     for r in read_csv(PLAYERS_CSV):
         pid = (r.get("personId") or "").strip()
         if not pid:
             continue
-        full = (r.get("firstName") or "").strip() + " " + (r.get("lastName") or "").strip()
+        first = (r.get("firstName") or "").strip()
+        last = (r.get("lastName") or "").strip()
+        full = (first + " " + last).strip()
         key = norm_name(full)
-        if key:
-            index[key].add(pid)
-    return {k: sorted(v) for k, v in index.items()}
+        if not key:
+            continue
+        exact[key].add(pid)
+        suffix[strip_suffix(key)].add(pid)
+        names[pid] = full
+        sk = strip_suffix(norm_name(last))
+        fi = (norm_name(first)[:1] or "")
+        if (sk, pid) not in seen_surname:
+            seen_surname.add((sk, pid))
+            surname[sk].append((pid, fi, full))
+    return (
+        {k: sorted(v) for k, v in exact.items()},
+        {k: sorted(v) for k, v in suffix.items()},
+        names,
+        surname,
+    )
 
 
 def load_dashboard_ids():
@@ -124,51 +161,81 @@ def main():
             sys.exit(f"ERROR: file not found: {p}")
     os.makedirs(args.out_dir, exist_ok=True)
 
-    players = load_players_index()
+    exact_index, suffix_index, pid_name, surname_index = load_players_index()
     dash_ids = load_dashboard_ids()
     allstars = aggregate_allstars()
     print(f"All-Star recipients (distinct names): {len(allstars)}")
 
+    def near_misses(name):
+        """Candidate '(personId) Full Name' strings for a name that didn't match
+        cleanly — suffix-stripped candidates plus same-surname/same-initial ones."""
+        cands = {}
+        for pid in suffix_index.get(strip_suffix(norm_name(name)), []):
+            cands[pid] = pid_name.get(pid, "")
+        parts = norm_name(name).split()
+        if parts:
+            sk = strip_suffix(norm_name(parts[-1]))
+            fi = parts[0][:1]
+            for pid, cfi, disp in surname_index.get(sk, []):
+                if cfi == fi:
+                    cands[pid] = disp
+        return [f"({pid}) {nm}" for pid, nm in sorted(cands.items(), key=lambda x: x[1])][:6]
+
     rows = []
-    unmatched, ambiguous, resolved = [], [], []
+    resolved_dash, resolved_suffix, review = [], [], []
     for key in sorted(allstars, key=lambda k: allstars[k]["name"].lower()):
         a = allstars[key]
-        pids = players.get(key, [])
-        if len(pids) == 0:
-            unmatched.append(a["name"])
-            continue
+        name = a["name"]
+        pids = exact_index.get(key, [])
+        pid = None
         if len(pids) == 1:
             pid = pids[0]
-        else:
+        elif len(pids) > 1:
             in_dash = [p for p in pids if p in dash_ids]
             if len(in_dash) == 1:
                 pid = in_dash[0]
-                resolved.append((a["name"], pids, pid))
+                resolved_dash.append((name, pids, pid))
             else:
-                ambiguous.append((a["name"], pids, in_dash))
+                review.append((name, "ambiguous (exact)", near_misses(name)))
+                continue
+        else:
+            # No exact match — fall back to suffix stripping, but only auto-merge
+            # when exactly one distinct personId remains (never when two real
+            # players could both match).
+            spids = suffix_index.get(strip_suffix(key), [])
+            if len(spids) == 1:
+                pid = spids[0]
+                resolved_suffix.append((name, pid))
+            elif len(spids) > 1:
+                review.append((name, "ambiguous (suffix strip)", near_misses(name)))
+                continue
+            else:
+                review.append((name, "no match", near_misses(name)))
                 continue
         rows.append({
             "personId": pid,
-            "playerName": a["name"],
+            "playerName": name,
             "times_selected": a["times_selected"],
             "first_year": a["first_year"] if a["first_year"] is not None else "",
             "last_year": a["last_year"] if a["last_year"] is not None else "",
         })
 
-    # ---- report ambiguous / unmatched (never guess silently) ----
-    if resolved:
-        print(f"\nResolved {len(resolved)} name(s) via the dashboard player set:")
-        for name, pids, pid in resolved:
+    # ---- auto-merges (transparent, never silent) ----
+    if resolved_dash:
+        print(f"\nResolved {len(resolved_dash)} name(s) via the dashboard player set:")
+        for name, pids, pid in resolved_dash:
             print(f"  {name}: candidates {pids} -> chose {pid} (only one in dashboard data)")
-    if ambiguous:
-        print(f"\nAMBIGUOUS — matched multiple personIds, skipped ({len(ambiguous)}):")
-        for name, pids, in_dash in ambiguous:
-            extra = f" (in dashboard: {in_dash})" if in_dash else ""
-            print(f"  {name}: {pids}{extra}")
-    if unmatched:
-        print(f"\nNO MATCH — matched zero personIds, skipped ({len(unmatched)}):")
-        for name in unmatched:
-            print(f"  {name}")
+    if resolved_suffix:
+        print(f"\nResolved {len(resolved_suffix)} name(s) via generational-suffix strip:")
+        for name, pid in resolved_suffix:
+            print(f"  {name} -> ({pid}) {pid_name.get(pid, '')}")
+
+    # ---- consolidated review list: every name still unmatched/ambiguous ----
+    print(f"\n=== FULL REVIEW LIST — {len(review)} name(s) not matched "
+          "(awards name -> reason -> near-miss candidates) ===")
+    for name, reason, cands in sorted(review, key=lambda x: x[0].lower()):
+        c = "; ".join(cands) if cands else "no near-miss candidates"
+        print(f"  {name}  [{reason}]  ->  {c}")
 
     out = os.path.join(args.out_dir, "allstar_players.csv")
     fieldnames = ["personId", "playerName", "times_selected", "first_year", "last_year"]

@@ -51,7 +51,6 @@
     </div>
     <div class="block">
       <div class="block-head"><h2>Players</h2><span class="sub">visiting players with 20+ qualifying road games</span></div>
-      <div id="drawAllstarMount"></div>
       <div id="playerDrawTable"></div>
     </div>
   </section>
@@ -177,16 +176,13 @@ async function initDraw() {
     attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) }),
     teamRows, { key: "diff", dir: "desc" });
 
-  await loadAllstar();
+  // Draw tables show everyone by default — never filtered to All-Stars.
   const playerRows = draw.players.map(p => ({ ...p, _href: playerHref(p.personId) }));
   const pmount = document.getElementById("playerDrawTable");
-  const ptable = sortableTable(pmount,
+  sortableTable(pmount,
     attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
-    [], { key: "diff", dir: "desc" });
+    playerRows, { key: "diff", dir: "desc" });
   wireRowNav(pmount);
-  const applyDraw = () => ptable.setRows(filterAllstar(playerRows, r => r.personId));
-  makeAllstarToggle(document.getElementById("drawAllstarMount"), applyDraw);
-  applyDraw();
 }
 
 /* ---------- TAB 3: arena overview ---------- */

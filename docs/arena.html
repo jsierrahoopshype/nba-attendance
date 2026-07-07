@@ -135,8 +135,12 @@ function render() {
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
     (allstarMode ? " All-Star" : "") + " records at this building.</div>");
 
-  // visiting-player attendance draw (2026 only) — who moved the gate the most here
-  renderVisitingDraw(mount);
+  // visiting-player + visiting-team attendance draw (2026 only) — shown to
+  // everyone, never filtered to All-Stars, side by side.
+  renderDrawTables(mount);
+
+  // players who only ever visited here (never suited up for the home team)
+  renderNeverHome(mount);
 
   // full records table for this game type
   const recs = filterAllstar(building.records.filter(r => r.gameType === gtLabel), r => r.personId);
@@ -161,26 +165,71 @@ function render() {
   }
 }
 
-function renderVisitingDraw(mount) {
-  const all = building.visiting_draw || [];
-  if (!all.length) return;
-  const rows = filterAllstar(all, r => r.personId).map(r => ({ ...r, _href: playerHref(r.personId) }));
-  const scope = allstarMode ? "All-Stars" : "all players";
+/* Visiting-player draw and visiting-team draw, side by side. These always show
+   everyone (never filtered to All-Stars). Labeled 2026 season only. */
+function renderDrawTables(mount) {
+  const players = (building.visiting_draw || []);
+  const teams = (building.team_draw || []);
+  if (!players.length && !teams.length) return;
+  const label = esc(building.draw_label || "2026 season only");
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Who drew the most here " +
-    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— visiting players · " +
-    esc(building.draw_label || "2026 season only") + " · " + scope + "</span></div>");
-  const dm = document.createElement("div");
-  mount.appendChild(dm);
-  if (!rows.length) { dm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; return; }
-  const cols = [
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
+    label + " · all players &amp; teams</span></div>");
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+
+  // players
+  const pcard = document.createElement("div");
+  pcard.className = "block lb-card";
+  pcard.innerHTML = '<h3>Visiting players <span class="cap">(avg draw vs baseline)</span></h3>';
+  const pm = document.createElement("div");
+  pcard.appendChild(pm); grid.appendChild(pcard);
+  if (players.length) {
+    const prows = players.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    sortableTable(pm, [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    ], prows, { key: "mean_delta", dir: "desc" });
+    wireRowNav(pm);
+  } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
+
+  // teams
+  const tcard = document.createElement("div");
+  tcard.className = "block lb-card";
+  tcard.innerHTML = '<h3>Visiting teams <span class="cap">(avg draw vs baseline)</span></h3>';
+  const tm = document.createElement("div");
+  tcard.appendChild(tm); grid.appendChild(tcard);
+  if (teams.length) {
+    sortableTable(tm, [
+      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    ], teams.slice(), { key: "mean_delta", dir: "desc" });
+  } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
+}
+
+/* Players who logged minutes here only as visitors — never for the home team. */
+function renderNeverHome(mount) {
+  const rows = (building.never_home || []).slice();
+  if (!rows.length) return;
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Never played here for the home team " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— visiting only, 3+ games · 2007–2026</span></div>");
+  const nm = document.createElement("div");
+  mount.appendChild(nm);
+  const r2 = rows.map(r => ({ ...r, _href: playerHref(r.personId) }));
+  sortableTable(nm, [
     { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
-    { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-    { key: "mean_delta", label: "Avg Draw vs Baseline", defaultDir: "desc", get: r => r.mean_delta,
-      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
-  ];
-  sortableTable(dm, cols, rows, { key: "mean_delta", dir: "desc" });
-  wireRowNav(dm);
+    { key: "away_games", label: "Visiting Games", defaultDir: "desc", get: r => r.away_games, cell: r => fmtInt(r.away_games) },
+    { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) },
+    { key: "seasons", label: "Seasons", align: "left", defaultDir: "asc", get: r => r.first_season, cell: r => '<span class="sub">' + seasons(r.first_season, r.last_season) + "</span>" },
+  ], r2, { key: "total_points", dir: "desc" });
+  wireRowNav(nm);
 }
 
 boot();

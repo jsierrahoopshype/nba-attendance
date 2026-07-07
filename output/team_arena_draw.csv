@@ -1,0 +1,872 @@
+﻿arenaName,teamId,teamCity,teamName,games,mean_delta
+American Airlines Center,1610612741,Chicago,Bulls,1,967.3
+American Airlines Center,1610612747,Los Angeles,Lakers,2,580.3
+American Airlines Center,1610612755,Philadelphia,76ers,1,557.3
+American Airlines Center,1610612737,Atlanta,Hawks,1,531.7
+American Airlines Center,1610612759,San Antonio,Spurs,2,491.2
+American Airlines Center,1610612765,Detroit,Pistons,1,319.5
+American Airlines Center,1610612739,Cleveland,Cavaliers,1,229.3
+American Airlines Center,1610612748,Miami,Heat,1,226.2
+American Airlines Center,1610612745,Houston,Rockets,2,223.6
+American Airlines Center,1610612756,Phoenix,Suns,1,218.0
+American Airlines Center,1610612763,Memphis,Grizzlies,2,108.3
+American Airlines Center,1610612753,Orlando,Magic,1,71.4
+American Airlines Center,1610612750,Minnesota,Timberwolves,2,63.7
+American Airlines Center,1610612762,Utah,Jazz,2,34.5
+American Airlines Center,1610612761,Toronto,Raptors,1,-57.7
+American Airlines Center,1610612764,Washington,Wizards,1,-64.9
+American Airlines Center,1610612743,Denver,Nuggets,2,-131.5
+American Airlines Center,1610612754,Indiana,Pacers,1,-151.0
+American Airlines Center,1610612738,Boston,Celtics,1,-160.2
+American Airlines Center,1610612749,Milwaukee,Bucks,1,-160.2
+American Airlines Center,1610612744,Golden State,Warriors,2,-165.9
+American Airlines Center,1610612760,Oklahoma City,Thunder,2,-191.5
+American Airlines Center,1610612766,Charlotte,Hornets,1,-270.9
+American Airlines Center,1610612758,Sacramento,Kings,1,-282.2
+American Airlines Center,1610612746,LA,Clippers,2,-301.2
+American Airlines Center,1610612751,Brooklyn,Nets,2,-467.7
+American Airlines Center,1610612757,Portland,Trail Blazers,1,-492.3
+American Airlines Center,1610612740,New Orleans,Pelicans,2,-587.1
+American Airlines Center,1610612752,New York,Knicks,1,-794.7
+Ball Arena,1610612756,Phoenix,Suns,1,203.9
+Ball Arena,1610612746,LA,Clippers,1,194.7
+Ball Arena,1610612759,San Antonio,Spurs,2,165.5
+Ball Arena,1610612766,Charlotte,Hornets,1,148.6
+Ball Arena,1610612764,Washington,Wizards,1,145.5
+Ball Arena,1610612747,Los Angeles,Lakers,2,137.8
+Ball Arena,1610612760,Oklahoma City,Thunder,2,134.2
+Ball Arena,1610612754,Indiana,Pacers,1,131.2
+Ball Arena,1610612741,Chicago,Bulls,1,128.1
+Ball Arena,1610612761,Toronto,Raptors,1,100.4
+Ball Arena,1610612755,Philadelphia,76ers,1,93.2
+Ball Arena,1610612750,Minnesota,Timberwolves,5,59.2
+Ball Arena,1610612748,Miami,Heat,1,36.8
+Ball Arena,1610612763,Memphis,Grizzlies,2,-8.2
+Ball Arena,1610612752,New York,Knicks,1,-19.5
+Ball Arena,1610612744,Golden State,Warriors,2,-48.7
+Ball Arena,1610612758,Sacramento,Kings,2,-54.4
+Ball Arena,1610612757,Portland,Trail Blazers,2,-58.0
+Ball Arena,1610612762,Utah,Jazz,2,-60.5
+Ball Arena,1610612738,Boston,Celtics,1,-64.6
+Ball Arena,1610612765,Detroit,Pistons,1,-94.3
+Ball Arena,1610612753,Orlando,Magic,1,-97.4
+Ball Arena,1610612745,Houston,Rockets,3,-111.1
+Ball Arena,1610612742,Dallas,Mavericks,2,-116.9
+Ball Arena,1610612737,Atlanta,Hawks,1,-180.5
+Ball Arena,1610612739,Cleveland,Cavaliers,1,-183.5
+Ball Arena,1610612749,Milwaukee,Bucks,1,-185.6
+Ball Arena,1610612751,Brooklyn,Nets,1,-201.0
+Ball Arena,1610612740,New Orleans,Pelicans,1,-300.4
+Barclays Center,1610612747,Los Angeles,Lakers,1,856.8
+Barclays Center,1610612744,Golden State,Warriors,1,769.7
+Barclays Center,1610612752,New York,Knicks,2,621.1
+Barclays Center,1610612745,Houston,Rockets,1,605.7
+Barclays Center,1610612738,Boston,Celtics,2,523.2
+Barclays Center,1610612755,Philadelphia,76ers,2,273.1
+Barclays Center,1610612739,Cleveland,Cavaliers,2,270.5
+Barclays Center,1610612737,Atlanta,Hawks,2,139.3
+Barclays Center,1610612743,Denver,Nuggets,1,139.3
+Barclays Center,1610612746,LA,Clippers,1,139.3
+Barclays Center,1610612748,Miami,Heat,1,139.3
+Barclays Center,1610612758,Sacramento,Kings,1,139.3
+Barclays Center,1610612759,San Antonio,Spurs,1,139.3
+Barclays Center,1610612760,Oklahoma City,Thunder,1,139.3
+Barclays Center,1610612765,Detroit,Pistons,2,139.3
+Barclays Center,1610612764,Washington,Wizards,2,-9.8
+Barclays Center,1610612761,Toronto,Raptors,2,-22.1
+Barclays Center,1610612756,Phoenix,Suns,1,-69.8
+Barclays Center,1610612741,Chicago,Bulls,2,-122.1
+Barclays Center,1610612750,Minnesota,Timberwolves,1,-128.2
+Barclays Center,1610612766,Charlotte,Hornets,2,-181.5
+Barclays Center,1610612754,Indiana,Pacers,2,-254.8
+Barclays Center,1610612740,New Orleans,Pelicans,1,-366.0
+Barclays Center,1610612757,Portland,Trail Blazers,1,-391.7
+Barclays Center,1610612753,Orlando,Magic,1,-508.5
+Barclays Center,1610612749,Milwaukee,Bucks,2,-795.0
+Barclays Center,1610612763,Memphis,Grizzlies,1,-890.8
+Barclays Center,1610612742,Dallas,Mavericks,1,-924.7
+Barclays Center,1610612762,Utah,Jazz,1,-950.3
+Capital One Arena,1610612747,Los Angeles,Lakers,1,4019.3
+Capital One Arena,1610612759,San Antonio,Spurs,1,4019.3
+Capital One Arena,1610612760,Oklahoma City,Thunder,1,4019.3
+Capital One Arena,1610612752,New York,Knicks,1,1758.1
+Capital One Arena,1610612762,Utah,Jazz,1,1621.8
+Capital One Arena,1610612745,Houston,Rockets,1,1276.4
+Capital One Arena,1610612756,Phoenix,Suns,1,897.1
+Capital One Arena,1610612755,Philadelphia,76ers,2,651.7
+Capital One Arena,1610612750,Minnesota,Timberwolves,1,636.8
+Capital One Arena,1610612763,Memphis,Grizzlies,1,588.6
+Capital One Arena,1610612746,LA,Clippers,1,536.4
+Capital One Arena,1610612740,New Orleans,Pelicans,1,467.7
+Capital One Arena,1610612761,Toronto,Raptors,2,405.2
+Capital One Arena,1610612766,Charlotte,Hornets,2,275.0
+Capital One Arena,1610612742,Dallas,Mavericks,1,155.0
+Capital One Arena,1610612738,Boston,Celtics,1,-82.8
+Capital One Arena,1610612748,Miami,Heat,2,-108.4
+Capital One Arena,1610612765,Detroit,Pistons,2,-177.1
+Capital One Arena,1610612744,Golden State,Warriors,1,-189.4
+Capital One Arena,1610612737,Atlanta,Hawks,2,-561.4
+Capital One Arena,1610612751,Brooklyn,Nets,2,-801.3
+Capital One Arena,1610612741,Chicago,Bulls,2,-862.3
+Capital One Arena,1610612754,Indiana,Pacers,2,-904.8
+Capital One Arena,1610612743,Denver,Nuggets,1,-1093.4
+Capital One Arena,1610612749,Milwaukee,Bucks,2,-1163.1
+Capital One Arena,1610612739,Cleveland,Cavaliers,2,-1380.9
+Capital One Arena,1610612753,Orlando,Magic,2,-1992.3
+Capital One Arena,1610612757,Portland,Trail Blazers,1,-2311.1
+Capital One Arena,1610612758,Sacramento,Kings,1,-3079.9
+Chase Center,1610612737,Atlanta,Hawks,1,0.0
+Chase Center,1610612738,Boston,Celtics,1,0.0
+Chase Center,1610612739,Cleveland,Cavaliers,1,0.0
+Chase Center,1610612740,New Orleans,Pelicans,1,0.0
+Chase Center,1610612741,Chicago,Bulls,1,0.0
+Chase Center,1610612742,Dallas,Mavericks,1,0.0
+Chase Center,1610612743,Denver,Nuggets,2,0.0
+Chase Center,1610612745,Houston,Rockets,2,0.0
+Chase Center,1610612746,LA,Clippers,2,0.0
+Chase Center,1610612747,Los Angeles,Lakers,2,0.0
+Chase Center,1610612748,Miami,Heat,1,0.0
+Chase Center,1610612749,Milwaukee,Bucks,1,0.0
+Chase Center,1610612750,Minnesota,Timberwolves,2,0.0
+Chase Center,1610612751,Brooklyn,Nets,1,0.0
+Chase Center,1610612752,New York,Knicks,1,0.0
+Chase Center,1610612753,Orlando,Magic,1,0.0
+Chase Center,1610612754,Indiana,Pacers,1,0.0
+Chase Center,1610612755,Philadelphia,76ers,1,0.0
+Chase Center,1610612756,Phoenix,Suns,2,0.0
+Chase Center,1610612757,Portland,Trail Blazers,2,0.0
+Chase Center,1610612758,Sacramento,Kings,2,0.0
+Chase Center,1610612759,San Antonio,Spurs,2,0.0
+Chase Center,1610612760,Oklahoma City,Thunder,2,0.0
+Chase Center,1610612761,Toronto,Raptors,1,0.0
+Chase Center,1610612762,Utah,Jazz,2,0.0
+Chase Center,1610612763,Memphis,Grizzlies,2,0.0
+Chase Center,1610612764,Washington,Wizards,1,0.0
+Chase Center,1610612765,Detroit,Pistons,1,0.0
+Chase Center,1610612766,Charlotte,Hornets,1,0.0
+Crypto.com Arena,1610612738,Boston,Celtics,1,145.8
+Crypto.com Arena,1610612739,Cleveland,Cavaliers,1,145.8
+Crypto.com Arena,1610612743,Denver,Nuggets,1,145.8
+Crypto.com Arena,1610612744,Golden State,Warriors,2,145.8
+Crypto.com Arena,1610612746,LA,Clippers,2,145.8
+Crypto.com Arena,1610612749,Milwaukee,Bucks,1,145.8
+Crypto.com Arena,1610612751,Brooklyn,Nets,1,145.8
+Crypto.com Arena,1610612752,New York,Knicks,1,145.8
+Crypto.com Arena,1610612753,Orlando,Magic,1,145.8
+Crypto.com Arena,1610612756,Phoenix,Suns,2,145.8
+Crypto.com Arena,1610612761,Toronto,Raptors,1,145.8
+Crypto.com Arena,1610612763,Memphis,Grizzlies,2,145.8
+Crypto.com Arena,1610612764,Washington,Wizards,1,145.8
+Crypto.com Arena,1610612765,Detroit,Pistons,1,145.8
+Crypto.com Arena,1610612766,Charlotte,Hornets,1,145.8
+Crypto.com Arena,1610612762,Utah,Jazz,2,40.2
+Crypto.com Arena,1610612745,Houston,Rockets,4,36.4
+Crypto.com Arena,1610612742,Dallas,Mavericks,2,-17.2
+Crypto.com Arena,1610612748,Miami,Heat,1,-24.4
+Crypto.com Arena,1610612750,Minnesota,Timberwolves,2,-36.2
+Crypto.com Arena,1610612760,Oklahoma City,Thunder,4,-49.6
+Crypto.com Arena,1610612741,Chicago,Bulls,1,-62.3
+Crypto.com Arena,1610612759,San Antonio,Spurs,3,-73.6
+Crypto.com Arena,1610612737,Atlanta,Hawks,1,-100.2
+Crypto.com Arena,1610612755,Philadelphia,76ers,1,-126.9
+Crypto.com Arena,1610612758,Sacramento,Kings,2,-225.8
+Crypto.com Arena,1610612740,New Orleans,Pelicans,2,-326.8
+Crypto.com Arena,1610612757,Portland,Trail Blazers,1,-351.4
+Crypto.com Arena,1610612754,Indiana,Pacers,1,-698.8
+Delta Center,1610612737,Atlanta,Hawks,1,0.0
+Delta Center,1610612738,Boston,Celtics,1,0.0
+Delta Center,1610612739,Cleveland,Cavaliers,1,0.0
+Delta Center,1610612740,New Orleans,Pelicans,2,0.0
+Delta Center,1610612741,Chicago,Bulls,1,0.0
+Delta Center,1610612742,Dallas,Mavericks,2,0.0
+Delta Center,1610612743,Denver,Nuggets,1,0.0
+Delta Center,1610612744,Golden State,Warriors,2,0.0
+Delta Center,1610612745,Houston,Rockets,2,0.0
+Delta Center,1610612746,LA,Clippers,2,0.0
+Delta Center,1610612747,Los Angeles,Lakers,2,0.0
+Delta Center,1610612748,Miami,Heat,1,0.0
+Delta Center,1610612749,Milwaukee,Bucks,1,0.0
+Delta Center,1610612750,Minnesota,Timberwolves,2,0.0
+Delta Center,1610612751,Brooklyn,Nets,1,0.0
+Delta Center,1610612752,New York,Knicks,1,0.0
+Delta Center,1610612753,Orlando,Magic,1,0.0
+Delta Center,1610612754,Indiana,Pacers,1,0.0
+Delta Center,1610612755,Philadelphia,76ers,1,0.0
+Delta Center,1610612756,Phoenix,Suns,1,0.0
+Delta Center,1610612757,Portland,Trail Blazers,2,0.0
+Delta Center,1610612758,Sacramento,Kings,2,0.0
+Delta Center,1610612759,San Antonio,Spurs,1,0.0
+Delta Center,1610612760,Oklahoma City,Thunder,2,0.0
+Delta Center,1610612761,Toronto,Raptors,1,0.0
+Delta Center,1610612763,Memphis,Grizzlies,2,0.0
+Delta Center,1610612764,Washington,Wizards,1,0.0
+Delta Center,1610612765,Detroit,Pistons,1,0.0
+Delta Center,1610612766,Charlotte,Hornets,1,0.0
+FedExForum,1610612738,Boston,Celtics,1,1752.4
+FedExForum,1610612761,Toronto,Raptors,1,1726.8
+FedExForum,1610612741,Chicago,Bulls,1,1583.2
+FedExForum,1610612749,Milwaukee,Bucks,1,1310.4
+FedExForum,1610612739,Cleveland,Cavaliers,1,1201.6
+FedExForum,1610612747,Los Angeles,Lakers,1,802.7
+FedExForum,1610612740,New Orleans,Pelicans,2,661.1
+FedExForum,1610612762,Utah,Jazz,2,479.6
+FedExForum,1610612764,Washington,Wizards,1,451.9
+FedExForum,1610612744,Golden State,Warriors,1,358.6
+FedExForum,1610612755,Philadelphia,76ers,1,337.0
+FedExForum,1610612751,Brooklyn,Nets,1,244.7
+FedExForum,1610612743,Denver,Nuggets,2,231.9
+FedExForum,1610612746,LA,Clippers,2,210.4
+FedExForum,1610612754,Indiana,Pacers,1,104.2
+FedExForum,1610612745,Houston,Rockets,2,79.6
+FedExForum,1610612752,New York,Knicks,1,-162.5
+FedExForum,1610612760,Oklahoma City,Thunder,2,-220.4
+FedExForum,1610612759,San Antonio,Spurs,2,-225.5
+FedExForum,1610612737,Atlanta,Hawks,1,-292.7
+FedExForum,1610612742,Dallas,Mavericks,2,-318.9
+FedExForum,1610612750,Minnesota,Timberwolves,2,-667.6
+FedExForum,1610612748,Miami,Heat,1,-716.3
+FedExForum,1610612756,Phoenix,Suns,2,-897.3
+FedExForum,1610612758,Sacramento,Kings,2,-922.5
+FedExForum,1610612757,Portland,Trail Blazers,2,-937.8
+FedExForum,1610612765,Detroit,Pistons,1,-1556.3
+FedExForum,1610612766,Charlotte,Hornets,1,-2090.7
+Fiserv Forum,1610612741,Chicago,Bulls,2,963.6
+Fiserv Forum,1610612766,Charlotte,Hornets,2,878.6
+Fiserv Forum,1610612743,Denver,Nuggets,1,708.4
+Fiserv Forum,1610612744,Golden State,Warriors,1,708.4
+Fiserv Forum,1610612745,Houston,Rockets,1,708.4
+Fiserv Forum,1610612746,LA,Clippers,1,708.4
+Fiserv Forum,1610612747,Los Angeles,Lakers,1,708.4
+Fiserv Forum,1610612750,Minnesota,Timberwolves,1,708.4
+Fiserv Forum,1610612758,Sacramento,Kings,1,708.4
+Fiserv Forum,1610612759,San Antonio,Spurs,1,708.4
+Fiserv Forum,1610612761,Toronto,Raptors,2,708.4
+Fiserv Forum,1610612764,Washington,Wizards,2,708.4
+Fiserv Forum,1610612755,Philadelphia,76ers,2,315.3
+Fiserv Forum,1610612751,Brooklyn,Nets,2,243.6
+Fiserv Forum,1610612752,New York,Knicks,2,179.5
+Fiserv Forum,1610612765,Detroit,Pistons,2,152.4
+Fiserv Forum,1610612754,Indiana,Pacers,2,-31.1
+Fiserv Forum,1610612760,Oklahoma City,Thunder,1,-57.2
+Fiserv Forum,1610612757,Portland,Trail Blazers,1,-127.0
+Fiserv Forum,1610612742,Dallas,Mavericks,1,-241.8
+Fiserv Forum,1610612738,Boston,Celtics,3,-395.8
+Fiserv Forum,1610612762,Utah,Jazz,1,-645.6
+Fiserv Forum,1610612753,Orlando,Magic,1,-1122.2
+Fiserv Forum,1610612739,Cleveland,Cavaliers,2,-1156.6
+Fiserv Forum,1610612748,Miami,Heat,1,-1220.6
+Fiserv Forum,1610612756,Phoenix,Suns,1,-1383.6
+Fiserv Forum,1610612763,Memphis,Grizzlies,1,-1436.9
+Fiserv Forum,1610612737,Atlanta,Hawks,1,-1804.9
+Fiserv Forum,1610612740,New Orleans,Pelicans,1,-2364.5
+Frost Bank Center,1610612747,Los Angeles,Lakers,1,643.2
+Frost Bank Center,1610612738,Boston,Celtics,1,387.5
+Frost Bank Center,1610612743,Denver,Nuggets,2,334.6
+Frost Bank Center,1610612745,Houston,Rockets,2,324.8
+Frost Bank Center,1610612751,Brooklyn,Nets,1,321.8
+Frost Bank Center,1610612739,Cleveland,Cavaliers,1,315.6
+Frost Bank Center,1610612741,Chicago,Bulls,1,206.7
+Frost Bank Center,1610612766,Charlotte,Hornets,1,162.6
+Frost Bank Center,1610612744,Golden State,Warriors,2,118.9
+Frost Bank Center,1610612754,Indiana,Pacers,1,111.2
+Frost Bank Center,1610612764,Washington,Wizards,1,52.7
+Frost Bank Center,1610612760,Oklahoma City,Thunder,5,46.9
+Frost Bank Center,1610612765,Detroit,Pistons,1,46.5
+Frost Bank Center,1610612746,LA,Clippers,1,8.5
+Frost Bank Center,1610612757,Portland,Trail Blazers,5,6.5
+Frost Bank Center,1610612762,Utah,Jazz,2,4.4
+Frost Bank Center,1610612748,Miami,Heat,1,-0.7
+Frost Bank Center,1610612750,Minnesota,Timberwolves,4,-47.8
+Frost Bank Center,1610612742,Dallas,Mavericks,2,-55.2
+Frost Bank Center,1610612756,Phoenix,Suns,1,-56.2
+Frost Bank Center,1610612749,Milwaukee,Bucks,1,-94.2
+Frost Bank Center,1610612752,New York,Knicks,4,-171.5
+Frost Bank Center,1610612740,New Orleans,Pelicans,2,-221.5
+Frost Bank Center,1610612737,Atlanta,Hawks,1,-358.1
+Frost Bank Center,1610612753,Orlando,Magic,1,-358.1
+Frost Bank Center,1610612755,Philadelphia,76ers,1,-358.1
+Frost Bank Center,1610612758,Sacramento,Kings,1,-358.1
+Frost Bank Center,1610612761,Toronto,Raptors,1,-358.1
+Frost Bank Center,1610612763,Memphis,Grizzlies,2,-358.1
+Gainbridge Fieldhouse,1610612742,Dallas,Mavericks,1,648.7
+Gainbridge Fieldhouse,1610612744,Golden State,Warriors,1,648.7
+Gainbridge Fieldhouse,1610612747,Los Angeles,Lakers,1,648.7
+Gainbridge Fieldhouse,1610612750,Minnesota,Timberwolves,1,648.7
+Gainbridge Fieldhouse,1610612757,Portland,Trail Blazers,1,648.7
+Gainbridge Fieldhouse,1610612760,Oklahoma City,Thunder,1,648.7
+Gainbridge Fieldhouse,1610612766,Charlotte,Hornets,2,406.8
+Gainbridge Fieldhouse,1610612748,Miami,Heat,2,390.9
+Gainbridge Fieldhouse,1610612759,San Antonio,Spurs,1,381.2
+Gainbridge Fieldhouse,1610612765,Detroit,Pistons,2,290.4
+Gainbridge Fieldhouse,1610612755,Philadelphia,76ers,2,272.5
+Gainbridge Fieldhouse,1610612741,Chicago,Bulls,2,256.6
+Gainbridge Fieldhouse,1610612749,Milwaukee,Bucks,2,124.4
+Gainbridge Fieldhouse,1610612740,New Orleans,Pelicans,1,114.7
+Gainbridge Fieldhouse,1610612763,Memphis,Grizzlies,1,55.2
+Gainbridge Fieldhouse,1610612762,Utah,Jazz,1,37.8
+Gainbridge Fieldhouse,1610612746,LA,Clippers,1,4.0
+Gainbridge Fieldhouse,1610612737,Atlanta,Hawks,2,-30.9
+Gainbridge Fieldhouse,1610612761,Toronto,Raptors,2,-112.4
+Gainbridge Fieldhouse,1610612745,Houston,Rockets,1,-133.4
+Gainbridge Fieldhouse,1610612753,Orlando,Magic,1,-140.6
+Gainbridge Fieldhouse,1610612756,Phoenix,Suns,1,-175.4
+Gainbridge Fieldhouse,1610612758,Sacramento,Kings,1,-180.5
+Gainbridge Fieldhouse,1610612738,Boston,Celtics,2,-322.0
+Gainbridge Fieldhouse,1610612764,Washington,Wizards,2,-392.7
+Gainbridge Fieldhouse,1610612751,Brooklyn,Nets,1,-551.6
+Gainbridge Fieldhouse,1610612739,Cleveland,Cavaliers,2,-925.2
+Gainbridge Fieldhouse,1610612752,New York,Knicks,2,-1065.1
+Gainbridge Fieldhouse,1610612743,Denver,Nuggets,1,-1089.7
+Golden 1 Center,1610612744,Golden State,Warriors,2,1910.2
+Golden 1 Center,1610612738,Boston,Celtics,1,1734.4
+Golden 1 Center,1610612747,Los Angeles,Lakers,2,1734.4
+Golden 1 Center,1610612765,Detroit,Pistons,1,1734.4
+Golden 1 Center,1610612753,Orlando,Magic,1,414.2
+Golden 1 Center,1610612756,Phoenix,Suns,2,353.8
+Golden 1 Center,1610612762,Utah,Jazz,2,350.7
+Golden 1 Center,1610612759,San Antonio,Spurs,1,343.5
+Golden 1 Center,1610612742,Dallas,Mavericks,2,312.8
+Golden 1 Center,1610612764,Washington,Wizards,1,204.1
+Golden 1 Center,1610612751,Brooklyn,Nets,1,152.9
+Golden 1 Center,1610612739,Cleveland,Cavaliers,1,73.9
+Golden 1 Center,1610612761,Toronto,Raptors,1,43.2
+Golden 1 Center,1610612757,Portland,Trail Blazers,2,-38.8
+Golden 1 Center,1610612750,Minnesota,Timberwolves,2,-49.1
+Golden 1 Center,1610612749,Milwaukee,Bucks,1,-254.1
+Golden 1 Center,1610612746,LA,Clippers,2,-307.9
+Golden 1 Center,1610612760,Oklahoma City,Thunder,1,-382.2
+Golden 1 Center,1610612743,Denver,Nuggets,2,-444.2
+Golden 1 Center,1610612766,Charlotte,Hornets,1,-556.5
+Golden 1 Center,1610612745,Houston,Rockets,2,-623.1
+Golden 1 Center,1610612763,Memphis,Grizzlies,2,-697.9
+Golden 1 Center,1610612740,New Orleans,Pelicans,2,-772.7
+Golden 1 Center,1610612748,Miami,Heat,1,-866.0
+Golden 1 Center,1610612752,New York,Knicks,1,-1071.0
+Golden 1 Center,1610612741,Chicago,Bulls,1,-1145.8
+Golden 1 Center,1610612737,Atlanta,Hawks,1,-1160.2
+Golden 1 Center,1610612755,Philadelphia,76ers,1,-1161.2
+Golden 1 Center,1610612754,Indiana,Pacers,1,-1559.9
+Intuit Dome,1610612738,Boston,Celtics,1,312.6
+Intuit Dome,1610612739,Cleveland,Cavaliers,1,312.6
+Intuit Dome,1610612741,Chicago,Bulls,1,312.6
+Intuit Dome,1610612742,Dallas,Mavericks,2,312.6
+Intuit Dome,1610612743,Denver,Nuggets,2,312.6
+Intuit Dome,1610612744,Golden State,Warriors,2,312.6
+Intuit Dome,1610612745,Houston,Rockets,1,312.6
+Intuit Dome,1610612747,Los Angeles,Lakers,2,312.6
+Intuit Dome,1610612751,Brooklyn,Nets,1,312.6
+Intuit Dome,1610612752,New York,Knicks,1,312.6
+Intuit Dome,1610612753,Orlando,Magic,1,312.6
+Intuit Dome,1610612755,Philadelphia,76ers,1,312.6
+Intuit Dome,1610612756,Phoenix,Suns,2,312.6
+Intuit Dome,1610612757,Portland,Trail Blazers,2,312.6
+Intuit Dome,1610612759,San Antonio,Spurs,2,312.6
+Intuit Dome,1610612761,Toronto,Raptors,1,312.6
+Intuit Dome,1610612762,Utah,Jazz,1,312.6
+Intuit Dome,1610612763,Memphis,Grizzlies,2,312.6
+Intuit Dome,1610612765,Detroit,Pistons,1,312.6
+Intuit Dome,1610612766,Charlotte,Hornets,1,312.6
+Intuit Dome,1610612758,Sacramento,Kings,2,52.7
+Intuit Dome,1610612760,Oklahoma City,Thunder,2,-62.6
+Intuit Dome,1610612750,Minnesota,Timberwolves,2,-371.1
+Intuit Dome,1610612754,Indiana,Pacers,1,-542.3
+Intuit Dome,1610612748,Miami,Heat,1,-591.5
+Intuit Dome,1610612740,New Orleans,Pelicans,2,-1106.0
+Intuit Dome,1610612749,Milwaukee,Bucks,1,-1134.7
+Intuit Dome,1610612737,Atlanta,Hawks,1,-1285.4
+Intuit Dome,1610612764,Washington,Wizards,1,-2224.3
+Kaseya Center,1610612747,Los Angeles,Lakers,1,479.8
+Kaseya Center,1610612743,Denver,Nuggets,1,346.6
+Kaseya Center,1610612750,Minnesota,Timberwolves,1,188.8
+Kaseya Center,1610612737,Atlanta,Hawks,2,125.2
+Kaseya Center,1610612738,Boston,Celtics,2,83.7
+Kaseya Center,1610612759,San Antonio,Spurs,1,77.0
+Kaseya Center,1610612755,Philadelphia,76ers,1,34.0
+Kaseya Center,1610612753,Orlando,Magic,2,20.1
+Kaseya Center,1610612754,Indiana,Pacers,1,6.3
+Kaseya Center,1610612760,Oklahoma City,Thunder,1,-5.0
+Kaseya Center,1610612761,Toronto,Raptors,2,-8.6
+Kaseya Center,1610612741,Chicago,Bulls,2,-9.1
+Kaseya Center,1610612745,Houston,Rockets,1,-9.1
+Kaseya Center,1610612751,Brooklyn,Nets,2,-9.1
+Kaseya Center,1610612756,Phoenix,Suns,1,-9.1
+Kaseya Center,1610612758,Sacramento,Kings,1,-9.1
+Kaseya Center,1610612762,Utah,Jazz,1,-9.1
+Kaseya Center,1610612763,Memphis,Grizzlies,1,-9.1
+Kaseya Center,1610612764,Washington,Wizards,2,-9.1
+Kaseya Center,1610612749,Milwaukee,Bucks,2,-60.3
+Kaseya Center,1610612765,Detroit,Pistons,2,-60.3
+Kaseya Center,1610612739,Cleveland,Cavaliers,2,-111.6
+Kaseya Center,1610612740,New Orleans,Pelicans,1,-111.6
+Kaseya Center,1610612742,Dallas,Mavericks,1,-111.6
+Kaseya Center,1610612744,Golden State,Warriors,1,-111.6
+Kaseya Center,1610612746,LA,Clippers,1,-111.6
+Kaseya Center,1610612752,New York,Knicks,2,-111.6
+Kaseya Center,1610612757,Portland,Trail Blazers,1,-111.6
+Kaseya Center,1610612766,Charlotte,Hornets,2,-111.6
+Kia Center,1610612747,Los Angeles,Lakers,1,1164.3
+Kia Center,1610612766,Charlotte,Hornets,2,972.5
+Kia Center,1610612755,Philadelphia,76ers,1,830.0
+Kia Center,1610612762,Utah,Jazz,1,760.2
+Kia Center,1610612761,Toronto,Raptors,1,719.2
+Kia Center,1610612743,Denver,Nuggets,1,706.9
+Kia Center,1610612756,Phoenix,Suns,1,672.0
+Kia Center,1610612740,New Orleans,Pelicans,1,612.5
+Kia Center,1610612739,Cleveland,Cavaliers,2,576.6
+Kia Center,1610612744,Golden State,Warriors,1,394.1
+Kia Center,1610612760,Oklahoma City,Thunder,1,394.1
+Kia Center,1610612765,Detroit,Pistons,5,314.3
+Kia Center,1610612738,Boston,Celtics,2,167.4
+Kia Center,1610612741,Chicago,Bulls,2,148.4
+Kia Center,1610612754,Indiana,Pacers,2,92.0
+Kia Center,1610612748,Miami,Heat,3,68.3
+Kia Center,1610612750,Minnesota,Timberwolves,1,20.7
+Kia Center,1610612749,Milwaukee,Bucks,2,-217.2
+Kia Center,1610612752,New York,Knicks,1,-459.3
+Kia Center,1610612751,Brooklyn,Nets,2,-476.2
+Kia Center,1610612757,Portland,Trail Blazers,1,-484.9
+Kia Center,1610612746,LA,Clippers,1,-677.7
+Kia Center,1610612737,Atlanta,Hawks,2,-818.2
+Kia Center,1610612759,San Antonio,Spurs,1,-839.8
+Kia Center,1610612745,Houston,Rockets,1,-961.8
+Kia Center,1610612758,Sacramento,Kings,1,-1236.7
+Kia Center,1610612764,Washington,Wizards,2,-1389.0
+Kia Center,1610612742,Dallas,Mavericks,1,-1503.4
+Little Caesars Arena,1610612747,Los Angeles,Lakers,1,542.6
+Little Caesars Arena,1610612744,Golden State,Warriors,1,421.6
+Little Caesars Arena,1610612745,Houston,Rockets,1,421.6
+Little Caesars Arena,1610612746,LA,Clippers,1,421.6
+Little Caesars Arena,1610612748,Miami,Heat,1,421.6
+Little Caesars Arena,1610612750,Minnesota,Timberwolves,1,421.6
+Little Caesars Arena,1610612755,Philadelphia,76ers,2,421.6
+Little Caesars Arena,1610612759,San Antonio,Spurs,1,421.6
+Little Caesars Arena,1610612760,Oklahoma City,Thunder,1,421.6
+Little Caesars Arena,1610612763,Memphis,Grizzlies,1,421.6
+Little Caesars Arena,1610612766,Charlotte,Hornets,1,421.6
+Little Caesars Arena,1610612752,New York,Knicks,2,406.2
+Little Caesars Arena,1610612738,Boston,Celtics,2,387.8
+Little Caesars Arena,1610612761,Toronto,Raptors,1,339.6
+Little Caesars Arena,1610612751,Brooklyn,Nets,2,338.0
+Little Caesars Arena,1610612743,Denver,Nuggets,1,333.4
+Little Caesars Arena,1610612749,Milwaukee,Bucks,2,321.1
+Little Caesars Arena,1610612757,Portland,Trail Blazers,1,262.6
+Little Caesars Arena,1610612753,Orlando,Magic,6,0.7
+Little Caesars Arena,1610612739,Cleveland,Cavaliers,6,-23.4
+Little Caesars Arena,1610612754,Indiana,Pacers,2,-93.3
+Little Caesars Arena,1610612741,Chicago,Bulls,2,-398.9
+Little Caesars Arena,1610612756,Phoenix,Suns,1,-463.5
+Little Caesars Arena,1610612737,Atlanta,Hawks,3,-695.6
+Little Caesars Arena,1610612740,New Orleans,Pelicans,1,-729.2
+Little Caesars Arena,1610612764,Washington,Wizards,2,-977.9
+Little Caesars Arena,1610612762,Utah,Jazz,1,-1279.9
+Little Caesars Arena,1610612758,Sacramento,Kings,1,-1386.6
+Madison Square Garden,1610612738,Boston,Celtics,2,10.8
+Madison Square Garden,1610612740,New Orleans,Pelicans,1,10.8
+Madison Square Garden,1610612741,Chicago,Bulls,2,10.8
+Madison Square Garden,1610612742,Dallas,Mavericks,1,10.8
+Madison Square Garden,1610612743,Denver,Nuggets,1,10.8
+Madison Square Garden,1610612744,Golden State,Warriors,1,10.8
+Madison Square Garden,1610612745,Houston,Rockets,1,10.8
+Madison Square Garden,1610612746,LA,Clippers,1,10.8
+Madison Square Garden,1610612747,Los Angeles,Lakers,1,10.8
+Madison Square Garden,1610612748,Miami,Heat,2,10.8
+Madison Square Garden,1610612749,Milwaukee,Bucks,1,10.8
+Madison Square Garden,1610612750,Minnesota,Timberwolves,1,10.8
+Madison Square Garden,1610612751,Brooklyn,Nets,2,10.8
+Madison Square Garden,1610612753,Orlando,Magic,2,10.8
+Madison Square Garden,1610612754,Indiana,Pacers,2,10.8
+Madison Square Garden,1610612756,Phoenix,Suns,1,10.8
+Madison Square Garden,1610612757,Portland,Trail Blazers,1,10.8
+Madison Square Garden,1610612758,Sacramento,Kings,1,10.8
+Madison Square Garden,1610612760,Oklahoma City,Thunder,1,10.8
+Madison Square Garden,1610612761,Toronto,Raptors,2,10.8
+Madison Square Garden,1610612762,Utah,Jazz,1,10.8
+Madison Square Garden,1610612763,Memphis,Grizzlies,1,10.8
+Madison Square Garden,1610612764,Washington,Wizards,2,10.8
+Madison Square Garden,1610612765,Detroit,Pistons,1,10.8
+Madison Square Garden,1610612766,Charlotte,Hornets,2,10.8
+Madison Square Garden,1610612739,Cleveland,Cavaliers,4,5.4
+Madison Square Garden,1610612759,San Antonio,Spurs,3,3.6
+Madison Square Garden,1610612737,Atlanta,Hawks,4,2.7
+Madison Square Garden,1610612755,Philadelphia,76ers,4,-102.8
+Moda Center,1610612765,Detroit,Pistons,1,1846.8
+Moda Center,1610612746,LA,Clippers,2,1159.5
+Moda Center,1610612744,Golden State,Warriors,2,1069.9
+Moda Center,1610612750,Minnesota,Timberwolves,2,947.9
+Moda Center,1610612747,Los Angeles,Lakers,2,692.6
+Moda Center,1610612759,San Antonio,Spurs,3,615.6
+Moda Center,1610612766,Charlotte,Hornets,1,614.8
+Moda Center,1610612758,Sacramento,Kings,2,446.1
+Moda Center,1610612738,Boston,Celtics,1,426.2
+Moda Center,1610612742,Dallas,Mavericks,2,359.5
+Moda Center,1610612752,New York,Knicks,1,342.1
+Moda Center,1610612741,Chicago,Bulls,1,268.3
+Moda Center,1610612743,Denver,Nuggets,2,-60.7
+Moda Center,1610612761,Toronto,Raptors,1,-97.6
+Moda Center,1610612764,Washington,Wizards,1,-136.6
+Moda Center,1610612739,Cleveland,Cavaliers,1,-300.6
+Moda Center,1610612760,Oklahoma City,Thunder,2,-331.8
+Moda Center,1610612753,Orlando,Magic,1,-471.8
+Moda Center,1610612762,Utah,Jazz,2,-476.4
+Moda Center,1610612751,Brooklyn,Nets,1,-486.1
+Moda Center,1610612749,Milwaukee,Bucks,1,-555.8
+Moda Center,1610612740,New Orleans,Pelicans,1,-672.7
+Moda Center,1610612754,Indiana,Pacers,1,-717.8
+Moda Center,1610612748,Miami,Heat,1,-727.0
+Moda Center,1610612763,Memphis,Grizzlies,2,-973.0
+Moda Center,1610612745,Houston,Rockets,2,-979.1
+Moda Center,1610612756,Phoenix,Suns,2,-985.8
+Moda Center,1610612737,Atlanta,Hawks,1,-1370.7
+Moda Center,1610612755,Philadelphia,76ers,1,-1546.0
+Moody Center,1610612756,Phoenix,Suns,1,90.0
+Moody Center,1610612758,Sacramento,Kings,1,-90.0
+Mortgage Matchup Center,1610612737,Atlanta,Hawks,1,0.0
+Mortgage Matchup Center,1610612738,Boston,Celtics,1,0.0
+Mortgage Matchup Center,1610612739,Cleveland,Cavaliers,1,0.0
+Mortgage Matchup Center,1610612740,New Orleans,Pelicans,1,0.0
+Mortgage Matchup Center,1610612741,Chicago,Bulls,1,0.0
+Mortgage Matchup Center,1610612742,Dallas,Mavericks,2,0.0
+Mortgage Matchup Center,1610612743,Denver,Nuggets,2,0.0
+Mortgage Matchup Center,1610612744,Golden State,Warriors,2,0.0
+Mortgage Matchup Center,1610612745,Houston,Rockets,2,0.0
+Mortgage Matchup Center,1610612746,LA,Clippers,2,0.0
+Mortgage Matchup Center,1610612747,Los Angeles,Lakers,3,0.0
+Mortgage Matchup Center,1610612748,Miami,Heat,1,0.0
+Mortgage Matchup Center,1610612749,Milwaukee,Bucks,1,0.0
+Mortgage Matchup Center,1610612750,Minnesota,Timberwolves,1,0.0
+Mortgage Matchup Center,1610612751,Brooklyn,Nets,1,0.0
+Mortgage Matchup Center,1610612752,New York,Knicks,1,0.0
+Mortgage Matchup Center,1610612753,Orlando,Magic,1,0.0
+Mortgage Matchup Center,1610612754,Indiana,Pacers,1,0.0
+Mortgage Matchup Center,1610612755,Philadelphia,76ers,1,0.0
+Mortgage Matchup Center,1610612757,Portland,Trail Blazers,1,0.0
+Mortgage Matchup Center,1610612758,Sacramento,Kings,2,0.0
+Mortgage Matchup Center,1610612759,San Antonio,Spurs,2,0.0
+Mortgage Matchup Center,1610612760,Oklahoma City,Thunder,4,0.0
+Mortgage Matchup Center,1610612761,Toronto,Raptors,1,0.0
+Mortgage Matchup Center,1610612762,Utah,Jazz,2,0.0
+Mortgage Matchup Center,1610612763,Memphis,Grizzlies,1,0.0
+Mortgage Matchup Center,1610612764,Washington,Wizards,1,0.0
+Mortgage Matchup Center,1610612765,Detroit,Pistons,1,0.0
+Mortgage Matchup Center,1610612766,Charlotte,Hornets,1,0.0
+Paycom Center,1610612737,Atlanta,Hawks,1,0.0
+Paycom Center,1610612738,Boston,Celtics,1,0.0
+Paycom Center,1610612739,Cleveland,Cavaliers,1,0.0
+Paycom Center,1610612740,New Orleans,Pelicans,2,0.0
+Paycom Center,1610612741,Chicago,Bulls,1,0.0
+Paycom Center,1610612742,Dallas,Mavericks,1,0.0
+Paycom Center,1610612743,Denver,Nuggets,2,0.0
+Paycom Center,1610612744,Golden State,Warriors,2,0.0
+Paycom Center,1610612745,Houston,Rockets,2,0.0
+Paycom Center,1610612746,LA,Clippers,1,0.0
+Paycom Center,1610612747,Los Angeles,Lakers,4,0.0
+Paycom Center,1610612748,Miami,Heat,1,0.0
+Paycom Center,1610612749,Milwaukee,Bucks,1,0.0
+Paycom Center,1610612750,Minnesota,Timberwolves,2,0.0
+Paycom Center,1610612751,Brooklyn,Nets,1,0.0
+Paycom Center,1610612752,New York,Knicks,1,0.0
+Paycom Center,1610612753,Orlando,Magic,1,0.0
+Paycom Center,1610612754,Indiana,Pacers,1,0.0
+Paycom Center,1610612755,Philadelphia,76ers,1,0.0
+Paycom Center,1610612756,Phoenix,Suns,5,0.0
+Paycom Center,1610612757,Portland,Trail Blazers,2,0.0
+Paycom Center,1610612758,Sacramento,Kings,2,0.0
+Paycom Center,1610612759,San Antonio,Spurs,6,0.0
+Paycom Center,1610612761,Toronto,Raptors,1,0.0
+Paycom Center,1610612762,Utah,Jazz,2,0.0
+Paycom Center,1610612763,Memphis,Grizzlies,1,0.0
+Paycom Center,1610612764,Washington,Wizards,1,0.0
+Paycom Center,1610612765,Detroit,Pistons,1,0.0
+Paycom Center,1610612766,Charlotte,Hornets,1,0.0
+Rocket Arena,1610612737,Atlanta,Hawks,2,0.0
+Rocket Arena,1610612738,Boston,Celtics,2,0.0
+Rocket Arena,1610612740,New Orleans,Pelicans,1,0.0
+Rocket Arena,1610612741,Chicago,Bulls,2,0.0
+Rocket Arena,1610612742,Dallas,Mavericks,1,0.0
+Rocket Arena,1610612743,Denver,Nuggets,1,0.0
+Rocket Arena,1610612744,Golden State,Warriors,1,0.0
+Rocket Arena,1610612745,Houston,Rockets,1,0.0
+Rocket Arena,1610612746,LA,Clippers,1,0.0
+Rocket Arena,1610612747,Los Angeles,Lakers,1,0.0
+Rocket Arena,1610612748,Miami,Heat,2,0.0
+Rocket Arena,1610612749,Milwaukee,Bucks,2,0.0
+Rocket Arena,1610612750,Minnesota,Timberwolves,1,0.0
+Rocket Arena,1610612751,Brooklyn,Nets,1,0.0
+Rocket Arena,1610612752,New York,Knicks,3,0.0
+Rocket Arena,1610612753,Orlando,Magic,2,0.0
+Rocket Arena,1610612754,Indiana,Pacers,2,0.0
+Rocket Arena,1610612755,Philadelphia,76ers,2,0.0
+Rocket Arena,1610612756,Phoenix,Suns,1,0.0
+Rocket Arena,1610612757,Portland,Trail Blazers,1,0.0
+Rocket Arena,1610612758,Sacramento,Kings,1,0.0
+Rocket Arena,1610612759,San Antonio,Spurs,1,0.0
+Rocket Arena,1610612760,Oklahoma City,Thunder,1,0.0
+Rocket Arena,1610612761,Toronto,Raptors,6,0.0
+Rocket Arena,1610612762,Utah,Jazz,1,0.0
+Rocket Arena,1610612763,Memphis,Grizzlies,1,0.0
+Rocket Arena,1610612764,Washington,Wizards,2,0.0
+Rocket Arena,1610612765,Detroit,Pistons,5,0.0
+Rocket Arena,1610612766,Charlotte,Hornets,2,0.0
+Scotiabank Arena,1610612742,Dallas,Mavericks,1,991.5
+Scotiabank Arena,1610612744,Golden State,Warriors,1,991.5
+Scotiabank Arena,1610612747,Los Angeles,Lakers,1,991.5
+Scotiabank Arena,1610612759,San Antonio,Spurs,1,991.5
+Scotiabank Arena,1610612764,Washington,Wizards,1,991.5
+Scotiabank Arena,1610612766,Charlotte,Hornets,2,600.4
+Scotiabank Arena,1610612753,Orlando,Magic,2,521.5
+Scotiabank Arena,1610612765,Detroit,Pistons,2,455.9
+Scotiabank Arena,1610612757,Portland,Trail Blazers,1,379.5
+Scotiabank Arena,1610612756,Phoenix,Suns,1,371.3
+Scotiabank Arena,1610612743,Denver,Nuggets,1,357.0
+Scotiabank Arena,1610612760,Oklahoma City,Thunder,1,328.3
+Scotiabank Arena,1610612752,New York,Knicks,3,209.7
+Scotiabank Arena,1610612740,New Orleans,Pelicans,1,199.2
+Scotiabank Arena,1610612738,Boston,Celtics,2,184.3
+Scotiabank Arena,1610612749,Milwaukee,Bucks,2,157.1
+Scotiabank Arena,1610612746,LA,Clippers,1,103.8
+Scotiabank Arena,1610612741,Chicago,Bulls,1,-38.7
+Scotiabank Arena,1610612748,Miami,Heat,2,-50.4
+Scotiabank Arena,1610612750,Minnesota,Timberwolves,1,-59.2
+Scotiabank Arena,1610612762,Utah,Jazz,1,-85.8
+Scotiabank Arena,1610612758,Sacramento,Kings,1,-222.1
+Scotiabank Arena,1610612751,Brooklyn,Nets,2,-435.3
+Scotiabank Arena,1610612739,Cleveland,Cavaliers,4,-437.1
+Scotiabank Arena,1610612754,Indiana,Pacers,2,-669.0
+Scotiabank Arena,1610612755,Philadelphia,76ers,2,-721.8
+Scotiabank Arena,1610612737,Atlanta,Hawks,2,-739.8
+Scotiabank Arena,1610612745,Houston,Rockets,1,-1638.7
+Scotiabank Arena,1610612763,Memphis,Grizzlies,1,-2138.9
+Smoothie King Center,1610612737,Atlanta,Hawks,1,1969.2
+Smoothie King Center,1610612747,Los Angeles,Lakers,2,1730.9
+Smoothie King Center,1610612744,Golden State,Warriors,2,975.0
+Smoothie King Center,1610612759,San Antonio,Spurs,2,612.2
+Smoothie King Center,1610612752,New York,Knicks,1,579.3
+Smoothie King Center,1610612739,Cleveland,Cavaliers,1,524.0
+Smoothie King Center,1610612743,Denver,Nuggets,2,431.2
+Smoothie King Center,1610612763,Memphis,Grizzlies,2,424.1
+Smoothie King Center,1610612742,Dallas,Mavericks,2,416.9
+Smoothie King Center,1610612738,Boston,Celtics,1,319.0
+Smoothie King Center,1610612756,Phoenix,Suns,2,310.3
+Smoothie King Center,1610612745,Houston,Rockets,2,293.4
+Smoothie King Center,1610612764,Washington,Wizards,1,227.8
+Smoothie King Center,1610612741,Chicago,Bulls,1,219.6
+Smoothie King Center,1610612758,Sacramento,Kings,1,161.2
+Smoothie King Center,1610612753,Orlando,Magic,1,157.0
+Smoothie King Center,1610612761,Toronto,Raptors,1,94.5
+Smoothie King Center,1610612748,Miami,Heat,1,-32.6
+Smoothie King Center,1610612754,Indiana,Pacers,1,-42.8
+Smoothie King Center,1610612755,Philadelphia,76ers,1,-51.0
+Smoothie King Center,1610612751,Brooklyn,Nets,1,-281.7
+Smoothie King Center,1610612762,Utah,Jazz,1,-517.4
+Smoothie King Center,1610612746,LA,Clippers,2,-517.9
+Smoothie King Center,1610612749,Milwaukee,Bucks,1,-780.8
+Smoothie King Center,1610612766,Charlotte,Hornets,1,-943.8
+Smoothie King Center,1610612765,Detroit,Pistons,1,-998.1
+Smoothie King Center,1610612757,Portland,Trail Blazers,3,-1117.7
+Smoothie King Center,1610612750,Minnesota,Timberwolves,2,-1907.8
+Smoothie King Center,1610612760,Oklahoma City,Thunder,1,-2786.8
+Spectrum Center,1610612744,Golden State,Warriors,1,994.2
+Spectrum Center,1610612738,Boston,Celtics,1,950.1
+Spectrum Center,1610612757,Portland,Trail Blazers,1,941.9
+Spectrum Center,1610612745,Houston,Rockets,1,929.6
+Spectrum Center,1610612752,New York,Knicks,2,913.7
+Spectrum Center,1610612756,Phoenix,Suns,1,900.9
+Spectrum Center,1610612748,Miami,Heat,2,871.7
+Spectrum Center,1610612765,Detroit,Pistons,2,855.3
+Spectrum Center,1610612747,Los Angeles,Lakers,1,842.5
+Spectrum Center,1610612759,San Antonio,Spurs,1,838.3
+Spectrum Center,1610612742,Dallas,Mavericks,1,824.0
+Spectrum Center,1610612751,Brooklyn,Nets,1,820.9
+Spectrum Center,1610612763,Memphis,Grizzlies,1,791.2
+Spectrum Center,1610612760,Oklahoma City,Thunder,1,772.8
+Spectrum Center,1610612758,Sacramento,Kings,1,753.3
+Spectrum Center,1610612750,Minnesota,Timberwolves,1,747.1
+Spectrum Center,1610612753,Orlando,Magic,2,314.1
+Spectrum Center,1610612746,LA,Clippers,1,6.0
+Spectrum Center,1610612739,Cleveland,Cavaliers,2,-61.6
+Spectrum Center,1610612754,Indiana,Pacers,2,-261.0
+Spectrum Center,1610612743,Denver,Nuggets,1,-306.6
+Spectrum Center,1610612749,Milwaukee,Bucks,2,-372.2
+Spectrum Center,1610612755,Philadelphia,76ers,2,-744.8
+Spectrum Center,1610612741,Chicago,Bulls,2,-908.2
+Spectrum Center,1610612737,Atlanta,Hawks,2,-1330.5
+Spectrum Center,1610612740,New Orleans,Pelicans,1,-1488.4
+Spectrum Center,1610612761,Toronto,Raptors,2,-1554.5
+Spectrum Center,1610612764,Washington,Wizards,2,-1564.8
+Spectrum Center,1610612762,Utah,Jazz,1,-1631.9
+State Farm Arena,1610612766,Charlotte,Hornets,2,1148.4
+State Farm Arena,1610612765,Detroit,Pistons,1,1022.3
+State Farm Arena,1610612738,Boston,Celtics,2,958.2
+State Farm Arena,1610612747,Los Angeles,Lakers,1,859.3
+State Farm Arena,1610612761,Toronto,Raptors,2,737.9
+State Farm Arena,1610612744,Golden State,Warriors,1,731.2
+State Farm Arena,1610612758,Sacramento,Kings,1,728.1
+State Farm Arena,1610612753,Orlando,Magic,2,639.5
+State Farm Arena,1610612752,New York,Knicks,5,479.6
+State Farm Arena,1610612739,Cleveland,Cavaliers,2,476.5
+State Farm Arena,1610612755,Philadelphia,76ers,2,365.3
+State Farm Arena,1610612745,Houston,Rockets,1,252.5
+State Farm Arena,1610612746,LA,Clippers,1,117.2
+State Farm Arena,1610612760,Oklahoma City,Thunder,1,96.7
+State Farm Arena,1610612750,Minnesota,Timberwolves,1,-10.9
+State Farm Arena,1610612751,Brooklyn,Nets,2,-32.9
+State Farm Arena,1610612743,Denver,Nuggets,1,-211.8
+State Farm Arena,1610612749,Milwaukee,Bucks,2,-212.3
+State Farm Arena,1610612763,Memphis,Grizzlies,1,-230.2
+State Farm Arena,1610612740,New Orleans,Pelicans,1,-371.7
+State Farm Arena,1610612748,Miami,Heat,2,-500.8
+State Farm Arena,1610612764,Washington,Wizards,2,-751.5
+State Farm Arena,1610612742,Dallas,Mavericks,1,-862.7
+State Farm Arena,1610612759,San Antonio,Spurs,1,-871.9
+State Farm Arena,1610612757,Portland,Trail Blazers,1,-879.1
+State Farm Arena,1610612756,Phoenix,Suns,1,-917.0
+State Farm Arena,1610612762,Utah,Jazz,1,-967.2
+State Farm Arena,1610612741,Chicago,Bulls,2,-1145.1
+State Farm Arena,1610612754,Indiana,Pacers,1,-4249.3
+T-Mobile Arena,1610612759,San Antonio,Spurs,1,1822.0
+T-Mobile Arena,1610612752,New York,Knicks,1,-1822.0
+TD Garden,1610612737,Atlanta,Hawks,2,0.0
+TD Garden,1610612739,Cleveland,Cavaliers,1,0.0
+TD Garden,1610612740,New Orleans,Pelicans,1,0.0
+TD Garden,1610612741,Chicago,Bulls,2,0.0
+TD Garden,1610612742,Dallas,Mavericks,1,0.0
+TD Garden,1610612743,Denver,Nuggets,1,0.0
+TD Garden,1610612744,Golden State,Warriors,1,0.0
+TD Garden,1610612745,Houston,Rockets,1,0.0
+TD Garden,1610612746,LA,Clippers,1,0.0
+TD Garden,1610612747,Los Angeles,Lakers,1,0.0
+TD Garden,1610612748,Miami,Heat,2,0.0
+TD Garden,1610612749,Milwaukee,Bucks,1,0.0
+TD Garden,1610612750,Minnesota,Timberwolves,1,0.0
+TD Garden,1610612751,Brooklyn,Nets,2,0.0
+TD Garden,1610612752,New York,Knicks,2,0.0
+TD Garden,1610612753,Orlando,Magic,2,0.0
+TD Garden,1610612754,Indiana,Pacers,2,0.0
+TD Garden,1610612755,Philadelphia,76ers,6,0.0
+TD Garden,1610612756,Phoenix,Suns,1,0.0
+TD Garden,1610612757,Portland,Trail Blazers,1,0.0
+TD Garden,1610612758,Sacramento,Kings,1,0.0
+TD Garden,1610612759,San Antonio,Spurs,1,0.0
+TD Garden,1610612760,Oklahoma City,Thunder,1,0.0
+TD Garden,1610612761,Toronto,Raptors,2,0.0
+TD Garden,1610612762,Utah,Jazz,1,0.0
+TD Garden,1610612763,Memphis,Grizzlies,1,0.0
+TD Garden,1610612764,Washington,Wizards,2,0.0
+TD Garden,1610612765,Detroit,Pistons,2,0.0
+TD Garden,1610612766,Charlotte,Hornets,2,0.0
+Target Center,1610612740,New Orleans,Pelicans,2,1140.8
+Target Center,1610612744,Golden State,Warriors,2,1140.8
+Target Center,1610612745,Houston,Rockets,1,1140.8
+Target Center,1610612749,Milwaukee,Bucks,1,1140.8
+Target Center,1610612751,Brooklyn,Nets,1,1140.8
+Target Center,1610612752,New York,Knicks,1,1140.8
+Target Center,1610612753,Orlando,Magic,1,1140.8
+Target Center,1610612754,Indiana,Pacers,1,1140.8
+Target Center,1610612755,Philadelphia,76ers,1,1140.8
+Target Center,1610612761,Toronto,Raptors,1,1140.8
+Target Center,1610612765,Detroit,Pistons,1,1140.8
+Target Center,1610612766,Charlotte,Hornets,1,1140.8
+Target Center,1610612760,Oklahoma City,Thunder,2,645.8
+Target Center,1610612746,LA,Clippers,2,386.4
+Target Center,1610612757,Portland,Trail Blazers,2,121.0
+Target Center,1610612759,San Antonio,Spurs,5,46.5
+Target Center,1610612742,Dallas,Mavericks,2,-20.5
+Target Center,1610612762,Utah,Jazz,2,-389.0
+Target Center,1610612741,Chicago,Bulls,1,-412.0
+Target Center,1610612738,Boston,Celtics,1,-534.0
+Target Center,1610612743,Denver,Nuggets,5,-560.5
+Target Center,1610612739,Cleveland,Cavaliers,1,-605.8
+Target Center,1610612737,Atlanta,Hawks,1,-637.5
+Target Center,1610612748,Miami,Heat,1,-863.0
+Target Center,1610612763,Memphis,Grizzlies,2,-1038.8
+Target Center,1610612756,Phoenix,Suns,2,-1217.2
+Target Center,1610612764,Washington,Wizards,1,-1319.2
+Target Center,1610612758,Sacramento,Kings,2,-1692.3
+Target Center,1610612747,Los Angeles,Lakers,1,-2620.9
+Toyota Center,1610612743,Denver,Nuggets,1,51.2
+Toyota Center,1610612750,Minnesota,Timberwolves,2,26.6
+Toyota Center,1610612739,Cleveland,Cavaliers,1,9.2
+Toyota Center,1610612747,Los Angeles,Lakers,5,-1.2
+Toyota Center,1610612737,Atlanta,Hawks,1,-3.1
+Toyota Center,1610612738,Boston,Celtics,1,-3.1
+Toyota Center,1610612740,New Orleans,Pelicans,2,-3.1
+Toyota Center,1610612741,Chicago,Bulls,1,-3.1
+Toyota Center,1610612742,Dallas,Mavericks,2,-3.1
+Toyota Center,1610612744,Golden State,Warriors,1,-3.1
+Toyota Center,1610612746,LA,Clippers,3,-3.1
+Toyota Center,1610612748,Miami,Heat,1,-3.1
+Toyota Center,1610612749,Milwaukee,Bucks,1,-3.1
+Toyota Center,1610612751,Brooklyn,Nets,1,-3.1
+Toyota Center,1610612752,New York,Knicks,1,-3.1
+Toyota Center,1610612753,Orlando,Magic,1,-3.1
+Toyota Center,1610612754,Indiana,Pacers,1,-3.1
+Toyota Center,1610612755,Philadelphia,76ers,1,-3.1
+Toyota Center,1610612756,Phoenix,Suns,2,-3.1
+Toyota Center,1610612757,Portland,Trail Blazers,2,-3.1
+Toyota Center,1610612758,Sacramento,Kings,2,-3.1
+Toyota Center,1610612759,San Antonio,Spurs,2,-3.1
+Toyota Center,1610612760,Oklahoma City,Thunder,1,-3.1
+Toyota Center,1610612761,Toronto,Raptors,1,-3.1
+Toyota Center,1610612762,Utah,Jazz,2,-3.1
+Toyota Center,1610612763,Memphis,Grizzlies,2,-3.1
+Toyota Center,1610612764,Washington,Wizards,1,-3.1
+Toyota Center,1610612765,Detroit,Pistons,1,-3.1
+Toyota Center,1610612766,Charlotte,Hornets,1,-3.1
+United Center,1610612738,Boston,Celtics,1,1895.4
+United Center,1610612759,San Antonio,Spurs,1,1463.9
+United Center,1610612765,Detroit,Pistons,2,1272.2
+United Center,1610612750,Minnesota,Timberwolves,1,1214.8
+United Center,1610612745,Houston,Rockets,1,1180.0
+United Center,1610612753,Orlando,Magic,2,1168.2
+United Center,1610612764,Washington,Wizards,1,1084.6
+United Center,1610612747,Los Angeles,Lakers,1,1080.5
+United Center,1610612748,Miami,Heat,2,774.1
+United Center,1610612755,Philadelphia,76ers,2,758.7
+United Center,1610612756,Phoenix,Suns,1,714.6
+United Center,1610612743,Denver,Nuggets,1,712.5
+United Center,1610612754,Indiana,Pacers,2,663.9
+United Center,1610612749,Milwaukee,Bucks,2,612.6
+United Center,1610612766,Charlotte,Hornets,2,-14.2
+United Center,1610612751,Brooklyn,Nets,2,-52.1
+United Center,1610612763,Memphis,Grizzlies,1,-89.0
+United Center,1610612742,Dallas,Mavericks,1,-503.1
+United Center,1610612761,Toronto,Raptors,2,-516.9
+United Center,1610612740,New Orleans,Pelicans,2,-814.2
+United Center,1610612739,Cleveland,Cavaliers,2,-949.5
+United Center,1610612758,Sacramento,Kings,1,-1257.5
+United Center,1610612752,New York,Knicks,2,-1296.4
+United Center,1610612762,Utah,Jazz,1,-1419.5
+United Center,1610612760,Oklahoma City,Thunder,1,-1724.9
+United Center,1610612746,LA,Clippers,1,-1750.5
+United Center,1610612757,Portland,Trail Blazers,1,-1771.0
+United Center,1610612744,Golden State,Warriors,1,-1839.7
+United Center,1610612737,Atlanta,Hawks,1,-2203.6
+Xfinity Mobile Arena,1610612747,Los Angeles,Lakers,1,1470.0
+Xfinity Mobile Arena,1610612740,New Orleans,Pelicans,1,1126.6
+Xfinity Mobile Arena,1610612739,Cleveland,Cavaliers,2,767.9
+Xfinity Mobile Arena,1610612745,Houston,Rockets,1,767.9
+Xfinity Mobile Arena,1610612757,Portland,Trail Blazers,1,767.9
+Xfinity Mobile Arena,1610612759,San Antonio,Spurs,1,767.9
+Xfinity Mobile Arena,1610612760,Oklahoma City,Thunder,1,767.9
+Xfinity Mobile Arena,1610612752,New York,Knicks,4,383.9
+Xfinity Mobile Arena,1610612748,Miami,Heat,2,308.7
+Xfinity Mobile Arena,1610612738,Boston,Celtics,5,307.2
+Xfinity Mobile Arena,1610612765,Detroit,Pistons,2,139.5
+Xfinity Mobile Arena,1610612766,Charlotte,Hornets,1,130.3
+Xfinity Mobile Arena,1610612751,Brooklyn,Nets,2,87.3
+Xfinity Mobile Arena,1610612753,Orlando,Magic,2,66.3
+Xfinity Mobile Arena,1610612742,Dallas,Mavericks,1,60.6
+Xfinity Mobile Arena,1610612741,Chicago,Bulls,1,-77.8
+Xfinity Mobile Arena,1610612754,Indiana,Pacers,2,-124.4
+Xfinity Mobile Arena,1610612758,Sacramento,Kings,1,-398.6
+Xfinity Mobile Arena,1610612743,Denver,Nuggets,1,-487.8
+Xfinity Mobile Arena,1610612737,Atlanta,Hawks,2,-524.1
+Xfinity Mobile Arena,1610612750,Minnesota,Timberwolves,1,-553.3
+Xfinity Mobile Arena,1610612761,Toronto,Raptors,2,-600.0
+Xfinity Mobile Arena,1610612762,Utah,Jazz,1,-626.1
+Xfinity Mobile Arena,1610612749,Milwaukee,Bucks,2,-682.0
+Xfinity Mobile Arena,1610612764,Washington,Wizards,2,-771.2
+Xfinity Mobile Arena,1610612744,Golden State,Warriors,1,-795.2
+Xfinity Mobile Arena,1610612746,LA,Clippers,1,-1013.6
+Xfinity Mobile Arena,1610612763,Memphis,Grizzlies,1,-1127.3
+Xfinity Mobile Arena,1610612756,Phoenix,Suns,1,-1186.8

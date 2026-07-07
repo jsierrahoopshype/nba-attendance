@@ -72,7 +72,8 @@ function render() {
   const cols = [
     { key: "building", label: "Building", align: "left", defaultDir: "asc", get: r => r.building,
       cell: r => arenaLink(r.slug, r.building) + '<span class="pill">' + esc(r.buildingType) + "</span>" },
-    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city, cell: r => '<span class="sub">' + esc(r.city) + "</span>" },
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city,
+      cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city) + "</span>" },
     { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
     { key: "wins", label: "W", defaultDir: "desc", get: r => r.wins, cell: r => fmtInt(r.wins) },
     { key: "losses", label: "L", defaultDir: "desc", get: r => r.losses, cell: r => fmtInt(r.losses) },
