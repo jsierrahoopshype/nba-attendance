@@ -34,6 +34,9 @@
 "use strict";
 let city = null, over = null, gt = "regular", season = null;
 
+/* draw tables only show real attendance for 2026 */
+const drawSeasonOK = () => season == null || season === 2026;
+
 async function boot() {
   const slug = qp("slug");
   if (!slug) { document.getElementById("result").innerHTML = '<div class="err">No city given.</div>'; return; }
@@ -145,6 +148,10 @@ function render() {
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
     (allstarMode ? " All-Star" : "") + " records in this city.</div>");
 
+  // visiting-player + visiting-team draw for the whole city (aggregated across
+  // its arenas). All-Stars-only default, 2026-only note off-season.
+  renderDrawTables(mount);
+
   // full records table for this game type (season-aware)
   const recs = fullRecs;
   if (recs.length) {
@@ -166,6 +173,69 @@ function render() {
     sortableTable(am, cols, rows, { key: "total_points", dir: "desc" });
     wireRowNav(am);
   }
+}
+
+/* City-level visiting-player / visiting-team draw (aggregated across the city's
+   arenas). All-Stars-only default (drawAllstarMode), 2026-only. */
+function renderDrawTables(mount) {
+  const players = (city.visiting_draw || []);
+  const teams = (city.team_draw || []);
+  if (!players.length && !teams.length) return;
+  const label = esc(city.draw_label || "2026 season only");
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Who drew the most in " + esc(city.name) + " " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + label + "</span></div>");
+
+  if (!drawSeasonOK()) {
+    mount.insertAdjacentHTML("beforeend",
+      '<div class="draw-note">Attendance data only exists for the 2026 season, so the ' +
+      "draw tables can't be shown for " + esc(seasonLabel(season)) +
+      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see them.</div>");
+    return;
+  }
+
+  const dc = document.createElement("div");
+  dc.className = "controls";
+  mount.appendChild(dc);
+  makeAllstarToggle(dc, render, {
+    label: "Draw players", get: () => drawAllstarMode, set: v => { drawAllstarMode = v; },
+  });
+
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+
+  const pfil = filterAllstar(players, r => r.personId, drawAllstarMode);
+  const pcard = document.createElement("div");
+  pcard.className = "block lb-card";
+  pcard.innerHTML = '<h3>Visiting players <span class="cap">(avg draw vs baseline)</span></h3>';
+  const pm = document.createElement("div");
+  pcard.appendChild(pm); grid.appendChild(pcard);
+  if (pfil.length) {
+    const prows = pfil.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    sortableTable(pm, [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    ], prows, { key: "mean_delta", dir: "desc" });
+    wireRowNav(pm);
+  } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
+
+  const tcard = document.createElement("div");
+  tcard.className = "block lb-card";
+  const teamCap = drawAllstarMode ? "all teams — no All-Star filter applies" : "avg draw vs baseline";
+  tcard.innerHTML = '<h3>Visiting teams <span class="cap">(' + teamCap + ")</span></h3>";
+  const tm = document.createElement("div");
+  tcard.appendChild(tm); grid.appendChild(tcard);
+  if (teams.length) {
+    sortableTable(tm, [
+      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    ], teams.slice(), { key: "mean_delta", dir: "desc" });
+  } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
 }
 
 boot();
