@@ -32,7 +32,8 @@ const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").r
    cols: [{key, label, align:'left'|'right', sortable:bool, defaultDir:'asc'|'desc',
            get(row) -> sort value (number or string), cell(row) -> html, tdcls(row)}]
    Every column is sortable unless sortable:false. */
-function sortableTable(mount, cols, rows, initial) {
+function sortableTable(mount, cols, rows, initial, opts) {
+  opts = opts || {};
   let sort = initial || firstSortable(cols);
 
   function firstSortable(cs) {
@@ -62,6 +63,8 @@ function sortableTable(mount, cols, rows, initial) {
     }).join("");
     const body = arr.map(row => {
       const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
+      const rc = opts.rowClass ? opts.rowClass(row) : "";
+      const rowCls = rc ? ' class="' + esc(rc) + '"' : "";
       const tds = cols.map(c => {
         const cls = [];
         if (c.align === "left") cls.push("name");
@@ -69,7 +72,7 @@ function sortableTable(mount, cols, rows, initial) {
         if (sort.key === c.key) cls.push("sorted-by");
         return '<td' + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + ">" + c.cell(row) + "</td>";
       }).join("");
-      return "<tr" + href + ">" + tds + "</tr>";
+      return "<tr" + rowCls + href + ">" + tds + "</tr>";
     }).join("");
     mount.innerHTML =
       '<div class="table-wrap"><table class="lb"><thead><tr>' + head +
@@ -188,13 +191,17 @@ function computeLeaderboards(recs) {
   return { total_points: top(byPts), wins: top(byWins), win_pct: top(wpPool), career_high: top(byHi) };
 }
 
-/* ---------- All-Star flags + leaderboard default toggle ----------
-   Every player leaderboard defaults to All-Star players only; a "show all
-   players" toggle expands to the full field. allstarMode is shared across the
-   page so a single toggle re-renders whatever is on screen. */
+/* ---------- All-Star flags + toggles ----------
+   Two independent defaults:
+     allstarMode      career leaderboards / record tables / player directory —
+                      default OFF (show everyone); All-Star is an opt-in filter.
+     drawAllstarMode  per-arena / per-city draw tables — default ON (All-Stars
+                      only); toggleable to show everyone. Opposite default,
+                      scoped to the draw tables only. */
 let ALLSTAR = null;          // Set of personId strings
 let ALLSTAR_META = {};       // personId -> {times_selected, first_year, last_year}
-let allstarMode = true;      // default: All-Stars only
+let allstarMode = false;     // records/leaderboards/directory: show all by default
+let drawAllstarMode = true;  // arena/city draw tables: All-Stars only by default
 
 async function loadAllstar() {
   if (ALLSTAR) return ALLSTAR;
@@ -206,27 +213,35 @@ async function loadAllstar() {
   return ALLSTAR;
 }
 const isAllstar = pid => !!(ALLSTAR && ALLSTAR.has(String(pid)));
-/* keep only All-Stars when allstarMode is on; getPid(row)->personId */
-function filterAllstar(rows, getPid) {
-  if (!allstarMode) return rows;
+/* keep only All-Stars when `mode` is on (defaults to allstarMode). */
+function filterAllstar(rows, getPid, mode) {
+  const on = (mode === undefined) ? allstarMode : mode;
+  if (!on) return rows;
   return rows.filter(r => isAllstar(getPid(r)));
 }
-/* Render an All-Stars / all-players segmented toggle into `mount`. onChange()
-   fires after allstarMode flips so the caller can re-render its tables. */
-function makeAllstarToggle(mount, onChange) {
+/* Render an All-Stars / all-players segmented toggle into `mount`. opts:
+     label   heading text (default "Leaderboards")
+     get/set read/write the backing mode flag (default allstarMode)
+   onChange() fires after the flag flips so the caller can re-render. */
+function makeAllstarToggle(mount, onChange, opts) {
+  opts = opts || {};
+  const label = opts.label || "Leaderboards";
+  const get = opts.get || (() => allstarMode);
+  const set = opts.set || (v => { allstarMode = v; });
   const wrap = document.createElement("div");
-  wrap.className = "controls allstar-controls";
+  wrap.className = "field allstar-field";
+  const on = get();
   wrap.innerHTML =
-    '<div class="field"><span class="lbl">Leaderboards</span>' +
+    '<span class="lbl">' + esc(label) + "</span>" +
     '<div class="toggle allstar-toggle">' +
-    '<button data-as="1" class="' + (allstarMode ? "active" : "") + '">★ All-Stars only</button>' +
-    '<button data-as="0" class="' + (allstarMode ? "" : "active") + '">Show all players</button>' +
-    "</div></div>";
+    '<button data-as="1" class="' + (on ? "active" : "") + '">★ All-Stars only</button>' +
+    '<button data-as="0" class="' + (on ? "" : "active") + '">Show all players</button>' +
+    "</div>";
   mount.appendChild(wrap);
   wrap.addEventListener("click", e => {
     const b = e.target.closest("button[data-as]");
     if (!b) return;
-    allstarMode = b.dataset.as === "1";
+    set(b.dataset.as === "1");
     wrap.querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
     onChange();
   });

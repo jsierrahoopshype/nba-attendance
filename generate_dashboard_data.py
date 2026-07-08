@@ -238,13 +238,14 @@ def load_allstar():
     return ids, meta
 
 
-def load_arena_draw():
+def load_arena_draw(slug_to_city=None):
     """Wire player_arena_draw.csv (2026-only visiting-player draw per arena) two
     ways, keyed by the same slug the building pages use:
 
       by_slug[slug]   -> visiting players sorted by mean_delta desc (who drew most)
       by_player[pid]  -> that player's draw at every arena they visited
     """
+    slug_to_city = slug_to_city or {}
     by_slug = defaultdict(list)
     by_player = defaultdict(list)
     if not os.path.exists(PLAYER_ARENA_DRAW_CSV):
@@ -252,6 +253,7 @@ def load_arena_draw():
     for r in read_csv(PLAYER_ARENA_DRAW_CSV):
         arena = r["arenaName"]
         slug = slugify(arena)
+        city = slug_to_city.get(slug, "")
         by_slug[slug].append({
             "personId": r["personId"],
             "playerName": r["playerName"],
@@ -261,6 +263,8 @@ def load_arena_draw():
         by_player[r["personId"]].append({
             "arena": arena,
             "slug": slug,
+            "city": city,
+            "city_slug": slugify(city) if city else "",
             "games": as_int(r["games"]),
             "mean_delta": as_float(r["mean_delta"]),
         })
@@ -289,31 +293,68 @@ def load_team_arena_draw():
     return dict(by_slug)
 
 
-def load_never_home():
-    """player_arena_home_away.csv -> per building slug, the players who never
-    played there for the home team (home_games == 0) with enough visits."""
-    by_slug = defaultdict(list)
+def load_home_away():
+    """player_arena_home_away.csv -> per building slug, a personId -> {home_games,
+    away_games} map. Merged into each leaderboard/record row on the arena page so
+    the home/away split (and the "never played home" cases, home_games == 0) show
+    inline rather than as a standalone section."""
+    by_slug = defaultdict(dict)
     if not os.path.exists(PLAYER_HOME_AWAY_CSV):
         return {}
     for r in read_csv(PLAYER_HOME_AWAY_CSV):
-        if as_int(r["home_games"]) != 0:
-            continue
-        if as_int(r["away_games"]) < NEVER_HOME_MIN_AWAY:
-            continue
         slug = slugify(r["arenaName"])
-        by_slug[slug].append({
-            "personId": r["personId"],
-            "playerName": r["playerName"],
+        by_slug[slug][r["personId"]] = {
+            "home_games": as_int(r["home_games"]),
             "away_games": as_int(r["away_games"]),
-            "games": as_int(r["games"]),
-            "total_points": as_int(r["total_points"]),
-            "first_season": as_int(r["first_season"]),
-            "last_season": as_int(r["last_season"]),
-        })
-    for s in by_slug:
-        by_slug[s].sort(key=lambda x: (-x["total_points"], -x["games"], x["playerName"]))
-        del by_slug[s][NEVER_HOME_TOP:]
-    return dict(by_slug)
+        }
+    return {s: dict(m) for s, m in by_slug.items()}
+
+
+def _weighted_draw(rows, key_field):
+    """Collapse per-arena draw rows to one row per key, games-weighted mean_delta."""
+    agg = {}
+    for r in rows:
+        k = r[key_field]
+        a = agg.setdefault(k, {"row": r, "wsum": 0.0, "games": 0})
+        a["wsum"] += r["mean_delta"] * r["games"]
+        a["games"] += r["games"]
+    out = []
+    for k, a in agg.items():
+        g = a["games"]
+        merged = dict(a["row"])
+        merged["games"] = g
+        merged["mean_delta"] = round(a["wsum"] / g, 1) if g else 0.0
+        out.append(merged)
+    out.sort(key=lambda x: -x["mean_delta"])
+    return out
+
+
+def load_city_draw(slug_to_city):
+    """Aggregate per-arena player/team draw up to the city level (games-weighted
+    mean_delta across the city's buildings). Returns (player_by_city, team_by_city)."""
+    player_rows = defaultdict(list)
+    team_rows = defaultdict(list)
+    if os.path.exists(PLAYER_ARENA_DRAW_CSV):
+        for r in read_csv(PLAYER_ARENA_DRAW_CSV):
+            city = slug_to_city.get(slugify(r["arenaName"]))
+            if not city:
+                continue
+            player_rows[city].append({
+                "personId": r["personId"], "playerName": r["playerName"],
+                "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"]),
+            })
+    if os.path.exists(TEAM_ARENA_DRAW_CSV):
+        for r in read_csv(TEAM_ARENA_DRAW_CSV):
+            city = slug_to_city.get(slugify(r["arenaName"]))
+            if not city:
+                continue
+            team_rows[city].append({
+                "teamId": r["teamId"], "team": f'{r["teamCity"]} {r["teamName"]}'.strip(),
+                "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"]),
+            })
+    player_by_city = {c: _weighted_draw(rows, "personId") for c, rows in player_rows.items()}
+    team_by_city = {c: _weighted_draw(rows, "teamId") for c, rows in team_rows.items()}
+    return player_by_city, team_by_city
 
 
 def load_records_by_season():
@@ -516,10 +557,10 @@ def load_winningest_teams():
 
 
 def build_buildings(records, building_games, allstar_ids, draw_by_slug,
-                    team_draw_by_slug=None, never_home_by_slug=None,
+                    team_draw_by_slug=None, home_away_by_slug=None,
                     season_by_building=None):
     team_draw_by_slug = team_draw_by_slug or {}
-    never_home_by_slug = never_home_by_slug or {}
+    home_away_by_slug = home_away_by_slug or {}
     season_by_building = season_by_building or {}
     by_building = {}
     for rec in records:
@@ -567,9 +608,9 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             },
             "records": [record_public(r) for r in recs],
             "records_by_season": season_by_building.get(name, []),
+            "home_away": home_away_by_slug.get(slug, {}),
             "visiting_draw": draw_by_slug.get(slug, [])[:ARENA_DRAW_TOP],
             "team_draw": team_draw_by_slug.get(slug, [])[:ARENA_DRAW_TOP],
-            "never_home": never_home_by_slug.get(slug, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
         write_json(os.path.join(DATA_DIR, "buildings", slug + ".json"), detail)
@@ -693,12 +734,14 @@ def city_record_public(rec):
 
 
 def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
-                 season_by_city=None):
-    season_by_city = season_by_city or {}
+                 season_by_city=None, city_player_draw=None, city_team_draw=None):
     """Write docs/data/cities/{index,overview,slug}.json from city_records.csv.
 
     buildings_by_city[city] -> sorted list of {name, slug} buildings in the city,
     so a city page can link out to its arenas."""
+    season_by_city = season_by_city or {}
+    city_player_draw = city_player_draw or {}
+    city_team_draw = city_team_draw or {}
     if not city_records:
         return 0
     by_city = {}
@@ -779,6 +822,9 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
             },
             "records": [city_record_public(r) for r in recs],
             "records_by_season": season_by_city.get(name, []),
+            "visiting_draw": city_player_draw.get(name, [])[:ARENA_DRAW_TOP],
+            "team_draw": city_team_draw.get(name, [])[:ARENA_DRAW_TOP],
+            "draw_label": BASELINE_SEASON_LABEL,
         }
         write_json(os.path.join(DATA_DIR, "cities", slug + ".json"), detail)
     return len(index)
@@ -835,13 +881,17 @@ def main():
     records = load_records()
     print(f"Loaded {len(records)} player-arena records")
 
+    # building slug -> city (for draw city-links and city-level draw aggregation)
+    slug_to_city = {slugify(r["building"]): r["city"] for r in records}
+
     # additive supporting tables
     building_games, city_games = load_game_counts(args.data_dir)
     allstar_ids_list, allstar_meta = load_allstar()
     allstar_ids = set(allstar_ids_list)
-    draw_by_slug, draw_by_player = load_arena_draw()
+    draw_by_slug, draw_by_player = load_arena_draw(slug_to_city)
     team_draw_by_slug = load_team_arena_draw()
-    never_home_by_slug = load_never_home()
+    home_away_by_slug = load_home_away()
+    city_player_draw, city_team_draw = load_city_draw(slug_to_city)
     city_records = load_city_records()
     season_by_player, season_by_building, season_by_city = load_records_by_season()
 
@@ -855,7 +905,7 @@ def main():
           f"{len(draw['players'])} players (games>={PLAYER_DRAW_MIN_GAMES})")
 
     n_buildings = build_buildings(records, building_games, allstar_ids, draw_by_slug,
-                                  team_draw_by_slug, never_home_by_slug,
+                                  team_draw_by_slug, home_away_by_slug,
                                   season_by_building)
     print(f"buildings: index + overview + {n_buildings} detail files")
 
@@ -868,7 +918,7 @@ def main():
         for c, b in buildings_by_city.items()
     }
     n_cities = build_cities(city_records, city_games, allstar_ids, buildings_by_city,
-                            season_by_city)
+                            season_by_city, city_player_draw, city_team_draw)
     print(f"cities: index + overview + {n_cities} detail files")
 
     n_players = build_players(records, draw_by_player, season_by_player)

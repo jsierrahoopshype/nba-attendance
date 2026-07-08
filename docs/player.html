@@ -103,11 +103,23 @@ function renderArenaDraw(mount) {
     "<div class='section-title'>Attendance draw by arena " +
     "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
     esc(player.draw_label || "2026 season only") + "</span></div>");
+
+  // Attendance only exists for 2026 — note instead of stale numbers off-season.
+  if (!(season == null || season === 2026)) {
+    mount.insertAdjacentHTML("beforeend",
+      '<div class="draw-note">Attendance data only exists for the 2026 season, so the ' +
+      "draw table can't be shown for " + esc(seasonLabel(season)) +
+      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see it.</div>");
+    return;
+  }
+
   const dm = document.createElement("div");
   mount.appendChild(dm);
   const rows = draw.map(r => ({ ...r, _href: arenaHref(r.slug) }));
   const cols = [
     { key: "arena", label: "Arena", align: "left", defaultDir: "asc", get: r => r.arena, cell: r => arenaLink(r.slug, r.arena) },
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
+      cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" },
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
     { key: "mean_delta", label: "Avg Draw vs Baseline", defaultDir: "desc", get: r => r.mean_delta,
       cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
