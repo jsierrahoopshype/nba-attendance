@@ -52,7 +52,6 @@ PLAYER_DRAW_MIN_GAMES = 20
 WIN_PCT_MIN_GAMES = 15          # player leaderboards + overview winningest player
 TEAM_WIN_PCT_MIN_GAMES = 20     # overview winningest team
 LEADERBOARD_SIZE = 25
-ARENA_DRAW_TOP = 40             # visiting-player draw rows kept per arena
 BASELINE_SEASON_LABEL = "2026 season only"
 
 
@@ -609,8 +608,12 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "records": [record_public(r) for r in recs],
             "records_by_season": season_by_building.get(name, []),
             "home_away": home_away_by_slug.get(slug, {}),
-            "visiting_draw": draw_by_slug.get(slug, [])[:ARENA_DRAW_TOP],
-            "team_draw": team_draw_by_slug.get(slug, [])[:ARENA_DRAW_TOP],
+            # Full sorted lists — no top-N truncation. Truncating here would run
+            # BEFORE arena.html's client-side All-Star filter, and with ~195
+            # visiting players tied at the same delta a top-N slice would drop
+            # most qualifying All-Stars (56 at Crypto) from the All-Stars view.
+            "visiting_draw": draw_by_slug.get(slug, []),
+            "team_draw": team_draw_by_slug.get(slug, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
         write_json(os.path.join(DATA_DIR, "buildings", slug + ".json"), detail)
@@ -822,8 +825,8 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
             },
             "records": [city_record_public(r) for r in recs],
             "records_by_season": season_by_city.get(name, []),
-            "visiting_draw": city_player_draw.get(name, [])[:ARENA_DRAW_TOP],
-            "team_draw": city_team_draw.get(name, [])[:ARENA_DRAW_TOP],
+            "visiting_draw": city_player_draw.get(name, []),
+            "team_draw": city_team_draw.get(name, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
         write_json(os.path.join(DATA_DIR, "cities", slug + ".json"), detail)
