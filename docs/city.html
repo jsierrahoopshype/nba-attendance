@@ -188,9 +188,9 @@ function renderDrawTables(mount) {
 
   if (!drawSeasonOK()) {
     mount.insertAdjacentHTML("beforeend",
-      '<div class="draw-note">Attendance data only exists for the 2026 season, so the ' +
-      "draw tables can't be shown for " + esc(seasonLabel(season)) +
-      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see them.</div>");
+      '<div class="draw-note">Attendance data only exists for the <strong>2025-26</strong> season, so there ' +
+      "is nothing to show for " + esc(seasonLabel(season)) +
+      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see the draw.</div>");
     return;
   }
 

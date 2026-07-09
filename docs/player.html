@@ -104,12 +104,13 @@ function renderArenaDraw(mount) {
     "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
     esc(player.draw_label || "2026 season only") + "</span></div>");
 
-  // Attendance only exists for 2026 — note instead of stale numbers off-season.
+  // Show the draw only under "All Seasons" or the 2025-26 season (the only
+  // season carrying attendance); otherwise a note, never stale numbers.
   if (!(season == null || season === 2026)) {
     mount.insertAdjacentHTML("beforeend",
-      '<div class="draw-note">Attendance data only exists for the 2026 season, so the ' +
-      "draw table can't be shown for " + esc(seasonLabel(season)) +
-      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see it.</div>");
+      '<div class="draw-note">Attendance data only exists for the <strong>2025-26</strong> season, so there ' +
+      "is nothing to show for " + esc(seasonLabel(season)) +
+      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see the draw.</div>");
     return;
   }
 
