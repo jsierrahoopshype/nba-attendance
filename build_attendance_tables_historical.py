@@ -72,19 +72,26 @@ def load_games(games_path, historical_path, mapping_path, coverage_threshold):
 
     g["has_att"] = g["attendance"].fillna(0) > 0
 
-    # ---- canonical building (arena_mapping); fall back to raw arenaName ----
-    if os.path.exists(mapping_path):
-        m = pd.read_csv(mapping_path)
-        m["arenaId"] = pd.to_numeric(m["arenaId"], errors="coerce")
-        g["arenaId"] = pd.to_numeric(g["arenaId"], errors="coerce")
-        g = g.merge(m[["arenaId", "building"]], on="arenaId", how="left")
-    else:
-        g["building"] = pd.NA
+    # ---- canonical building via the shared resolver ----
+    # Tier 1: arenaId in arena_mapping.csv. Tier 2 (1980-2006, only when
+    # arena_mapping_pre2007.csv is present): home team city+name+season. Seasons
+    # without attendance still self-exclude below via the coverage threshold, so
+    # extending the building range back to 1980 doesn't add draw rows until real
+    # attendance for those seasons exists.
+    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO, UNMATCHED_GATE
+    resolver = load_arena_resolver(os.path.dirname(games_path))
+    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    if resolver.has_pre2007:
+        _, _, frac = resolver.coverage_report(g)
+        if frac > UNMATCHED_GATE:
+            sys.exit(f"STOP: {frac:.2%} of 1980-2006 games are unresolved "
+                     f"(> {UNMATCHED_GATE:.0%}); fix arena_mapping_pre2007.csv and re-run.")
+    g = resolver.attach(g)
     g["building"] = g["building"].fillna(g["arenaName"])
 
-    # Key on the canonical building (arenaName is null pre-2026). Require a known
-    # building so neutral/unmapped sites don't form spurious baseline groups.
-    mask = g["gameType"].isin(GAME_TYPES) & g["building"].notna()
+    # Require a known building so neutral/unmapped sites don't form spurious
+    # baseline groups.
+    mask = (g["season"] >= floor) & g["gameType"].isin(GAME_TYPES) & g["building"].notna()
     gm = g[mask].copy()
 
     keys = ["building", "season", "gameType"]

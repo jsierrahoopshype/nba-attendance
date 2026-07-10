@@ -25,7 +25,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
-  <div class="foot">Leaderboards cover the 2007–2026 seasons · minimum 15 games for the win% board.</div>
+  <div class="foot" id="foot">Leaderboards · minimum 15 games for the win% board.</div>
 </div>
 
 <script src="app.js"></script>
@@ -77,6 +77,9 @@ async function boot() {
     "<span>" + fmtInt(building.total_games) + " games hosted</span><span class=\"sep\">·</span>" +
     "<span>" + fmtInt(building.player_game_rows) + " player-game records</span></div></div>";
 
+  document.getElementById("foot").textContent =
+    "Leaderboards cover the " + seasons(building.first_season, building.last_season) +
+    " seasons · minimum 15 games for the win% board.";
   await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
