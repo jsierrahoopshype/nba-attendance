@@ -12,7 +12,7 @@ db_path = sys.argv[2] if len(sys.argv) > 2 else "nba.sqlite"
 g = pd.read_csv(f"{data_dir}/Games.csv", low_memory=False, usecols=["gameId", "gameDate", "gameType"])
 g["gameDate"] = pd.to_datetime(g["gameDate"], errors="coerce")
 g["season"] = g["gameDate"].dt.year + (g["gameDate"].dt.month >= 8).astype(int)
-g = g[(g["season"] >= 2007) & (g["season"] <= 2023)
+g = g[(g["season"] >= 1980) & (g["season"] <= 2023)
       & g["gameType"].isin(["Regular Season", "Playoffs"])].copy()
 g["gid"] = g["gameId"].astype(str).str.replace(".0", "", regex=False).str.zfill(10)
 
