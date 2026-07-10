@@ -1,0 +1,719 @@
+﻿building,season,gameType,games,games_with_attendance,coverage_pct,mean_attendance
+Amway Arena,2007,Playoffs,2,2,100.0,17451.0
+Capital One Arena,2007,Playoffs,2,2,100.0,20173.0
+Crypto.com Arena,2007,Playoffs,2,2,100.0,18997.0
+Delta Center,2007,Playoffs,8,6,75.0,19911.0
+Frost Bank Center,2007,Playoffs,11,10,90.9,18747.3
+Izod Center,2007,Playoffs,6,6,100.0,19086.2
+Kaseya Center,2007,Playoffs,2,2,100.0,20281.5
+Oracle Arena,2007,Playoffs,5,4,80.0,20670.8
+Rocket Arena,2007,Playoffs,10,8,80.0,20562.0
+The Palace of Auburn Hills,2007,Playoffs,8,7,87.5,22076.0
+Toyota Center,2007,Playoffs,4,4,100.0,18255.5
+United Center,2007,Playoffs,5,5,100.0,22974.2
+American Airlines Center,2007,Regular Season,41,39,95.1,20351.6
+Amway Arena,2007,Regular Season,41,35,85.4,17153.9
+Ball Arena,2007,Regular Season,41,36,87.8,17217.1
+Bradley Center,2007,Regular Season,41,37,90.2,16202.3
+Capital One Arena,2007,Regular Season,41,36,87.8,18252.3
+Crypto.com Arena,2007,Regular Season,82,70,85.4,18718.6
+Delta Center,2007,Regular Season,41,37,90.2,19528.9
+FedExForum,2007,Regular Season,41,38,92.7,14669.2
+Frost Bank Center,2007,Regular Season,41,37,90.2,18651.4
+Gainbridge Fieldhouse,2007,Regular Season,41,36,87.8,15394.6
+Izod Center,2007,Regular Season,41,38,92.7,16953.6
+Kaseya Center,2007,Regular Season,41,36,87.8,19704.6
+KeyArena,2007,Regular Season,41,37,90.2,15924.4
+Madison Square Garden,2007,Regular Season,41,38,92.7,18823.0
+Moda Center,2007,Regular Season,41,37,90.2,16432.8
+Mortgage Matchup Center,2007,Regular Season,41,37,90.2,18422.0
+Oracle Arena,2007,Regular Season,41,34,82.9,18228.5
+Paycom Center,2007,Regular Season,35,29,82.9,17932.2
+Rocket Arena,2007,Regular Season,41,35,85.4,20427.0
+Scotiabank Arena,2007,Regular Season,41,38,92.7,18371.2
+Sleep Train Arena,2007,Regular Season,41,38,92.7,17317.0
+Smoothie King Center,2007,Regular Season,6,6,100.0,17129.3
+Spectrum Center,2007,Regular Season,41,35,85.4,15461.5
+State Farm Arena,2007,Regular Season,41,38,92.7,15418.9
+TD Garden,2007,Regular Season,41,34,82.9,16825.5
+Target Center,2007,Regular Season,41,37,90.2,16010.4
+The Palace of Auburn Hills,2007,Regular Season,41,35,85.4,22076.0
+Toyota Center,2007,Regular Season,41,37,90.2,16366.1
+United Center,2007,Regular Season,41,36,87.8,22245.4
+Xfinity Mobile Arena,2007,Regular Season,41,36,87.8,14818.0
+American Airlines Center,2008,Playoffs,2,2,100.0,20741.5
+Amway Arena,2008,Playoffs,5,4,80.0,17519.0
+Ball Arena,2008,Playoffs,2,2,100.0,19433.0
+Capital One Arena,2008,Playoffs,3,3,100.0,20173.0
+Crypto.com Arena,2008,Playoffs,11,11,100.0,18997.0
+Delta Center,2008,Playoffs,6,5,83.3,19911.0
+Frost Bank Center,2008,Playoffs,8,8,100.0,18797.0
+Mortgage Matchup Center,2008,Playoffs,2,2,100.0,18422.0
+Scotiabank Arena,2008,Playoffs,2,2,100.0,20219.5
+Smoothie King Center,2008,Playoffs,7,5,71.4,17969.4
+State Farm Arena,2008,Playoffs,3,3,100.0,20055.3
+TD Garden,2008,Playoffs,14,14,100.0,18624.0
+The Palace of Auburn Hills,2008,Playoffs,9,9,100.0,22076.0
+Xfinity Mobile Arena,2008,Playoffs,3,3,100.0,17094.0
+American Airlines Center,2008,Regular Season,41,34,82.9,20282.3
+Amway Arena,2008,Regular Season,41,34,82.9,17339.8
+Ball Arena,2008,Regular Season,41,37,90.2,17299.1
+Bradley Center,2008,Regular Season,41,37,90.2,15510.5
+Capital One Arena,2008,Regular Season,41,39,95.1,18014.8
+Crypto.com Arena,2008,Regular Season,82,74,90.2,17895.0
+Delta Center,2008,Regular Season,41,39,95.1,19907.4
+FedExForum,2008,Regular Season,41,38,92.7,12775.9
+Frost Bank Center,2008,Regular Season,41,34,82.9,18563.8
+Gainbridge Fieldhouse,2008,Regular Season,41,36,87.8,12283.1
+Izod Center,2008,Regular Season,41,36,87.8,15791.8
+Kaseya Center,2008,Regular Season,41,38,92.7,19452.7
+KeyArena,2008,Regular Season,41,38,92.7,13269.3
+Madison Square Garden,2008,Regular Season,41,36,87.8,19197.4
+Moda Center,2008,Regular Season,41,38,92.7,19507.5
+Mortgage Matchup Center,2008,Regular Season,41,39,95.1,18422.0
+Oracle Arena,2008,Regular Season,41,41,100.0,19630.8
+Rocket Arena,2008,Regular Season,41,35,85.4,20458.6
+Scotiabank Arena,2008,Regular Season,41,37,90.2,19474.8
+Sleep Train Arena,2008,Regular Season,41,38,92.7,14054.2
+Smoothie King Center,2008,Regular Season,41,38,92.7,14274.3
+Spectrum Center,2008,Regular Season,41,38,92.7,14852.5
+State Farm Arena,2008,Regular Season,41,35,85.4,16252.9
+TD Garden,2008,Regular Season,41,38,92.7,18624.0
+Target Center,2008,Regular Season,41,40,97.6,14468.7
+The Palace of Auburn Hills,2008,Regular Season,41,40,97.6,22076.0
+Toyota Center,2008,Regular Season,41,32,78.0,17567.8
+United Center,2008,Regular Season,41,38,92.7,21991.1
+Xfinity Mobile Arena,2008,Regular Season,41,34,82.9,14321.3
+American Airlines Center,2009,Playoffs,4,4,100.0,20615.8
+Amway Arena,2009,Playoffs,12,11,91.7,17461.0
+Ball Arena,2009,Playoffs,9,8,88.9,19797.2
+Crypto.com Arena,2009,Playoffs,12,11,91.7,18997.0
+Frost Bank Center,2009,Playoffs,3,3,100.0,18797.0
+Kaseya Center,2009,Playoffs,3,3,100.0,19600.0
+Moda Center,2009,Playoffs,3,3,100.0,20399.7
+Rocket Arena,2009,Playoffs,7,7,100.0,20562.0
+Smoothie King Center,2009,Playoffs,2,2,100.0,17362.5
+State Farm Arena,2009,Playoffs,6,5,83.3,19289.0
+Toyota Center,2009,Playoffs,6,6,100.0,18387.8
+United Center,2009,Playoffs,3,3,100.0,23189.7
+American Airlines Center,2009,Regular Season,41,34,82.9,20026.0
+Amway Arena,2009,Regular Season,41,38,92.7,17034.6
+Ball Arena,2009,Regular Season,41,37,90.2,17265.6
+Bradley Center,2009,Regular Season,41,36,87.8,15300.0
+Capital One Arena,2009,Regular Season,41,38,92.7,16740.9
+Crypto.com Arena,2009,Regular Season,82,77,93.9,17572.5
+Delta Center,2009,Regular Season,41,40,97.6,19903.3
+FedExForum,2009,Regular Season,41,39,95.1,12793.1
+Frost Bank Center,2009,Regular Season,41,36,87.8,18236.3
+Gainbridge Fieldhouse,2009,Regular Season,41,38,92.7,14160.4
+Izod Center,2009,Regular Season,41,37,90.2,15074.9
+Kaseya Center,2009,Regular Season,41,35,85.4,18223.6
+Madison Square Garden,2009,Regular Season,41,40,97.6,19276.0
+Moda Center,2009,Regular Season,41,34,82.9,20515.4
+Mortgage Matchup Center,2009,Regular Season,41,36,87.8,18422.0
+Oracle Arena,2009,Regular Season,41,34,82.9,18925.4
+Paycom Center,2009,Regular Season,41,38,92.7,18700.0
+Rocket Arena,2009,Regular Season,41,36,87.8,20519.5
+Scotiabank Arena,2009,Regular Season,41,32,78.0,18827.8
+Sleep Train Arena,2009,Regular Season,41,36,87.8,12838.4
+Smoothie King Center,2009,Regular Season,41,34,82.9,16957.7
+Spectrum Center,2009,Regular Season,41,36,87.8,14631.9
+State Farm Arena,2009,Regular Season,41,36,87.8,16935.8
+TD Garden,2009,Regular Season,41,37,90.2,18624.0
+Target Center,2009,Regular Season,41,34,82.9,14412.0
+The Palace of Auburn Hills,2009,Regular Season,41,38,92.7,21861.7
+Toyota Center,2009,Regular Season,41,39,95.1,17467.4
+United Center,2009,Regular Season,41,35,85.4,21213.2
+Xfinity Mobile Arena,2009,Regular Season,41,38,92.7,16005.6
+American Airlines Center,2010,Playoffs,3,3,100.0,20552.3
+Amway Arena,2010,Playoffs,7,7,100.0,17461.0
+Ball Arena,2010,Playoffs,3,3,100.0,19155.0
+Bradley Center,2010,Playoffs,3,3,100.0,18717.0
+Crypto.com Arena,2010,Playoffs,12,11,91.7,18997.0
+Delta Center,2010,Playoffs,5,4,80.0,19911.0
+Frost Bank Center,2010,Playoffs,5,5,100.0,18581.0
+Kaseya Center,2010,Playoffs,2,2,100.0,19510.0
+Mortgage Matchup Center,2010,Playoffs,8,8,100.0,18422.0
+Paycom Center,2010,Playoffs,3,3,100.0,18342.0
+Rocket Arena,2010,Playoffs,6,5,83.3,20562.0
+TD Garden,2010,Playoffs,12,12,100.0,18624.0
+American Airlines Center,2010,Regular Season,41,38,92.7,19990.6
+Amway Arena,2010,Regular Season,41,34,82.9,17461.0
+Ball Arena,2010,Regular Season,41,39,95.1,17960.6
+Bradley Center,2010,Regular Season,41,37,90.2,15182.6
+Capital One Arena,2010,Regular Season,41,37,90.2,16412.4
+Crypto.com Arena,2010,Regular Season,82,70,85.4,17746.8
+Delta Center,2010,Regular Season,41,37,90.2,19327.3
+FedExForum,2010,Regular Season,41,34,82.9,13643.9
+Frost Bank Center,2010,Regular Season,41,37,90.2,18105.2
+Gainbridge Fieldhouse,2010,Regular Season,41,38,92.7,14015.8
+Izod Center,2010,Regular Season,41,38,92.7,13195.9
+Kaseya Center,2010,Regular Season,41,39,95.1,17730.0
+Madison Square Garden,2010,Regular Season,41,37,90.2,19500.1
+Moda Center,2010,Regular Season,41,37,90.2,20492.1
+Mortgage Matchup Center,2010,Regular Season,41,39,95.1,17721.8
+Oracle Arena,2010,Regular Season,41,38,92.7,17989.6
+Paycom Center,2010,Regular Season,41,37,90.2,17987.1
+Rocket Arena,2010,Regular Season,41,39,95.1,20562.0
+Scotiabank Arena,2010,Regular Season,41,38,92.7,17882.6
+Sleep Train Arena,2010,Regular Season,41,34,82.9,13075.6
+Smoothie King Center,2010,Regular Season,41,37,90.2,15061.5
+Spectrum Center,2010,Regular Season,41,39,95.1,15940.7
+State Farm Arena,2010,Regular Season,41,39,95.1,16622.8
+TD Garden,2010,Regular Season,41,37,90.2,18624.0
+Target Center,2010,Regular Season,41,34,82.9,14934.3
+The Palace of Auburn Hills,2010,Regular Season,41,36,87.8,18779.2
+Toyota Center,2010,Regular Season,41,37,90.2,16653.5
+United Center,2010,Regular Season,41,38,92.7,20710.3
+Xfinity Mobile Arena,2010,Regular Season,41,36,87.8,14104.1
+American Airlines Center,2011,Playoffs,11,10,90.9,20766.1
+Ball Arena,2011,Playoffs,2,2,100.0,19556.5
+Crypto.com Arena,2011,Playoffs,5,4,80.0,18997.0
+FedExForum,2011,Playoffs,6,5,83.3,18119.0
+Frost Bank Center,2011,Playoffs,3,3,100.0,18640.7
+Gainbridge Fieldhouse,2011,Playoffs,2,2,100.0,18165.0
+Kaseya Center,2011,Playoffs,11,10,90.9,20039.4
+Kia Center,2011,Playoffs,3,3,100.0,19119.7
+Madison Square Garden,2011,Playoffs,2,2,100.0,19763.0
+Paycom Center,2011,Playoffs,9,8,88.9,18203.0
+State Farm Arena,2011,Playoffs,6,6,100.0,19466.5
+TD Garden,2011,Playoffs,4,3,75.0,18624.0
+United Center,2011,Playoffs,9,8,88.9,22884.8
+Xfinity Mobile Arena,2011,Playoffs,2,2,100.0,19726.0
+American Airlines Center,2011,Regular Season,41,36,87.8,20079.0
+Ball Arena,2011,Regular Season,41,36,87.8,16788.6
+Bradley Center,2011,Regular Season,41,41,100.0,15412.5
+Capital One Arena,2011,Regular Season,41,37,90.2,16958.6
+Crypto.com Arena,2011,Regular Season,82,78,95.1,18392.7
+Delta Center,2011,Regular Season,41,35,85.4,19486.6
+FedExForum,2011,Regular Season,41,35,85.4,14935.0
+Frost Bank Center,2011,Regular Season,41,40,97.6,18301.9
+Gainbridge Fieldhouse,2011,Regular Season,41,34,82.9,13401.9
+Kaseya Center,2011,Regular Season,41,37,90.2,19781.0
+Kia Center,2011,Regular Season,41,37,90.2,18967.3
+Madison Square Garden,2011,Regular Season,41,38,92.7,19726.1
+Moda Center,2011,Regular Season,41,38,92.7,20513.7
+Mortgage Matchup Center,2011,Regular Season,41,40,97.6,17545.7
+Oracle Arena,2011,Regular Season,41,39,95.1,18696.6
+Paycom Center,2011,Regular Season,41,37,90.2,18160.8
+Prudential Center,2011,Regular Season,39,36,92.3,13813.5
+Rocket Arena,2011,Regular Season,41,40,97.6,20119.6
+Scotiabank Arena,2011,Regular Season,41,36,87.8,16627.2
+Sleep Train Arena,2011,Regular Season,41,39,95.1,13959.3
+Smoothie King Center,2011,Regular Season,41,37,90.2,14891.2
+Spectrum Center,2011,Regular Season,41,37,90.2,15741.5
+State Farm Arena,2011,Regular Season,41,38,92.7,15704.2
+TD Garden,2011,Regular Season,41,37,90.2,18624.0
+Target Center,2011,Regular Season,41,38,92.7,15407.1
+The O2 Arena,2011,Regular Season,2,2,100.0,18689.0
+The Palace of Auburn Hills,2011,Regular Season,41,39,95.1,16805.5
+Toyota Center,2011,Regular Season,41,40,97.6,16142.0
+United Center,2011,Regular Season,41,41,100.0,21791.8
+Xfinity Mobile Arena,2011,Regular Season,41,37,90.2,14652.4
+American Airlines Center,2012,Playoffs,2,2,100.0,20586.5
+Ball Arena,2012,Playoffs,3,3,100.0,19360.0
+Crypto.com Arena,2012,Playoffs,11,10,90.9,19039.2
+Delta Center,2012,Playoffs,2,2,100.0,19911.0
+FedExForum,2012,Playoffs,4,4,100.0,18119.0
+Frost Bank Center,2012,Playoffs,7,7,100.0,18581.0
+Kaseya Center,2012,Playoffs,13,13,100.0,19893.3
+Kia Center,2012,Playoffs,2,2,100.0,18846.0
+Madison Square Garden,2012,Playoffs,2,2,100.0,19763.0
+Paycom Center,2012,Playoffs,10,9,90.0,18203.0
+State Farm Arena,2012,Playoffs,3,3,100.0,19306.3
+TD Garden,2012,Playoffs,10,9,90.0,18624.0
+United Center,2012,Playoffs,3,3,100.0,22034.3
+Xfinity Mobile Arena,2012,Playoffs,6,5,83.3,20381.6
+American Airlines Center,2012,Regular Season,33,30,90.9,20363.3
+Ball Arena,2012,Regular Season,33,30,90.9,16889.8
+Bradley Center,2012,Regular Season,33,31,93.9,14818.8
+Capital One Arena,2012,Regular Season,33,30,90.9,16718.1
+Crypto.com Arena,2012,Regular Season,66,57,86.4,19106.5
+Delta Center,2012,Regular Season,33,30,90.9,19314.4
+FedExForum,2012,Regular Season,33,30,90.9,15694.6
+Frost Bank Center,2012,Regular Season,33,30,90.9,18456.0
+Gainbridge Fieldhouse,2012,Regular Season,33,28,84.8,13936.2
+Kaseya Center,2012,Regular Season,33,31,93.9,19936.9
+Kia Center,2012,Regular Season,33,30,90.9,18898.0
+Madison Square Garden,2012,Regular Season,33,30,90.9,19763.0
+Moda Center,2012,Regular Season,33,30,90.9,20490.9
+Mortgage Matchup Center,2012,Regular Season,33,31,93.9,15530.5
+Oracle Arena,2012,Regular Season,33,28,84.8,18945.6
+Paycom Center,2012,Regular Season,33,31,93.9,18203.0
+Prudential Center,2012,Regular Season,33,30,90.9,13881.2
+Rocket Arena,2012,Regular Season,33,32,97.0,16014.2
+Scotiabank Arena,2012,Regular Season,33,29,87.9,16740.6
+Sleep Train Arena,2012,Regular Season,33,31,93.9,14526.1
+Smoothie King Center,2012,Regular Season,33,28,84.8,15421.6
+Spectrum Center,2012,Regular Season,33,28,84.8,14837.6
+State Farm Arena,2012,Regular Season,33,28,84.8,15078.2
+TD Garden,2012,Regular Season,33,29,87.9,18624.0
+Target Center,2012,Regular Season,33,30,90.9,17549.3
+The Palace of Auburn Hills,2012,Regular Season,33,30,90.9,14646.9
+Toyota Center,2012,Regular Season,33,29,87.9,15282.2
+United Center,2012,Regular Season,33,27,81.8,22183.4
+Xfinity Mobile Arena,2012,Regular Season,33,32,97.0,17574.9
+Ball Arena,2013,Playoffs,3,3,100.0,19155.0
+Barclays Center,2013,Playoffs,4,3,75.0,17732.0
+Bradley Center,2013,Playoffs,2,2,100.0,18441.0
+Crypto.com Arena,2013,Playoffs,5,4,80.0,19257.5
+FedExForum,2013,Playoffs,7,6,85.7,18119.0
+Frost Bank Center,2013,Playoffs,10,10,100.0,18581.0
+Gainbridge Fieldhouse,2013,Playoffs,9,9,100.0,18165.0
+Kaseya Center,2013,Playoffs,13,13,100.0,19903.4
+Madison Square Garden,2013,Playoffs,6,5,83.3,19033.0
+Oracle Arena,2013,Playoffs,6,5,83.3,19596.0
+Paycom Center,2013,Playoffs,6,5,83.3,18203.0
+State Farm Arena,2013,Playoffs,3,3,100.0,18239.0
+TD Garden,2013,Playoffs,3,3,100.0,18624.0
+Toyota Center,2013,Playoffs,3,3,100.0,18200.3
+United Center,2013,Playoffs,5,5,100.0,21981.0
+American Airlines Center,2014,Playoffs,3,3,100.0,20743.7
+Capital One Arena,2014,Playoffs,5,4,80.0,20142.5
+Crypto.com Arena,2014,Playoffs,7,6,85.7,19485.3
+Frost Bank Center,2014,Playoffs,13,12,92.3,18581.0
+Gainbridge Fieldhouse,2014,Playoffs,10,10,100.0,18165.0
+Kaseya Center,2014,Playoffs,10,8,80.0,19720.2
+Moda Center,2014,Playoffs,5,5,100.0,20242.8
+Oracle Arena,2014,Playoffs,3,3,100.0,19596.0
+Paycom Center,2014,Playoffs,10,8,80.0,18203.0
+Scotiabank Arena,2014,Playoffs,4,4,100.0,20258.0
+Spectrum Center,2014,Playoffs,2,2,100.0,19362.5
+State Farm Arena,2014,Playoffs,3,3,100.0,18737.0
+Toyota Center,2014,Playoffs,3,3,100.0,18267.0
+United Center,2014,Playoffs,3,3,100.0,21703.0
+American Airlines Center,2014,Regular Season,41,39,95.1,19968.9
+Ball Arena,2014,Regular Season,41,35,85.4,16829.6
+Barclays Center,2014,Regular Season,41,38,92.7,17214.1
+Bradley Center,2014,Regular Season,41,37,90.2,13587.8
+Capital One Arena,2014,Regular Season,41,36,87.8,17079.9
+Crypto.com Arena,2014,Regular Season,82,76,92.7,19012.3
+Delta Center,2014,Regular Season,41,37,90.2,18125.3
+FedExForum,2014,Regular Season,41,39,95.1,16752.2
+Frost Bank Center,2014,Regular Season,41,36,87.8,18414.1
+Gainbridge Fieldhouse,2014,Regular Season,41,36,87.8,17464.7
+Kaseya Center,2014,Regular Season,41,37,90.2,19779.0
+Kia Center,2014,Regular Season,41,39,95.1,16206.0
+Madison Square Garden,2014,Regular Season,41,39,95.1,19812.0
+Moda Center,2014,Regular Season,41,38,92.7,19738.0
+Mortgage Matchup Center,2014,Regular Season,41,37,90.2,15841.0
+Oracle Arena,2014,Regular Season,41,35,85.4,19596.0
+Paycom Center,2014,Regular Season,41,36,87.8,18203.0
+Rocket Arena,2014,Regular Season,41,39,95.1,17329.5
+Scotiabank Arena,2014,Regular Season,41,37,90.2,18313.6
+Sleep Train Arena,2014,Regular Season,41,38,92.7,16243.6
+Smoothie King Center,2014,Regular Season,41,38,92.7,16388.5
+Spectrum Center,2014,Regular Season,41,36,87.8,15569.0
+State Farm Arena,2014,Regular Season,40,37,92.5,14158.4
+TD Garden,2014,Regular Season,41,37,90.2,18145.2
+Target Center,2014,Regular Season,41,37,90.2,14682.1
+The O2 Arena,2014,Regular Season,1,1,100.0,18689.0
+The Palace of Auburn Hills,2014,Regular Season,41,37,90.2,15074.1
+Toyota Center,2014,Regular Season,41,36,87.8,18104.9
+United Center,2014,Regular Season,41,40,97.6,21715.8
+Xfinity Mobile Arena,2014,Regular Season,41,38,92.7,13818.0
+American Airlines Center,2015,Playoffs,2,2,100.0,20620.0
+Barclays Center,2015,Playoffs,3,3,100.0,17732.0
+Bradley Center,2015,Playoffs,3,3,100.0,18717.0
+Capital One Arena,2015,Playoffs,5,5,100.0,20356.0
+Crypto.com Arena,2015,Playoffs,7,6,85.7,19439.3
+FedExForum,2015,Playoffs,6,5,83.3,18119.0
+Frost Bank Center,2015,Playoffs,3,3,100.0,18581.0
+Moda Center,2015,Playoffs,2,2,100.0,19743.0
+Oracle Arena,2015,Playoffs,11,8,72.7,19596.0
+Rocket Arena,2015,Playoffs,10,9,90.0,20562.0
+Smoothie King Center,2015,Playoffs,2,2,100.0,18443.5
+State Farm Arena,2015,Playoffs,8,7,87.5,18413.7
+TD Garden,2015,Playoffs,2,2,100.0,18624.0
+Toyota Center,2015,Playoffs,9,8,88.9,18257.8
+United Center,2015,Playoffs,6,6,100.0,22080.7
+American Airlines Center,2015,Regular Season,41,37,90.2,20188.9
+Ball Arena,2015,Regular Season,41,35,85.4,14813.2
+Barclays Center,2015,Regular Season,41,38,92.7,16990.8
+Bradley Center,2015,Regular Season,40,37,92.5,14603.1
+Capital One Arena,2015,Regular Season,41,35,85.4,18001.8
+Crypto.com Arena,2015,Regular Season,82,78,95.1,18957.4
+Delta Center,2015,Regular Season,41,39,95.1,18827.7
+FedExForum,2015,Regular Season,41,39,95.1,17301.7
+Frost Bank Center,2015,Regular Season,41,39,95.1,18607.5
+Gainbridge Fieldhouse,2015,Regular Season,41,40,97.6,16831.7
+Kaseya Center,2015,Regular Season,41,35,85.4,19719.9
+Kia Center,2015,Regular Season,41,35,85.4,16771.0
+Madison Square Garden,2015,Regular Season,41,36,87.8,19812.0
+Moda Center,2015,Regular Season,41,38,92.7,19564.7
+Mortgage Matchup Center,2015,Regular Season,41,39,95.1,16956.1
+Oracle Arena,2015,Regular Season,41,40,97.6,19596.0
+Paycom Center,2015,Regular Season,41,39,95.1,18203.0
+Rocket Arena,2015,Regular Season,41,36,87.8,20562.0
+Scotiabank Arena,2015,Regular Season,41,40,97.6,19750.6
+Sleep Train Arena,2015,Regular Season,41,39,95.1,16603.2
+Smoothie King Center,2015,Regular Season,41,36,87.8,16928.9
+Spectrum Center,2015,Regular Season,41,37,90.2,17211.1
+State Farm Arena,2015,Regular Season,41,37,90.2,17499.4
+TD Garden,2015,Regular Season,41,35,85.4,17560.9
+Target Center,2015,Regular Season,40,38,95.0,14310.3
+The O2 Arena,2015,Regular Season,1,1,100.0,18689.0
+The Palace of Auburn Hills,2015,Regular Season,41,38,92.7,15184.5
+Toyota Center,2015,Regular Season,41,34,82.9,18226.1
+United Center,2015,Regular Season,41,39,95.1,21877.6
+Xfinity Mobile Arena,2015,Regular Season,41,38,92.7,14008.8
+American Airlines Center,2016,Playoffs,2,2,100.0,20333.0
+Crypto.com Arena,2016,Playoffs,3,3,100.0,19103.0
+FedExForum,2016,Playoffs,2,2,100.0,18119.0
+Frost Bank Center,2016,Playoffs,5,4,80.0,18418.0
+Kaseya Center,2016,Playoffs,7,7,100.0,19690.7
+Moda Center,2016,Playoffs,5,5,100.0,19678.4
+Oracle Arena,2016,Playoffs,14,13,92.9,19596.0
+Paycom Center,2016,Playoffs,9,8,88.9,18203.0
+Rocket Arena,2016,Playoffs,10,9,90.0,20562.0
+Scotiabank Arena,2016,Playoffs,11,8,72.7,20262.1
+State Farm Arena,2016,Playoffs,5,5,100.0,19011.8
+The Palace of Auburn Hills,2016,Playoffs,2,2,100.0,21584.0
+Toyota Center,2016,Playoffs,2,2,100.0,18200.0
+American Airlines Center,2016,Regular Season,41,40,97.6,20141.0
+Ball Arena,2016,Regular Season,41,39,95.1,14149.2
+Barclays Center,2016,Regular Season,41,38,92.7,15116.8
+Bradley Center,2016,Regular Season,41,38,92.7,15170.5
+Capital One Arena,2016,Regular Season,41,38,92.7,17682.5
+Crypto.com Arena,2016,Regular Season,82,73,89.0,19089.9
+Delta Center,2016,Regular Season,41,39,95.1,19300.4
+FedExForum,2016,Regular Season,41,38,92.7,17109.8
+Frost Bank Center,2016,Regular Season,41,40,97.6,18450.7
+Gainbridge Fieldhouse,2016,Regular Season,41,37,90.2,16856.8
+Kaseya Center,2016,Regular Season,41,36,87.8,19745.9
+Kia Center,2016,Regular Season,40,35,87.5,17544.1
+Madison Square Garden,2016,Regular Season,41,40,97.6,19812.0
+Moda Center,2016,Regular Season,41,38,92.7,19403.5
+Mortgage Matchup Center,2016,Regular Season,41,38,92.7,17137.5
+Oracle Arena,2016,Regular Season,41,36,87.8,19596.0
+Paycom Center,2016,Regular Season,41,36,87.8,18203.0
+Rocket Arena,2016,Regular Season,41,36,87.8,20562.0
+Scotiabank Arena,2016,Regular Season,41,36,87.8,19829.5
+Sleep Train Arena,2016,Regular Season,40,38,95.0,17216.6
+Smoothie King Center,2016,Regular Season,41,35,85.4,16704.1
+Spectrum Center,2016,Regular Season,41,37,90.2,17434.1
+State Farm Arena,2016,Regular Season,41,36,87.8,16859.5
+TD Garden,2016,Regular Season,41,40,97.6,18261.3
+Target Center,2016,Regular Season,41,36,87.8,14261.4
+The O2 Arena,2016,Regular Season,1,1,100.0,18689.0
+The Palace of Auburn Hills,2016,Regular Season,41,37,90.2,16689.4
+Toyota Center,2016,Regular Season,41,39,95.1,17986.2
+United Center,2016,Regular Season,41,35,85.4,21872.1
+Xfinity Mobile Arena,2016,Regular Season,41,38,92.7,14928.6
+Bradley Center,2017,Playoffs,3,3,100.0,18717.0
+Capital One Arena,2017,Playoffs,6,5,83.3,20356.0
+Crypto.com Arena,2017,Playoffs,4,3,75.0,19097.0
+Delta Center,2017,Playoffs,5,5,100.0,19911.0
+FedExForum,2017,Playoffs,3,3,100.0,18119.0
+Frost Bank Center,2017,Playoffs,8,7,87.5,18478.3
+Gainbridge Fieldhouse,2017,Playoffs,2,2,100.0,17923.0
+Moda Center,2017,Playoffs,2,2,100.0,20039.5
+Oracle Arena,2017,Playoffs,9,8,88.9,19596.0
+Paycom Center,2017,Playoffs,2,2,100.0,18203.0
+Rocket Arena,2017,Playoffs,8,6,75.0,20562.0
+Scotiabank Arena,2017,Playoffs,5,5,100.0,20230.4
+State Farm Arena,2017,Playoffs,3,3,100.0,18797.0
+TD Garden,2017,Playoffs,10,8,80.0,18624.0
+Toyota Center,2017,Playoffs,6,6,100.0,18077.0
+American Airlines Center,2017,Regular Season,41,35,85.4,19800.4
+Ball Arena,2017,Regular Season,40,37,92.5,14772.1
+Barclays Center,2017,Regular Season,41,39,95.1,15533.8
+Bradley Center,2017,Regular Season,41,35,85.4,15911.1
+Capital One Arena,2017,Regular Season,41,35,85.4,17063.7
+Crypto.com Arena,2017,Regular Season,82,75,91.5,19015.5
+Delta Center,2017,Regular Season,41,39,95.1,19649.2
+FedExForum,2017,Regular Season,41,39,95.1,16547.8
+Frost Bank Center,2017,Regular Season,41,38,92.7,18423.5
+Gainbridge Fieldhouse,2017,Regular Season,41,39,95.1,16712.4
+Golden 1 Center,2017,Regular Season,41,32,78.0,17608.0
+Kaseya Center,2017,Regular Season,41,35,85.4,19647.0
+Kia Center,2017,Regular Season,41,38,92.7,17722.8
+Madison Square Garden,2017,Regular Season,41,36,87.8,19768.9
+Moda Center,2017,Regular Season,41,37,90.2,19304.6
+Mortgage Matchup Center,2017,Regular Season,39,36,92.3,17095.4
+Oracle Arena,2017,Regular Season,41,39,95.1,19596.0
+Paycom Center,2017,Regular Season,41,41,100.0,18203.0
+Rocket Arena,2017,Regular Season,41,35,85.4,20562.0
+Scotiabank Arena,2017,Regular Season,41,37,90.2,19833.8
+Smoothie King Center,2017,Regular Season,41,39,95.1,16153.4
+Spectrum Center,2017,Regular Season,41,39,95.1,17233.0
+State Farm Arena,2017,Regular Season,41,39,95.1,15937.5
+TD Garden,2017,Regular Season,41,39,95.1,18579.8
+Target Center,2017,Regular Season,41,36,87.8,14883.2
+The Palace of Auburn Hills,2017,Regular Season,41,36,87.8,16191.4
+Toyota Center,2017,Regular Season,41,38,92.7,16952.4
+United Center,2017,Regular Season,41,36,87.8,21678.5
+Xfinity Mobile Arena,2017,Regular Season,41,34,82.9,17281.2
+Bradley Center,2018,Playoffs,3,3,100.0,18717.0
+Capital One Arena,2018,Playoffs,3,3,100.0,20356.0
+Delta Center,2018,Playoffs,5,5,100.0,18306.0
+Frost Bank Center,2018,Playoffs,2,2,100.0,18418.0
+Moda Center,2018,Playoffs,2,2,100.0,19974.0
+Oracle Arena,2018,Playoffs,11,10,90.9,19596.0
+Rocket Arena,2018,Playoffs,11,10,90.9,20562.0
+Scotiabank Arena,2018,Playoffs,5,4,80.0,20030.0
+Smoothie King Center,2018,Playoffs,4,4,100.0,18539.8
+TD Garden,2018,Playoffs,11,10,90.9,18624.0
+Target Center,2018,Playoffs,2,2,100.0,18978.0
+Toyota Center,2018,Playoffs,10,9,90.0,18079.1
+Xfinity Mobile Arena,2018,Playoffs,5,5,100.0,20847.0
+American Airlines Center,2018,Regular Season,41,40,97.6,19782.0
+Ball Arena,2018,Regular Season,41,37,90.2,16971.5
+Barclays Center,2018,Regular Season,39,37,94.9,15307.1
+Bradley Center,2018,Regular Season,40,37,92.5,16929.9
+Capital One Arena,2018,Regular Season,41,38,92.7,17942.3
+Crypto.com Arena,2018,Regular Season,82,71,86.6,18047.9
+Delta Center,2018,Regular Season,41,36,87.8,17896.8
+FedExForum,2018,Regular Season,41,38,92.7,15996.6
+Frost Bank Center,2018,Regular Season,41,38,92.7,18399.2
+Gainbridge Fieldhouse,2018,Regular Season,41,38,92.7,16075.7
+Golden 1 Center,2018,Regular Season,41,38,92.7,17419.2
+Kaseya Center,2018,Regular Season,41,37,90.2,19633.8
+Kia Center,2018,Regular Season,41,36,87.8,17881.9
+Little Caesars Arena,2018,Regular Season,41,36,87.8,17460.0
+Madison Square Garden,2018,Regular Season,41,38,92.7,19344.6
+Moda Center,2018,Regular Season,41,37,90.2,19403.5
+Mortgage Matchup Center,2018,Regular Season,41,38,92.7,16852.1
+Oracle Arena,2018,Regular Season,41,38,92.7,19596.0
+Paycom Center,2018,Regular Season,41,38,92.7,18203.0
+Rocket Arena,2018,Regular Season,41,38,92.7,20562.0
+Scotiabank Arena,2018,Regular Season,41,38,92.7,19842.9
+Smoothie King Center,2018,Regular Season,41,38,92.7,16349.3
+Spectrum Center,2018,Regular Season,41,37,90.2,16170.5
+State Farm Arena,2018,Regular Season,41,39,95.1,14483.2
+TD Garden,2018,Regular Season,41,37,90.2,18624.0
+Target Center,2018,Regular Season,41,40,97.6,17114.2
+The O2 Arena,2018,Regular Season,1,1,100.0,19078.0
+Toyota Center,2018,Regular Season,41,32,78.0,17818.4
+United Center,2018,Regular Season,41,41,100.0,20776.2
+Xfinity Mobile Arena,2018,Regular Season,40,36,90.0,20612.5
+Ball Arena,2019,Playoffs,8,7,87.5,19578.6
+Barclays Center,2019,Playoffs,2,2,100.0,17732.0
+Delta Center,2019,Playoffs,2,2,100.0,18306.0
+Fiserv Forum,2019,Playoffs,8,7,87.5,17491.1
+Frost Bank Center,2019,Playoffs,3,3,100.0,18354.0
+Gainbridge Fieldhouse,2019,Playoffs,2,2,100.0,17923.0
+Kia Center,2019,Playoffs,2,2,100.0,19227.0
+Moda Center,2019,Playoffs,8,7,87.5,20084.7
+Oracle Arena,2019,Playoffs,11,10,90.9,19596.0
+Paycom Center,2019,Playoffs,2,2,100.0,18203.0
+Scotiabank Arena,2019,Playoffs,13,12,92.3,20113.4
+TD Garden,2019,Playoffs,4,4,100.0,18624.0
+Toyota Center,2019,Playoffs,6,5,83.3,18077.8
+Xfinity Mobile Arena,2019,Playoffs,6,5,83.3,20561.2
+American Airlines Center,2019,Regular Season,41,39,95.1,20009.2
+Ball Arena,2019,Regular Season,41,37,90.2,18471.8
+Barclays Center,2019,Regular Season,41,35,85.4,15063.5
+Capital One Arena,2019,Regular Season,40,34,85.0,17489.0
+Crypto.com Arena,2019,Regular Season,82,75,91.5,18103.1
+Delta Center,2019,Regular Season,41,36,87.8,18306.0
+FedExForum,2019,Regular Season,41,37,90.2,15754.4
+Fiserv Forum,2019,Regular Season,41,38,92.7,17582.0
+Frost Bank Center,2019,Regular Season,41,39,95.1,18298.3
+Gainbridge Fieldhouse,2019,Regular Season,41,39,95.1,16805.9
+Golden 1 Center,2019,Regular Season,41,36,87.8,17123.5
+Kaseya Center,2019,Regular Season,41,39,95.1,19642.7
+Kia Center,2019,Regular Season,39,36,92.3,17391.3
+Little Caesars Arena,2019,Regular Season,41,40,97.6,16538.6
+Madison Square Garden,2019,Regular Season,41,37,90.2,18956.8
+Moda Center,2019,Regular Season,41,37,90.2,19487.8
+Mortgage Matchup Center,2019,Regular Season,41,39,95.1,15237.8
+Oracle Arena,2019,Regular Season,41,40,97.6,19596.0
+Paycom Center,2019,Regular Season,41,38,92.7,18203.0
+Rocket Arena,2019,Regular Season,41,36,87.8,19338.2
+Scotiabank Arena,2019,Regular Season,41,34,82.9,19830.1
+Smoothie King Center,2019,Regular Season,41,35,85.4,15896.3
+Spectrum Center,2019,Regular Season,41,40,97.6,16556.8
+State Farm Arena,2019,Regular Season,41,39,95.1,15305.8
+TD Garden,2019,Regular Season,41,36,87.8,18624.0
+Target Center,2019,Regular Season,41,36,87.8,15059.7
+The O2 Arena,2019,Regular Season,1,1,100.0,19078.0
+Toyota Center,2019,Regular Season,41,40,97.6,18058.4
+United Center,2019,Regular Season,41,38,92.7,20022.2
+Xfinity Mobile Arena,2019,Regular Season,41,38,92.7,20446.0
+American Airlines Center,2020,Regular Season,34,31,91.2,20060.7
+Ball Arena,2020,Regular Season,33,31,93.9,19201.3
+Barclays Center,2020,Regular Season,32,32,100.0,16403.3
+Capital One Arena,2020,Regular Season,32,28,87.5,16722.9
+Chase Center,2020,Regular Season,34,26,76.5,18064.0
+Crypto.com Arena,2020,Regular Season,63,61,96.8,19034.2
+Delta Center,2020,Regular Season,31,27,87.1,18306.0
+FedExForum,2020,Regular Season,33,30,90.9,15800.7
+Fiserv Forum,2020,Regular Season,31,27,87.1,17698.5
+Frost Bank Center,2020,Regular Season,30,27,90.0,18367.4
+Gainbridge Fieldhouse,2020,Regular Season,32,29,90.6,16561.7
+Golden 1 Center,2020,Regular Season,31,30,96.8,16787.8
+Kaseya Center,2020,Regular Season,32,29,90.6,19678.4
+Kia Center,2020,Regular Season,31,28,90.3,17159.6
+Little Caesars Arena,2020,Regular Season,32,28,87.5,15299.2
+Madison Square Garden,2020,Regular Season,33,30,90.9,18760.3
+Moda Center,2020,Regular Season,32,29,90.6,19653.2
+Mortgage Matchup Center,2020,Regular Season,34,31,91.2,15509.9
+Paycom Center,2020,Regular Season,33,30,90.9,18203.0
+Rocket Arena,2020,Regular Season,36,31,86.1,17868.2
+Scotiabank Arena,2020,Regular Season,32,29,90.6,19761.0
+Smoothie King Center,2020,Regular Season,32,29,90.6,16603.3
+Spectrum Center,2020,Regular Season,30,28,93.3,15541.7
+State Farm Arena,2020,Regular Season,34,31,91.2,15994.2
+TD Garden,2020,Regular Season,32,28,87.5,19080.0
+Target Center,2020,Regular Season,32,28,87.5,14891.4
+Toyota Center,2020,Regular Season,32,29,90.6,18079.1
+United Center,2020,Regular Season,34,31,91.2,18676.3
+Xfinity Mobile Arena,2020,Regular Season,31,30,96.8,20630.0
+American Airlines Center,2021,Playoffs,3,3,100.0,17930.0
+Ball Arena,2021,Playoffs,5,5,100.0,12497.8
+Barclays Center,2021,Playoffs,7,6,85.7,15544.0
+Capital One Arena,2021,Playoffs,2,2,100.0,10665.0
+Crypto.com Arena,2021,Playoffs,13,12,92.3,10137.8
+Delta Center,2021,Playoffs,6,6,100.0,16036.8
+FedExForum,2021,Playoffs,2,2,100.0,12185.0
+Fiserv Forum,2021,Playoffs,11,11,100.0,15200.9
+Kaseya Center,2021,Playoffs,2,2,100.0,17000.0
+Madison Square Garden,2021,Playoffs,3,3,100.0,15937.7
+Moda Center,2021,Playoffs,3,3,100.0,8707.3
+Mortgage Matchup Center,2021,Playoffs,11,9,81.8,15462.4
+State Farm Arena,2021,Playoffs,8,8,100.0,16436.6
+TD Garden,2021,Playoffs,2,2,100.0,11007.5
+Xfinity Mobile Arena,2021,Playoffs,7,7,100.0,16048.4
+American Airlines Center,2021,Regular Season,36,26,72.2,3648.0
+Kia Center,2021,Regular Season,36,26,72.2,3703.4
+Mortgage Matchup Center,2021,Regular Season,36,27,75.0,3852.9
+Smoothie King Center,2021,Regular Season,36,27,75.0,2912.2
+State Farm Arena,2021,Regular Season,36,26,72.2,2162.9
+American Airlines Center,2022,Playoffs,8,7,87.5,20559.0
+Ball Arena,2022,Playoffs,2,2,100.0,19627.5
+Barclays Center,2022,Playoffs,2,2,100.0,18137.0
+Chase Center,2022,Playoffs,12,11,91.7,18064.0
+FedExForum,2022,Playoffs,6,6,100.0,17794.0
+Fiserv Forum,2022,Playoffs,6,6,100.0,17638.8
+Kaseya Center,2022,Playoffs,10,9,90.0,19809.9
+Mortgage Matchup Center,2022,Playoffs,7,7,100.0,17071.0
+Scotiabank Arena,2022,Playoffs,3,3,100.0,19800.0
+Smoothie King Center,2022,Playoffs,3,3,100.0,18878.0
+State Farm Arena,2022,Playoffs,2,2,100.0,18686.0
+TD Garden,2022,Playoffs,12,11,91.7,19156.0
+Target Center,2022,Playoffs,3,3,100.0,19929.7
+United Center,2022,Playoffs,2,2,100.0,22343.5
+Xfinity Mobile Arena,2022,Playoffs,6,5,83.3,20960.0
+American Airlines Center,2022,Regular Season,41,37,90.2,19747.5
+Ball Arena,2022,Regular Season,41,37,90.2,16799.6
+Barclays Center,2022,Regular Season,41,39,95.1,17398.1
+Capital One Arena,2022,Regular Season,41,38,92.7,15399.9
+Chase Center,2022,Regular Season,41,39,95.1,18064.0
+Crypto.com Arena,2022,Regular Season,82,73,89.0,17903.7
+Delta Center,2022,Regular Season,41,36,87.8,18306.0
+FedExForum,2022,Regular Season,41,36,87.8,15855.4
+Fiserv Forum,2022,Regular Season,41,40,97.6,17456.0
+Frost Bank Center,2022,Regular Season,41,36,87.8,14981.9
+Gainbridge Fieldhouse,2022,Regular Season,41,33,80.5,14473.1
+Golden 1 Center,2022,Regular Season,41,37,90.2,14497.1
+Kaseya Center,2022,Regular Season,41,36,87.8,19630.1
+Kia Center,2022,Regular Season,41,37,90.2,15081.4
+Little Caesars Arena,2022,Regular Season,41,37,90.2,16213.8
+Madison Square Garden,2022,Regular Season,41,37,90.2,18720.6
+Moda Center,2022,Regular Season,41,38,92.7,17224.6
+Mortgage Matchup Center,2022,Regular Season,41,37,90.2,16512.6
+Paycom Center,2022,Regular Season,41,36,87.8,14834.4
+Rocket Arena,2022,Regular Season,41,40,97.6,18469.9
+Smoothie King Center,2022,Regular Season,41,39,95.1,15504.5
+Spectrum Center,2022,Regular Season,41,35,85.4,16958.6
+State Farm Arena,2022,Regular Season,41,37,90.2,16396.8
+TD Garden,2022,Regular Season,41,38,92.7,19156.0
+Target Center,2022,Regular Season,41,38,92.7,16140.3
+Toyota Center,2022,Regular Season,41,35,85.4,15656.1
+United Center,2022,Regular Season,41,38,92.7,20861.7
+Xfinity Mobile Arena,2022,Regular Season,41,36,87.8,20646.2
+Ball Arena,2023,Playoffs,11,11,100.0,19646.0
+Barclays Center,2023,Playoffs,2,2,100.0,17973.5
+Chase Center,2023,Playoffs,6,5,83.3,18064.0
+Crypto.com Arena,2023,Playoffs,10,10,100.0,19011.2
+FedExForum,2023,Playoffs,3,3,100.0,18177.3
+Golden 1 Center,2023,Playoffs,4,3,75.0,18253.0
+Kaseya Center,2023,Playoffs,10,10,100.0,19942.0
+Madison Square Garden,2023,Playoffs,5,5,100.0,19812.0
+Mortgage Matchup Center,2023,Playoffs,6,6,100.0,17071.0
+State Farm Arena,2023,Playoffs,3,3,100.0,18952.0
+TD Garden,2023,Playoffs,11,9,81.8,19156.0
+Target Center,2023,Playoffs,2,2,100.0,19257.0
+Xfinity Mobile Arena,2023,Playoffs,5,5,100.0,21152.4
+American Airlines Center,2023,Regular Season,41,40,97.6,20174.4
+Ball Arena,2023,Regular Season,41,39,95.1,19207.3
+Barclays Center,2023,Regular Season,41,36,87.8,17661.7
+Capital One Arena,2023,Regular Season,41,36,87.8,17145.0
+Chase Center,2023,Regular Season,41,39,95.1,18064.0
+Crypto.com Arena,2023,Regular Season,82,73,89.0,18048.2
+Delta Center,2023,Regular Season,41,36,87.8,18206.0
+FedExForum,2023,Regular Season,41,38,92.7,17284.7
+Fiserv Forum,2023,Regular Season,41,37,90.2,17543.9
+Frost Bank Center,2023,Regular Season,37,32,86.5,15447.6
+Gainbridge Fieldhouse,2023,Regular Season,41,40,97.6,15620.8
+Golden 1 Center,2023,Regular Season,41,40,97.6,17541.9
+Kaseya Center,2023,Regular Season,41,36,87.8,19690.2
+Kia Center,2023,Regular Season,41,34,82.9,17690.9
+Little Caesars Arena,2023,Regular Season,40,35,87.5,18742.8
+Madison Square Garden,2023,Regular Season,41,37,90.2,19347.6
+Moda Center,2023,Regular Season,41,37,90.2,18702.8
+Moody Center,2023,Regular Season,2,2,100.0,16085.5
+Mortgage Matchup Center,2023,Regular Season,41,39,95.1,17071.0
+Paycom Center,2023,Regular Season,41,34,82.9,15445.1
+Rocket Arena,2023,Regular Season,41,36,87.8,19432.0
+Scotiabank Arena,2023,Regular Season,41,38,92.7,19785.8
+Smoothie King Center,2023,Regular Season,41,34,82.9,17078.8
+Spectrum Center,2023,Regular Season,41,37,90.2,17067.9
+State Farm Arena,2023,Regular Season,41,33,80.5,17520.7
+TD Garden,2023,Regular Season,41,36,87.8,19156.0
+Target Center,2023,Regular Season,41,38,92.7,16826.4
+Toyota Center,2023,Regular Season,41,33,80.5,16307.7
+United Center,2023,Regular Season,41,38,92.7,20459.1
+Xfinity Mobile Arena,2023,Regular Season,41,39,95.1,20471.2
+Ball Arena,2026,Playoffs,3,3,100.0,19798.3
+Crypto.com Arena,2026,Playoffs,5,5,100.0,19057.0
+Frost Bank Center,2026,Playoffs,12,12,100.0,19122.3
+Kia Center,2026,Playoffs,3,3,100.0,19030.3
+Little Caesars Arena,2026,Playoffs,8,8,100.0,20062.0
+Madison Square Garden,2026,Playoffs,9,9,100.0,19812.0
+Moda Center,2026,Playoffs,2,2,100.0,20077.5
+Mortgage Matchup Center,2026,Playoffs,2,2,100.0,17071.0
+Paycom Center,2026,Playoffs,8,8,100.0,18203.0
+Rocket Arena,2026,Playoffs,9,9,100.0,19432.0
+Scotiabank Arena,2026,Playoffs,3,3,100.0,19839.7
+State Farm Arena,2026,Playoffs,3,3,100.0,18300.0
+TD Garden,2026,Playoffs,4,4,100.0,19156.0
+Target Center,2026,Playoffs,6,6,100.0,18978.0
+Toyota Center,2026,Playoffs,3,3,100.0,18055.0
+Xfinity Mobile Arena,2026,Playoffs,5,5,100.0,19746.0
+American Airlines Center,2026,Regular Season,41,41,100.0,19288.3
+Arena CDMX,2026,Regular Season,1,1,100.0,20385.0
+Ball Arena,2026,Regular Season,41,41,100.0,19826.0
+Barclays Center,2026,Regular Season,41,41,100.0,17412.1
+Capital One Arena,2026,Regular Season,41,41,100.0,16106.7
+Chase Center,2026,Regular Season,41,41,100.0,18064.0
+Crypto.com Arena,2026,Regular Season,41,41,100.0,18854.8
+Delta Center,2026,Regular Season,41,40,97.6,18186.0
+FedExForum,2026,Regular Season,40,40,100.0,15339.4
+Fiserv Forum,2026,Regular Season,41,41,100.0,16649.9
+Frost Bank Center,2026,Regular Season,38,38,100.0,18702.7
+Gainbridge Fieldhouse,2026,Regular Season,41,41,100.0,16641.1
+Golden 1 Center,2026,Regular Season,41,41,100.0,16139.9
+Intuit Dome,2026,Regular Season,41,41,100.0,17622.0
+Kaseya Center,2026,Regular Season,41,41,100.0,19708.9
+Kia Center,2026,Regular Season,40,40,100.0,18461.8
+Little Caesars Arena,2026,Regular Season,40,40,100.0,19650.9
+Madison Square Garden,2026,Regular Season,40,40,100.0,19801.4
+Moda Center,2026,Regular Season,41,41,100.0,17533.2
+Moody Center,2026,Regular Season,2,2,100.0,16213.0
+Mortgage Matchup Center,2026,Regular Season,41,40,97.6,17071.0
+Paycom Center,2026,Regular Season,41,41,100.0,18203.0
+Rocket Arena,2026,Regular Season,41,41,100.0,19432.0
+Scotiabank Arena,2026,Regular Season,41,41,100.0,18832.7
+Smoothie King Center,2026,Regular Season,41,41,100.0,16475.8
+Spectrum Center,2026,Regular Season,41,41,100.0,18715.1
+State Farm Arena,2026,Regular Season,41,41,100.0,16355.6
+T-Mobile Arena,2026,Regular Season,2,2,100.0,17608.0
+TD Garden,2026,Regular Season,41,41,100.0,19156.0
+Target Center,2026,Regular Season,41,41,100.0,17865.0
+The O2 Arena,2026,Regular Season,1,1,100.0,18424.0
+Toyota Center,2026,Regular Season,41,41,100.0,18058.0
+Uber Arena,2026,Regular Season,1,1,100.0,13738.0
+United Center,2026,Regular Season,41,41,100.0,20243.8
+Xfinity Mobile Arena,2026,Regular Season,41,41,100.0,18996.9
