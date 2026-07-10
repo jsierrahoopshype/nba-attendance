@@ -36,12 +36,18 @@ def derive_season(dt: pd.Series) -> pd.Series:
 
 
 def load_games(data_dir: str) -> pd.DataFrame:
-    """One qualifying row per game with building/season attached."""
+    """One qualifying row per game with building/season/type attached.
+
+    Additive back-history: with data/arena_mapping_pre2007.csv present the range
+    extends to 1980 (arenaId mapping first, then home team city+name+season via
+    arena_resolver, with a coverage report and a >2% unresolved stop). Without
+    that file, behavior is exactly as before (2007+ via arenaId only)."""
+    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO, UNMATCHED_GATE
+
     games_path = os.path.join(data_dir, "Games.csv")
-    map_path = os.path.join(data_dir, "arena_mapping.csv")
-    for p in (games_path, map_path):
-        if not os.path.exists(p):
-            sys.exit(f"ERROR: file not found: {p}")
+    if not os.path.exists(games_path):
+        sys.exit(f"ERROR: file not found: {games_path}")
+    resolver = load_arena_resolver(data_dir)
 
     g = pd.read_csv(games_path, low_memory=False)
     g["gameDate"] = pd.to_datetime(g["gameDate"], errors="coerce")
@@ -49,21 +55,21 @@ def load_games(data_dir: str) -> pd.DataFrame:
     g["arenaId"] = pd.to_numeric(g["arenaId"], errors="coerce")
     g["winner"] = pd.to_numeric(g["winner"], errors="coerce")
 
-    m = pd.read_csv(map_path)
-    m["arenaId"] = pd.to_numeric(m["arenaId"], errors="coerce")
+    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    if resolver.has_pre2007:
+        _, _, frac = resolver.coverage_report(g)
+        if frac > UNMATCHED_GATE:
+            sys.exit(f"STOP: {frac:.2%} of 1980-2006 games are unresolved "
+                     f"(> {UNMATCHED_GATE:.0%}); fix arena_mapping_pre2007.csv and re-run.")
 
-    mask = (
-        (g["season"] >= 2007)
-        & g["gameType"].isin(GAME_TYPES)
-        & g["arenaId"].isin(set(m["arenaId"].dropna()))
-        & g["winner"].notna()
-    )
-    g = g[mask].merge(
-        m[["arenaId", "building", "city", "type"]], on="arenaId", how="left"
-    )
+    g = g[(g["season"] >= floor) & g["gameType"].isin(GAME_TYPES) & g["winner"].notna()].copy()
+    g = resolver.attach(g)
+    g = g[g["building"].notna()].copy()
+    g = g.rename(columns={"buildingType": "type"})
     print(
-        f"Qualifying games 2007+: {len(g):,} across "
-        f"{g['building'].nunique()} buildings"
+        f"Qualifying games {floor}+: {len(g):,} across "
+        f"{g['building'].nunique()} buildings, seasons "
+        f"{int(g['season'].min())}-{int(g['season'].max())}"
     )
     return g
 

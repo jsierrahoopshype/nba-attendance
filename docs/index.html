@@ -18,7 +18,7 @@
     <span class="brand">HoopsHype</span>
   </div>
   <div class="subtitle">
-    Player and team performance by building (2007–2026), plus who moves the turnstiles on the road.
+    Player and team performance by building and season, plus who moves the turnstiles on the road.
   </div>
 
   <div class="tabs" id="tabs">
@@ -58,7 +58,7 @@
   <!-- TAB 3: ARENA RECORDS -->
   <section class="view" id="view-records">
     <div class="block-head">
-      <h2>Every building, 2007–2026</h2>
+      <h2 id="buildingsHead">Every building</h2>
       <span class="sub">tap an arena for full leaderboards</span>
     </div>
     <div id="overviewTable"><div class="loading">Loading arenas…</div></div>
@@ -67,21 +67,30 @@
   <!-- TAB 4: CITY RECORDS -->
   <section class="view" id="view-cities">
     <div class="block-head">
-      <h2>Every city, 2007–2026</h2>
+      <h2 id="citiesHead">Every city</h2>
       <span class="sub">all arenas in a city combined · tap for full leaderboards</span>
     </div>
     <div id="cityTable"><div class="loading">Loading cities…</div></div>
   </section>
 
-  <div class="foot">
-    Records span the 2007–2026 seasons. Attendance figures and the road-draw tables are
-    <strong>2026-season only</strong> (the only season carrying attendance in the source data).
+  <div class="foot" id="foot">
+    Player and team records by building, city and season. Attendance-based draw tables
+    cover the seasons that carry attendance in the source data.
   </div>
 </div>
 
 <script src="app.js"></script>
 <script>
 "use strict";
+
+/* set an overview header to include the real season range from the data */
+function setHeadRange(id, base, ov) {
+  const el = document.getElementById(id);
+  if (!el || !ov || !ov.length) return;
+  const lo = Math.min(...ov.map(x => x.first_season));
+  const hi = Math.max(...ov.map(x => x.last_season));
+  el.textContent = base + ", " + (lo === hi ? lo : lo + "–" + hi);
+}
 
 /* ---------- tab switching (lazy init) ---------- */
 const inited = {};
@@ -191,6 +200,7 @@ async function initRecords() {
   try { ov = await getJSON(DATA + "/buildings/overview.json"); }
   catch (err) { document.getElementById("overviewTable").innerHTML = '<div class="err">Failed to load arenas: ' + esc(err.message) + "</div>"; return; }
 
+  setHeadRange("buildingsHead", "Every building", ov);
   const rows = ov.map(b => ({ ...b, _href: arenaHref(b.slug) }));
   const cols = [
     { key: "name", label: "Arena", align: "left", defaultDir: "asc", get: r => r.name,
@@ -222,6 +232,7 @@ async function initCities() {
   try { ov = await getJSON(DATA + "/cities/overview.json"); }
   catch (err) { document.getElementById("cityTable").innerHTML = '<div class="err">Failed to load cities: ' + esc(err.message) + "</div>"; return; }
 
+  setHeadRange("citiesHead", "Every city", ov);
   const rows = ov.map(c => ({ ...c, _href: cityHref(c.slug) }));
   const cols = [
     { key: "name", label: "City", align: "left", defaultDir: "asc", get: r => r.name, cell: r => cityLink(r.slug, r.name) },

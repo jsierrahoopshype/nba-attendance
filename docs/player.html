@@ -24,7 +24,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
-  <div class="foot">Records span the 2007–2026 seasons · one row per building where the player logged minutes.</div>
+  <div class="foot" id="foot">One row per building where the player logged minutes.</div>
 </div>
 
 <script src="app.js"></script>
@@ -46,6 +46,8 @@ async function boot() {
     '<div class="ehead"><h1>' + esc(player.name) + "</h1>" +
     '<div class="esub"><span>' + buildings + " buildings</span><span class=\"sep\">·</span>" +
     "<span>" + seasons(fs, ls) + "</span></div></div>";
+  document.getElementById("foot").textContent =
+    "Records span the " + seasons(fs, ls) + " seasons · one row per building where the player logged minutes.";
   document.getElementById("controls").style.display = "";
   makeSeasonPicker(document.getElementById("controls"), player.records_by_season, s => { season = s; render(); }, player.draw_seasons);
 

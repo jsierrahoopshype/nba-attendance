@@ -26,7 +26,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
-  <div class="foot">Every arena in the city is combined · leaderboards cover the 2007–2026 seasons · minimum 15 games for the win% board.</div>
+  <div class="foot" id="foot">Every arena in the city is combined · minimum 15 games for the win% board.</div>
 </div>
 
 <script src="app.js"></script>
@@ -70,6 +70,9 @@ async function boot() {
   const chips = (city.buildings || []).map(b => arenaLink(b.slug, b.name)).join("");
   document.getElementById("buildings").innerHTML = chips ? '<div class="city-buildings">' + chips + "</div>" : "";
 
+  document.getElementById("foot").textContent =
+    "Every arena in the city is combined · leaderboards cover the " +
+    seasons(city.first_season, city.last_season) + " seasons · minimum 15 games for the win% board.";
   await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
