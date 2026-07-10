@@ -42,6 +42,9 @@ RECORDS_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "player_arena_records_by_season
 ALLSTAR_CSV = os.path.join(OUTPUT_DIR, "allstar_players.csv")
 PLAYER_ARENA_DRAW_CSV = os.path.join(OUTPUT_DIR, "player_arena_draw.csv")
 TEAM_ARENA_DRAW_CSV = os.path.join(OUTPUT_DIR, "team_arena_draw.csv")
+# Season-keyed draws from build_attendance_tables_historical.py (2007-2026).
+PLAYER_ARENA_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "player_arena_draw_by_season.csv")
+TEAM_ARENA_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "team_arena_draw_by_season.csv")
 PLAYER_HOME_AWAY_CSV = os.path.join(OUTPUT_DIR, "player_arena_home_away.csv")
 ARENA_MAPPING_CSV = os.path.join(HERE, "data", "arena_mapping.csv")
 
@@ -58,6 +61,19 @@ BASELINE_SEASON_LABEL = "2026 season only"
 def slugify(name):
     """Lowercase-hyphenated building name."""
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _season_label(y):
+    """Season-ending year -> NBA label, e.g. 2026 -> '2025-26'."""
+    return f"{y - 1}-{str(y)[-2:]}"
+
+
+def draw_range_label(seasons):
+    """Human label for the seasons carrying draw data, e.g. '2006-07 – 2025-26'."""
+    if not seasons:
+        return BASELINE_SEASON_LABEL
+    lo, hi = min(seasons), max(seasons)
+    return _season_label(lo) if lo == hi else f"{_season_label(lo)} – {_season_label(hi)}"
 
 
 def read_csv(path):
@@ -356,6 +372,97 @@ def load_city_draw(slug_to_city):
     return player_by_city, team_by_city
 
 
+# --------------------------------------------------------------------------- #
+# season-keyed draws (build_attendance_tables_historical.py, 2007-2026)
+# --------------------------------------------------------------------------- #
+def _season_draw_map(rows_by_season, key_field):
+    """{season_str -> [rows]} -> {"all": weighted-across-seasons, season_str: sorted}.
+    Each per-season list is sorted by mean_delta desc; "all" is the games-weighted
+    mean per key across every season."""
+    out = {}
+    all_rows = []
+    for s, rows in rows_by_season.items():
+        out[s] = sorted(rows, key=lambda x: -x["mean_delta"])
+        all_rows.extend(rows)
+    out["all"] = _weighted_draw(all_rows, key_field)
+    return out
+
+
+def load_arena_draw_by_season(slug_to_city):
+    """Season-keyed per-arena and per-city draws. Returns a dict of:
+        building[slug] -> {"players": season-map, "teams": season-map, "seasons": [..]}
+        city[name]     -> {"players": season-map, "teams": season-map, "seasons": [..]}
+    Empty ({}) when the by-season CSVs are absent, so the caller falls back to the
+    single-season draw fields."""
+    have = (os.path.exists(PLAYER_ARENA_DRAW_BY_SEASON_CSV)
+            or os.path.exists(TEAM_ARENA_DRAW_BY_SEASON_CSV))
+    if not have:
+        return {}, {}
+
+    bp = defaultdict(lambda: defaultdict(list))   # slug -> season -> [player rows]
+    bt = defaultdict(lambda: defaultdict(list))   # slug -> season -> [team rows]
+    cp = defaultdict(lambda: defaultdict(list))   # city -> season -> [player rows]
+    ct = defaultdict(lambda: defaultdict(list))   # city -> season -> [team rows]
+
+    if os.path.exists(PLAYER_ARENA_DRAW_BY_SEASON_CSV):
+        for r in read_csv(PLAYER_ARENA_DRAW_BY_SEASON_CSV):
+            slug = slugify(r["building"])
+            s = str(as_int(r["season"]))
+            row = {"personId": r["personId"], "playerName": r["playerName"],
+                   "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"])}
+            bp[slug][s].append(row)
+            city = slug_to_city.get(slug)
+            if city:
+                cp[city][s].append(dict(row))
+    if os.path.exists(TEAM_ARENA_DRAW_BY_SEASON_CSV):
+        for r in read_csv(TEAM_ARENA_DRAW_BY_SEASON_CSV):
+            slug = slugify(r["building"])
+            s = str(as_int(r["season"]))
+            row = {"teamId": r["teamId"], "team": f'{r["teamCity"]} {r["teamName"]}'.strip(),
+                   "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"])}
+            bt[slug][s].append(row)
+            city = slug_to_city.get(slug)
+            if city:
+                ct[city][s].append(dict(row))
+
+    def pack(pmap, tmap, keys):
+        out = {}
+        for k in keys:
+            players = _season_draw_map(pmap.get(k, {}), "personId") if k in pmap else {"all": []}
+            teams = _season_draw_map(tmap.get(k, {}), "teamId") if k in tmap else {"all": []}
+            seasons = sorted({int(s) for s in list(pmap.get(k, {})) + list(tmap.get(k, {}))})
+            out[k] = {"players": players, "teams": teams, "seasons": seasons}
+        return out
+
+    building = pack(bp, bt, set(bp) | set(bt))
+    city = pack(cp, ct, set(cp) | set(ct))
+    return building, city
+
+
+def load_player_draw_by_season(slug_to_city):
+    """Per player: {"seasons": [..], "by_season": {"all": [...], season: [...]}} of
+    their draw-by-arena rows. Empty when the by-season CSV is absent."""
+    if not os.path.exists(PLAYER_ARENA_DRAW_BY_SEASON_CSV):
+        return {}
+    pp = defaultdict(lambda: defaultdict(list))   # pid -> season -> [rows]
+    for r in read_csv(PLAYER_ARENA_DRAW_BY_SEASON_CSV):
+        bld = r["building"]
+        slug = slugify(bld)
+        city = slug_to_city.get(slug, "")
+        pp[r["personId"]][str(as_int(r["season"]))].append({
+            "arena": bld, "slug": slug, "city": city,
+            "city_slug": slugify(city) if city else "",
+            "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"]),
+        })
+    out = {}
+    for pid, by_season in pp.items():
+        out[pid] = {
+            "seasons": sorted(int(s) for s in by_season),
+            "by_season": _season_draw_map(by_season, "slug"),
+        }
+    return out
+
+
 def load_records_by_season():
     """Season-level player-arena records (additive). Returns three views keyed
     for embedding:
@@ -557,10 +664,11 @@ def load_winningest_teams():
 
 def build_buildings(records, building_games, allstar_ids, draw_by_slug,
                     team_draw_by_slug=None, home_away_by_slug=None,
-                    season_by_building=None):
+                    season_by_building=None, season_draw_buildings=None):
     team_draw_by_slug = team_draw_by_slug or {}
     home_away_by_slug = home_away_by_slug or {}
     season_by_building = season_by_building or {}
+    season_draw_buildings = season_draw_buildings or {}
     by_building = {}
     for rec in records:
         by_building.setdefault(rec["building"], []).append(rec)
@@ -616,6 +724,15 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "team_draw": team_draw_by_slug.get(slug, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
+        # Season-keyed draw (2007-2026) when available — used by arena.html so the
+        # draw section follows the season selector; the note then shows only for
+        # seasons genuinely absent from the data.
+        sd = season_draw_buildings.get(slug)
+        if sd:
+            detail["visiting_draw_by_season"] = sd["players"]
+            detail["team_draw_by_season"] = sd["teams"]
+            detail["draw_seasons"] = sd["seasons"]
+            detail["draw_label"] = draw_range_label(sd["seasons"])
         write_json(os.path.join(DATA_DIR, "buildings", slug + ".json"), detail)
 
     # overview table (Arena Records default view)
@@ -676,9 +793,11 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
 # --------------------------------------------------------------------------- #
 # players
 # --------------------------------------------------------------------------- #
-def build_players(records, draw_by_player=None, season_by_player=None):
+def build_players(records, draw_by_player=None, season_by_player=None,
+                  season_draw_players=None):
     draw_by_player = draw_by_player or {}
     season_by_player = season_by_player or {}
+    season_draw_players = season_draw_players or {}
     by_player = {}
     names = {}
     for rec in records:
@@ -709,6 +828,11 @@ def build_players(records, draw_by_player=None, season_by_player=None):
             "arena_draw": draw_by_player.get(pid, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
+        sdp = season_draw_players.get(pid)
+        if sdp:
+            detail["arena_draw_by_season"] = sdp["by_season"]
+            detail["draw_seasons"] = sdp["seasons"]
+            detail["draw_label"] = draw_range_label(sdp["seasons"])
         write_json(os.path.join(DATA_DIR, "players", pid + ".json"), detail)
 
     return len(index)
@@ -737,7 +861,8 @@ def city_record_public(rec):
 
 
 def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
-                 season_by_city=None, city_player_draw=None, city_team_draw=None):
+                 season_by_city=None, city_player_draw=None, city_team_draw=None,
+                 season_draw_cities=None):
     """Write docs/data/cities/{index,overview,slug}.json from city_records.csv.
 
     buildings_by_city[city] -> sorted list of {name, slug} buildings in the city,
@@ -745,6 +870,7 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
     season_by_city = season_by_city or {}
     city_player_draw = city_player_draw or {}
     city_team_draw = city_team_draw or {}
+    season_draw_cities = season_draw_cities or {}
     if not city_records:
         return 0
     by_city = {}
@@ -829,6 +955,12 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
             "team_draw": city_team_draw.get(name, []),
             "draw_label": BASELINE_SEASON_LABEL,
         }
+        sd = season_draw_cities.get(name)
+        if sd:
+            detail["visiting_draw_by_season"] = sd["players"]
+            detail["team_draw_by_season"] = sd["teams"]
+            detail["draw_seasons"] = sd["seasons"]
+            detail["draw_label"] = draw_range_label(sd["seasons"])
         write_json(os.path.join(DATA_DIR, "cities", slug + ".json"), detail)
     return len(index)
 
@@ -895,8 +1027,13 @@ def main():
     team_draw_by_slug = load_team_arena_draw()
     home_away_by_slug = load_home_away()
     city_player_draw, city_team_draw = load_city_draw(slug_to_city)
+    season_draw_buildings, season_draw_cities = load_arena_draw_by_season(slug_to_city)
+    season_draw_players = load_player_draw_by_season(slug_to_city)
     city_records = load_city_records()
     season_by_player, season_by_building, season_by_city = load_records_by_season()
+    if season_draw_buildings:
+        print(f"season-keyed draw: {len(season_draw_buildings)} buildings, "
+              f"{len(season_draw_cities)} cities, {len(season_draw_players)} players")
 
     write_json(os.path.join(DATA_DIR, "allstar.json"),
                {"personIds": allstar_ids_list, "players": allstar_meta})
@@ -909,7 +1046,7 @@ def main():
 
     n_buildings = build_buildings(records, building_games, allstar_ids, draw_by_slug,
                                   team_draw_by_slug, home_away_by_slug,
-                                  season_by_building)
+                                  season_by_building, season_draw_buildings)
     print(f"buildings: index + overview + {n_buildings} detail files")
 
     # city -> its buildings (for cross-links on the city page)
@@ -921,10 +1058,12 @@ def main():
         for c, b in buildings_by_city.items()
     }
     n_cities = build_cities(city_records, city_games, allstar_ids, buildings_by_city,
-                            season_by_city, city_player_draw, city_team_draw)
+                            season_by_city, city_player_draw, city_team_draw,
+                            season_draw_cities)
     print(f"cities: index + overview + {n_cities} detail files")
 
-    n_players = build_players(records, draw_by_player, season_by_player)
+    n_players = build_players(records, draw_by_player, season_by_player,
+                              season_draw_players)
     print(f"players: index + {n_players} detail files")
 
     n_search = build_search(records, city_records)

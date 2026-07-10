@@ -39,8 +39,20 @@ const noHomeClass = r => {
   const ha = homeAwayOf(r.personId);
   return (ha && ha.home_games === 0 && ha.away_games > 0) ? "no-home" : "";
 };
-/* draw tables only show real attendance for 2026; note when another season is picked */
-const drawSeasonOK = () => season == null || season === 2026;
+/* Draw rows for the current season selection. Prefers the season-keyed data
+   (2007-2026) when present; otherwise falls back to the single-season fields
+   with the old 2026-only gate. `absent` => the picked season genuinely has no
+   attendance data, so a note replaces the table. */
+function currentDraw() {
+  const vs = building.visiting_draw_by_season, ts = building.team_draw_by_season;
+  if (vs || ts) {
+    if (seasonAbsentFromDraw(building.draw_seasons, season)) return { absent: true, players: [], teams: [] };
+    const k = drawKey(season);
+    return { absent: false, players: (vs && vs[k]) || [], teams: (ts && ts[k]) || [] };
+  }
+  const ok = season == null || season === 2026;   // legacy single-season data
+  return { absent: !ok, players: building.visiting_draw || [], teams: building.team_draw || [] };
+}
 
 async function boot() {
   const slug = qp("slug");
@@ -68,7 +80,7 @@ async function boot() {
   await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
-  makeSeasonPicker(document.getElementById("controls"), building.records_by_season, s => { season = s; render(); });
+  makeSeasonPicker(document.getElementById("controls"), building.records_by_season, s => { season = s; render(); }, building.draw_seasons);
   makeAllstarToggle(document.getElementById("controls"), render);
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
@@ -198,22 +210,26 @@ function render() {
 
 /* Visiting-player draw and visiting-team draw, side by side. These default to
    All-Stars only (drawAllstarMode) — the opposite default from the career
-   tables — and are toggleable to show everyone. Attendance only exists for
-   2026, so any other season selection shows a note instead of stale numbers. */
+   tables — and are toggleable to show everyone. The section follows the season
+   selector: All Seasons is an all-years aggregate, a season shows that season,
+   and a season with no attendance data shows a note. */
 function renderDrawTables(mount) {
-  const players = (building.visiting_draw || []);
-  const teams = (building.team_draw || []);
-  if (!players.length && !teams.length) return;
-  const label = esc(building.draw_label || "2026 season only");
+  const hasAny = (building.visiting_draw_by_season || building.team_draw_by_season
+    || (building.visiting_draw || []).length || (building.team_draw || []).length);
+  if (!hasAny) return;
+  const { absent, players, teams } = currentDraw();
+  const scopeLabel = season == null
+    ? "all seasons · " + esc(building.draw_label || "")
+    : esc(seasonLabel(season));
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Who drew the most here " +
-    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + label + "</span></div>");
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
 
-  if (!drawSeasonOK()) {
+  if (absent) {
     mount.insertAdjacentHTML("beforeend",
-      '<div class="draw-note">Attendance data only exists for the <strong>2025-26</strong> season, so there ' +
-      "is nothing to show for " + esc(seasonLabel(season)) +
-      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see the draw.</div>");
+      '<div class="draw-note">No attendance data exists for the <strong>' + esc(seasonLabel(season)) +
+      "</strong> season, so there's no draw to show. Attendance is available for " +
+      esc(building.draw_label || "2026") + " — pick a covered season or <strong>All Seasons</strong>.</div>");
     return;
   }
 

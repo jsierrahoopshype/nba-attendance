@@ -47,7 +47,7 @@ async function boot() {
     '<div class="esub"><span>' + buildings + " buildings</span><span class=\"sep\">·</span>" +
     "<span>" + seasons(fs, ls) + "</span></div></div>";
   document.getElementById("controls").style.display = "";
-  makeSeasonPicker(document.getElementById("controls"), player.records_by_season, s => { season = s; render(); });
+  makeSeasonPicker(document.getElementById("controls"), player.records_by_season, s => { season = s; render(); }, player.draw_seasons);
 
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
@@ -95,24 +95,37 @@ function render() {
   renderArenaDraw(mount);
 }
 
-/* This player's road-attendance draw at each arena they visited (2026 only). */
+/* This player's road-attendance draw at each arena. Follows the season selector:
+   season-keyed data (2007-2026) preferred, single-season fallback. */
 function renderArenaDraw(mount) {
-  const draw = (player.arena_draw || []).slice();
-  if (!draw.length) return;
+  const bySeason = player.arena_draw_by_season;
+  const hasAny = bySeason
+    ? ((player.draw_seasons || []).length > 0 || (bySeason.all || []).length > 0)
+    : (player.arena_draw || []).length > 0;
+  if (!hasAny) return;
+  let draw, absent;
+  if (bySeason) {
+    absent = seasonAbsentFromDraw(player.draw_seasons, season);
+    draw = absent ? [] : (bySeason[drawKey(season)] || []);
+  } else {
+    absent = !(season == null || season === 2026);
+    draw = player.arena_draw || [];
+  }
+  const scopeLabel = season == null
+    ? "all seasons · " + esc(player.draw_label || "")
+    : esc(seasonLabel(season));
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Attendance draw by arena " +
-    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
-    esc(player.draw_label || "2026 season only") + "</span></div>");
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
 
-  // Show the draw only under "All Seasons" or the 2025-26 season (the only
-  // season carrying attendance); otherwise a note, never stale numbers.
-  if (!(season == null || season === 2026)) {
+  if (absent) {
     mount.insertAdjacentHTML("beforeend",
-      '<div class="draw-note">Attendance data only exists for the <strong>2025-26</strong> season, so there ' +
-      "is nothing to show for " + esc(seasonLabel(season)) +
-      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see the draw.</div>");
+      '<div class="draw-note">No attendance data exists for the <strong>' + esc(seasonLabel(season)) +
+      "</strong> season, so there's no draw to show. Attendance is available for " +
+      esc(player.draw_label || "2026") + " — pick a covered season or <strong>All Seasons</strong>.</div>");
     return;
   }
+  if (!draw.length) return;
 
   const dm = document.createElement("div");
   mount.appendChild(dm);
