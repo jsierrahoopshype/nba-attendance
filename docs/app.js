@@ -158,9 +158,19 @@ const seasonLabel = y => (Number(y) - 1) + "-" + String(Number(y)).slice(-2); //
 function seasonsIn(rows) {
   return [...new Set((rows || []).map(r => r.season))].sort((a, b) => b - a);
 }
-/* Build the season <select> (mount is a container). onChange(seasonOrNull). */
-function makeSeasonPicker(mount, rows, onChange) {
-  const yrs = seasonsIn(rows);
+/* Season-keyed draw helpers (used by the draw sections). "All Seasons"
+   (season === null) maps to the "all" aggregate; a specific season maps to its
+   own key. A season not in the draw data is genuinely absent -> caller shows a
+   note instead of the table. */
+const drawKey = season => (season == null ? "all" : String(season));
+const seasonAbsentFromDraw = (seasons, season) =>
+  season != null && !(seasons || []).map(Number).includes(Number(season));
+/* Build the season <select> (mount is a container). onChange(seasonOrNull).
+   `extraSeasons` merges in seasons that exist in other data on the page (e.g.
+   draw seasons that predate the player-record sample) so they're selectable. */
+function makeSeasonPicker(mount, rows, onChange, extraSeasons) {
+  const yrs = [...new Set([...seasonsIn(rows), ...(extraSeasons || []).map(Number)])]
+    .sort((a, b) => b - a);
   const wrap = document.createElement("div");
   wrap.className = "field season-field";
   wrap.innerHTML = '<span class="lbl">Season</span>' +

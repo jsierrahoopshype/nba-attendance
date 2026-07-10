@@ -34,8 +34,18 @@
 "use strict";
 let city = null, over = null, gt = "regular", season = null;
 
-/* draw tables only show real attendance for 2026 */
-const drawSeasonOK = () => season == null || season === 2026;
+/* Draw rows for the current season selection (season-keyed data preferred,
+   single-season fallback). `absent` => the picked season genuinely has no data. */
+function currentDraw() {
+  const vs = city.visiting_draw_by_season, ts = city.team_draw_by_season;
+  if (vs || ts) {
+    if (seasonAbsentFromDraw(city.draw_seasons, season)) return { absent: true, players: [], teams: [] };
+    const k = drawKey(season);
+    return { absent: false, players: (vs && vs[k]) || [], teams: (ts && ts[k]) || [] };
+  }
+  const ok = season == null || season === 2026;
+  return { absent: !ok, players: city.visiting_draw || [], teams: city.team_draw || [] };
+}
 
 async function boot() {
   const slug = qp("slug");
@@ -63,7 +73,7 @@ async function boot() {
   await loadAllstar();
   renderCards();
   document.getElementById("controls").style.display = "";
-  makeSeasonPicker(document.getElementById("controls"), city.records_by_season, s => { season = s; render(); });
+  makeSeasonPicker(document.getElementById("controls"), city.records_by_season, s => { season = s; render(); }, city.draw_seasons);
   makeAllstarToggle(document.getElementById("controls"), render);
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
@@ -176,21 +186,26 @@ function render() {
 }
 
 /* City-level visiting-player / visiting-team draw (aggregated across the city's
-   arenas). All-Stars-only default (drawAllstarMode), 2026-only. */
+   arenas). All-Stars-only default (drawAllstarMode). Follows the season selector:
+   All Seasons = all-years aggregate, a season shows that season, a season with no
+   attendance data shows a note. */
 function renderDrawTables(mount) {
-  const players = (city.visiting_draw || []);
-  const teams = (city.team_draw || []);
-  if (!players.length && !teams.length) return;
-  const label = esc(city.draw_label || "2026 season only");
+  const hasAny = (city.visiting_draw_by_season || city.team_draw_by_season
+    || (city.visiting_draw || []).length || (city.team_draw || []).length);
+  if (!hasAny) return;
+  const { absent, players, teams } = currentDraw();
+  const scopeLabel = season == null
+    ? "all seasons · " + esc(city.draw_label || "")
+    : esc(seasonLabel(season));
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Who drew the most in " + esc(city.name) + " " +
-    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + label + "</span></div>");
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
 
-  if (!drawSeasonOK()) {
+  if (absent) {
     mount.insertAdjacentHTML("beforeend",
-      '<div class="draw-note">Attendance data only exists for the <strong>2025-26</strong> season, so there ' +
-      "is nothing to show for " + esc(seasonLabel(season)) +
-      ". Switch the season back to <strong>All Seasons</strong> or <strong>2025-26</strong> to see the draw.</div>");
+      '<div class="draw-note">No attendance data exists for the <strong>' + esc(seasonLabel(season)) +
+      "</strong> season, so there's no draw to show. Attendance is available for " +
+      esc(city.draw_label || "2026") + " — pick a covered season or <strong>All Seasons</strong>.</div>");
     return;
   }
 
