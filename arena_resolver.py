@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Shared arena/building resolver for the historical (1980-2026) pipelines.
 
-Two-tier resolution, additive to the existing arenaId mapping:
-  1. If a game's arenaId is in data/arena_mapping.csv, use that building/city
-     exactly as the current pipelines do (so 2007+ output is unchanged).
-  2. Otherwise, for 1980-2006 Regular Season + Playoff games, resolve the
-     building from the home team's city+name and a season that falls within a
-     data/arena_mapping_pre2007.csv row's [first_season, last_season] range.
+Two-tier resolution, split strictly by season:
+  1. Season >= 2007: use the game's arenaId in data/arena_mapping.csv, exactly as
+     the current pipelines do (so 2007+ output is unchanged).
+  2. Season <= 2006: IGNORE arenaId entirely. Games.csv backfills pre-2007 games
+     with the franchise's modern arenaId (audit_tier_conflicts.py shows e.g.
+     Chicago Stadium-era Bulls games carrying the United Center's id), so trusting
+     it resolves the wrong, era-incorrect building. These games resolve only from
+     the home team's city+name and a season inside a data/arena_mapping_pre2007.csv
+     row's [first_season, last_season] range. A pre-2007 game that matches no row
+     is unresolved (counted by the coverage report / 2% gate) — it never falls
+     back to arenaId.
 
 If data/arena_mapping_pre2007.csv is absent, tier 2 is inert and callers keep
 their current 2007+ behavior — nothing breaks.
@@ -48,28 +53,44 @@ class ArenaResolver:
         return None, None
 
     def attach(self, g):
-        """Return g with `building`, `city`, `buildingType` filled by tier 1 then,
-        for 1980-2006 games, tier 2 (a pre-2007 home arena). Unresolved rows get
-        NaN building (dropped downstream)."""
+        """Return g with `building`, `city`, `buildingType`.
+
+        Season >= 2007: tier 1 — arenaId in arena_mapping.csv, exactly as before.
+
+        Season <= 2006: arenaId is IGNORED entirely (Games.csv backfills pre-2007
+        games with the franchise's modern arenaId — e.g. Chicago Stadium-era Bulls
+        games carry the United Center's id — so tier 1 would resolve the wrong,
+        era-incorrect building). These games resolve exclusively via the pre-2007
+        team-season lookup; any that miss it stay unresolved (NaN building) and are
+        counted by the coverage report / 2% gate — never falling back to arenaId.
+        """
         g = g.copy()
         aid = pd.to_numeric(g["arenaId"], errors="coerce")
-        g["building"] = aid.map(self.id_building)
-        g["city"] = aid.map(self.id_city)
-        g["buildingType"] = aid.map(self.id_type)
+        modern = g["season"] >= 2007
 
+        # tier 1 — only for 2007+ games (byte-identical to the previous behavior
+        # once the frame is restricted to 2007+, which is the no-pre2007 case).
+        g["building"] = pd.NA
+        g["city"] = pd.NA
+        g["buildingType"] = pd.NA
+        g.loc[modern, "building"] = aid[modern].map(self.id_building)
+        g.loc[modern, "city"] = aid[modern].map(self.id_city)
+        g.loc[modern, "buildingType"] = aid[modern].map(self.id_type)
+
+        # tier 2 — pre-2007 team-season lookup, arenaId ignored.
         if self.has_pre2007:
-            need = g["building"].isna() & g["season"].between(PRE2007_SEASON_LO, PRE2007_SEASON_HI)
-            if need.any():
-                sub = g.loc[need, ["hometeamCity", "hometeamName", "season"]]
+            pre = g["season"].between(PRE2007_SEASON_LO, PRE2007_SEASON_HI)
+            if pre.any():
+                sub = g.loc[pre, ["hometeamCity", "hometeamName", "season"]]
                 resolved = {}
                 for row in sub.drop_duplicates().itertuples(index=False):
                     resolved[(row.hometeamCity, row.hometeamName, int(row.season))] = \
                         self._pre2007_lookup(row.hometeamCity, row.hometeamName, int(row.season))
                 keys = list(zip(sub["hometeamCity"], sub["hometeamName"], sub["season"].astype(int)))
-                g.loc[need, "building"] = [resolved[k][0] for k in keys]
-                g.loc[need, "city"] = [resolved[k][1] for k in keys]
+                g.loc[pre, "building"] = [resolved[k][0] for k in keys]
+                g.loc[pre, "city"] = [resolved[k][1] for k in keys]
                 # pre-2007 rows resolved via a team's home arena are home games
-                g.loc[need & g["building"].notna(), "buildingType"] = "home"
+                g.loc[pre & g["building"].notna(), "buildingType"] = "home"
         return g
 
     def coverage_report(self, g, lo=PRE2007_SEASON_LO, hi=PRE2007_SEASON_HI, verbose=True):
@@ -127,3 +148,50 @@ def load_arena_resolver(data_dir):
             pre2007_index[(_norm(r.teamCity), _norm(r.teamName))].append(
                 (int(r.first_season), int(r.last_season), r.building, r.city))
     return ArenaResolver(id_building, id_city, id_type, dict(pre2007_index), has_pre2007)
+
+
+def _selftest():
+    """In-memory verification of the season-split tier logic. No files needed."""
+    # 2007+ mapping: modern arenas for the backfilled ids.
+    id_building = {100.0: "United Center", 200.0: "TD Garden"}
+    id_city = {100.0: "Chicago", 200.0: "Boston"}
+    id_type = {100.0: "home", 200.0: "home"}
+    # pre-2007 team-season -> era-correct arena.
+    pre = {
+        ("Chicago", "Bulls"): [(1980, 1994, "Chicago Stadium", "Chicago")],
+        ("Boston", "Celtics"): [(1980, 1995, "Boston Garden", "Boston")],
+    }
+    R = ArenaResolver(id_building, id_city, id_type, pre, True)
+    g = pd.DataFrame([
+        # pre-2007 Bulls game whose arenaId is BACKFILLED to the United Center id:
+        # must resolve to Chicago Stadium, NOT United Center.
+        dict(gameId=1, arenaId=100, season=1990, gameType="Regular Season",
+             hometeamCity="Chicago", hometeamName="Bulls"),
+        # pre-2007 Celtics game, arenaId backfilled to TD Garden id -> Boston Garden.
+        dict(gameId=2, arenaId=200, season=1990, gameType="Regular Season",
+             hometeamCity="Boston", hometeamName="Celtics"),
+        # pre-2007 team absent from the pre-2007 mapping -> unresolved (no fallback).
+        dict(gameId=3, arenaId=100, season=1990, gameType="Regular Season",
+             hometeamCity="Denver", hometeamName="Nuggets"),
+        # 2007+ game -> tier 1 via arenaId, unchanged.
+        dict(gameId=4, arenaId=100, season=2015, gameType="Regular Season",
+             hometeamCity="Chicago", hometeamName="Bulls"),
+    ])
+    a = R.attach(g).set_index("gameId")
+    assert a.loc[1, "building"] == "Chicago Stadium", a.loc[1, "building"]
+    assert a.loc[2, "building"] == "Boston Garden", a.loc[2, "building"]
+    assert pd.isna(a.loc[3, "building"]), "pre-2007 miss must not fall back to arenaId"
+    assert a.loc[4, "building"] == "United Center", a.loc[4, "building"]
+    un, total, frac = R.coverage_report(g, verbose=False)
+    assert (total, un) == (3, 1), (total, un)
+
+    # No pre-2007 file: pre-2007 games are unresolved, 2007+ still tier 1.
+    R2 = ArenaResolver(id_building, id_city, id_type, {}, False)
+    a2 = R2.attach(g).set_index("gameId")
+    assert pd.isna(a2.loc[1, "building"]) and a2.loc[4, "building"] == "United Center"
+    print("arena_resolver self-test: OK (pre-2007 ignores backfilled arenaId; "
+          "2007+ unchanged; misses counted, never fall back)")
+
+
+if __name__ == "__main__":
+    _selftest()
