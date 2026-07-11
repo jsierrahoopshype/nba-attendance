@@ -84,7 +84,7 @@ table.lb td.sub{color:var(--text-secondary)}
   border:1px solid var(--border);border-radius:20px;padding:.05rem .5rem;text-transform:capitalize;margin-left:.4rem;vertical-align:middle}
 
 /* stat cards (detail pages) */
-.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin-bottom:1.3rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;min-width:0}
 .stat-card .lbl{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.3rem}
 .stat-card .num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;letter-spacing:-.02em;
@@ -185,6 +185,19 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
 .draw-note{background:var(--surface);border:1px dashed var(--border);border-radius:10px;
   padding:.9rem 1rem;color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
 
+/* fixed explainer above every draw section */
+.draw-explainer{color:var(--text-secondary);font-size:.82rem;margin:.1rem 0 .8rem;max-width:60rem}
+
+/* frontpage: responsive grid of ranking boxes */
+.fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:.4rem}
+.fp-box{margin-bottom:0;border:1px solid var(--border);border-radius:12px;
+  background:var(--surface);padding:1rem 1.1rem;display:flex;flex-direction:column}
+.fp-box .block-head{margin-bottom:.5rem}
+.fp-box table{margin-top:.1rem}
+.fp-more{display:inline-block;margin-top:.7rem;font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;font-weight:600;color:var(--accent)}
+.fp-more:hover{text-decoration:underline}
+
 /* city page: building chips */
 .city-buildings{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 1rem}
 .city-buildings a{font-family:'JetBrains Mono',monospace;font-size:.66rem;padding:.3rem .6rem;
@@ -198,6 +211,7 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
   .stat-card .num{font-size:1.15rem}
   .ehead h1{font-size:1.3rem}
   table.lb thead th{position:static}
+  .fp-grid{grid-template-columns:1fr}
 }
 @media(max-width:520px){
   .stat-cards{grid-template-columns:1fr 1fr}

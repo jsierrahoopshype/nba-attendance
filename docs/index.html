@@ -22,14 +22,20 @@
   </div>
 
   <div class="tabs" id="tabs">
-    <button data-tab="players" class="active">Player Lookup</button>
-    <button data-tab="draw">Attendance Draw 2026</button>
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="players">Player Lookup</button>
+    <button data-tab="draw">Attendance Draw</button>
     <button data-tab="records">Arena Records</button>
     <button data-tab="cities">City Records</button>
   </div>
 
+  <!-- TAB 0: HOME (landing) -->
+  <section class="view active" id="view-home">
+    <div id="frontpageGrid"><div class="loading">Loading rankings…</div></div>
+  </section>
+
   <!-- TAB 1: PLAYER LOOKUP -->
-  <section class="view active" id="view-players">
+  <section class="view" id="view-players">
     <div class="controls">
       <div class="field grow searchbox">
         <span class="lbl">Search player</span>
@@ -105,7 +111,8 @@ document.getElementById("tabs").addEventListener("click", e => {
 function init(tab) {
   if (inited[tab]) return;
   inited[tab] = true;
-  if (tab === "players") initPlayers();
+  if (tab === "home") initHome();
+  else if (tab === "players") initPlayers();
   else if (tab === "draw") initDraw();
   else if (tab === "records") initRecords();
   else if (tab === "cities") initCities();
@@ -164,11 +171,7 @@ async function initDraw() {
   try { draw = await getJSON(DATA + "/draw.json"); }
   catch (err) { document.getElementById("teamTable").innerHTML = '<div class="err">Failed to load draw data: ' + esc(err.message) + "</div>"; return; }
 
-  document.getElementById("drawExplainer").innerHTML =
-    "How much a team or player moves the gate on the road: their <strong>actual average road attendance</strong> " +
-    "versus the <strong>arena baseline</strong> (what those same buildings normally draw), and the " +
-    '<span class="pos">difference</span> / <span class="neg">shortfall</span>. ' +
-    "Baseline uses a leave-one-out average per game · " + esc(draw.baseline_label) + ".";
+  document.getElementById("drawExplainer").textContent = DRAW_EXPLAINER;
   document.getElementById("teamCount").textContent = draw.teams.length + " teams";
 
   const attCols = (nameCol) => [
@@ -176,7 +179,7 @@ async function initDraw() {
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
     { key: "actual", label: "Avg Road Attendance", defaultDir: "desc", get: r => r.actual, cell: r => fmtInt(r.actual) },
     { key: "baseline", label: "Arena Baseline", defaultDir: "desc", get: r => r.baseline, cell: r => fmtInt(r.baseline) },
-    { key: "diff", label: "Difference", defaultDir: "desc", get: r => r.diff,
+    { key: "diff", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.diff,
       cell: r => '<span class="delta ' + deltaCls(r.diff) + '">' + signed(r.diff) + "</span>" },
   ];
 
@@ -250,10 +253,67 @@ async function initCities() {
   wireRowNav(mount);
 }
 
-/* boot: honor ?tab=, else the first tab */
+/* ---------- HOME: six ranking boxes ---------- */
+async function initHome() {
+  let fp;
+  try { fp = await getJSON(DATA + "/frontpage.json"); }
+  catch (err) { document.getElementById("frontpageGrid").innerHTML = '<div class="err">Failed to load rankings: ' + esc(err.message) + "</div>"; return; }
+  const b = fp.boxes || {};
+  const sl = fp.latest_label || "";
+  const draw = r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>";
+  const arenaCol = { key: "building", label: "Arena", align: "left", defaultDir: "asc", get: r => r.building, cell: r => arenaLink(r.slug, r.building) };
+  const playerCol = { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) };
+  const gCol = { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) };
+
+  const boxes = [
+    { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
+      rows: b.arena_attendance, tab: "records", cols: [arenaCol,
+        { key: "avg", label: "Avg Att", defaultDir: "desc", get: r => r.avg, cell: r => fmtInt(r.avg) }] },
+    { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top visiting players, min 15 road games",
+      rows: b.biggest_draws_season, tab: "draw", cols: [playerCol, gCol,
+        { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw }] },
+    { title: "All-time draw kings", sub: "career avg draw, min 100 road games",
+      rows: b.draw_kings_alltime, tab: "draw", cols: [playerCol, gCol,
+        { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw }] },
+    { title: "Sellout meter" + (sl ? " · " + sl : ""), sub: "share of games within 0.5% of capacity",
+      rows: b.sellout, tab: "records", cols: [arenaCol,
+        { key: "pct", label: "Sellout%", defaultDir: "desc", get: r => r.pct, cell: r => pct(r.pct) }] },
+    { title: "Road legends", sub: "highest visiting single game, by arena",
+      rows: b.road_legends, tab: "records", cols: [arenaCol, playerCol,
+        { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) }] },
+    { title: "Enemy territory", sub: "top scorers who never played home there",
+      rows: b.enemy_territory, tab: "players", cols: [playerCol, arenaCol,
+        { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) }] },
+  ];
+
+  const grid = document.getElementById("frontpageGrid");
+  grid.innerHTML = "";
+  grid.className = "fp-grid";
+  boxes.forEach(box => {
+    const el = document.createElement("div");
+    el.className = "block fp-box";
+    el.innerHTML = '<div class="block-head"><h2>' + esc(box.title) + '</h2>' +
+      '<span class="sub">' + esc(box.sub) + "</span></div>";
+    const tm = document.createElement("div");
+    el.appendChild(tm);
+    grid.appendChild(el);
+    const rows = (box.rows || []).map(r => ({ ...r,
+      _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId) : null) }));
+    if (rows.length) {
+      sortableTable(tm, box.cols, rows, { key: box.cols[box.cols.length - 1].key, dir: "desc" });
+      wireRowNav(tm);
+    } else {
+      tm.innerHTML = '<div class="empty">No data yet.</div>';
+    }
+    el.insertAdjacentHTML("beforeend",
+      '<a class="fp-more" href="index.html?tab=' + box.tab + '">See full ranking →</a>');
+  });
+}
+
+/* boot: honor ?tab=, else the home landing */
 const startTab = qp("tab");
 if (startTab && document.querySelector('#tabs button[data-tab="' + startTab + '"]')) activateTab(startTab);
-else init("players");
+else init("home");
 </script>
 </body>
 </html>

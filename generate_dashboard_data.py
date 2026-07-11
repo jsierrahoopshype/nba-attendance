@@ -45,11 +45,18 @@ TEAM_ARENA_DRAW_CSV = os.path.join(OUTPUT_DIR, "team_arena_draw.csv")
 # Season-keyed draws from build_attendance_tables_historical.py (2007-2026).
 PLAYER_ARENA_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "player_arena_draw_by_season.csv")
 TEAM_ARENA_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "team_arena_draw_by_season.csv")
+PLAYER_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "player_draw_by_season.csv")
+ARENA_BASELINES_ALL_CSV = os.path.join(OUTPUT_DIR, "arena_baselines_all.csv")
 PLAYER_HOME_AWAY_CSV = os.path.join(OUTPUT_DIR, "player_arena_home_away.csv")
 ARENA_MAPPING_CSV = os.path.join(HERE, "data", "arena_mapping.csv")
 
 NEVER_HOME_MIN_AWAY = 3         # min visiting games for the "never played home" list
 NEVER_HOME_TOP = 40
+BIGGEST_DRAW_MIN_GAMES = 15     # min games for the per-arena biggest-draw card
+DRAW_KING_MIN_GAMES = 100       # min road games for the all-time draw-kings box
+SEASON_DRAW_MIN_GAMES = 15      # min road games for the biggest-draws-this-season box
+SELLOUT_WITHIN = 0.005          # within 0.5% of an arena-season's max attendance
+FRONTPAGE_ROWS = 10
 
 PLAYER_DRAW_MIN_GAMES = 20
 WIN_PCT_MIN_GAMES = 15          # player leaderboards + overview winningest player
@@ -208,28 +215,27 @@ def build_draw(data_dir, player_filename, chunksize):
 # --------------------------------------------------------------------------- #
 def load_game_counts(data_dir):
     """Distinct-gameId counts per canonical building and per city, derived from
-    the raw game-level data (Games.csv joined to arena_mapping.csv).
+    the raw game-level data resolved through arena_resolver.
 
     This is the single source of truth for "total games". It counts each game
-    once (via unique gameId), never by summing a per-player/per-team games column
-    — summing those inflates the total by the number of players/teams per game.
+    once (via unique gameId), never by summing a per-player/per-team games column.
+    Resolution goes through arena_resolver so pre-2007 buildings (e.g. Chicago
+    Stadium) count correctly instead of showing 0 — the old arenaId-only join
+    dropped every 1980-2006 game.
     """
     import pandas as pd
+    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO
 
     games_path = os.path.join(data_dir, "Games.csv")
     g = pd.read_csv(games_path, low_memory=False)
     g["gameDate"] = pd.to_datetime(g["gameDate"], errors="coerce")
     g["season"] = g["gameDate"].dt.year + (g["gameDate"].dt.month >= 8).astype("int64")
-    g["arenaId"] = pd.to_numeric(g["arenaId"], errors="coerce")
 
-    m = pd.read_csv(ARENA_MAPPING_CSV)
-    m["arenaId"] = pd.to_numeric(m["arenaId"], errors="coerce")
-
-    g = g[
-        (g["season"] >= 2007)
-        & g["gameType"].isin(("Regular Season", "Playoffs"))
-        & g["arenaId"].isin(set(m["arenaId"].dropna()))
-    ].merge(m[["arenaId", "building", "city"]], on="arenaId", how="left")
+    resolver = load_arena_resolver(data_dir)
+    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    g = g[(g["season"] >= floor) & g["gameType"].isin(("Regular Season", "Playoffs"))].copy()
+    g = resolver.attach(g)
+    g = g[g["building"].notna()]
 
     building_games = g.groupby("building")["gameId"].nunique().astype(int).to_dict()
     city_games = g.groupby("city")["gameId"].nunique().astype(int).to_dict()
@@ -635,11 +641,94 @@ def load_baseline_avgs():
     return {a: (v["wsum"] / v["games"]) for a, v in sums.items() if v["games"]}
 
 
-def load_winningest_teams():
-    """Per building: the team with the best combined win_pct (min games)."""
+def load_avg_attendance_all():
+    """Games-weighted mean attendance per building across every season/gameType
+    that carries attendance (arena_baselines_all.csv), with the covered season
+    range. Empty when the all-seasons baselines file is absent."""
+    if not os.path.exists(ARENA_BASELINES_ALL_CSV):
+        return {}
+    agg = defaultdict(lambda: {"wsum": 0.0, "games": 0, "lo": 9999, "hi": 0})
+    for r in read_csv(ARENA_BASELINES_ALL_CSV):
+        g = as_int(r["games_with_attendance"]) or as_int(r["games"])
+        if not g:
+            continue
+        a = agg[r["building"]]
+        s = as_int(r["season"])
+        a["wsum"] += as_float(r["mean_attendance"]) * g
+        a["games"] += g
+        a["lo"] = min(a["lo"], s)
+        a["hi"] = max(a["hi"], s)
+    return {b: {"avg": round(a["wsum"] / a["games"], 1),
+                "first_season": a["lo"], "last_season": a["hi"]}
+            for b, a in agg.items() if a["games"]}
+
+
+def load_biggest_draw():
+    """Per building: the visiting team with the highest games-weighted mean LOO
+    delta across all covered seasons (min games). LOO deltas sum to zero per
+    group, so this is a max, never an average-of-all stat."""
+    if not os.path.exists(TEAM_ARENA_DRAW_BY_SEASON_CSV):
+        return {}
+    agg = defaultdict(lambda: defaultdict(lambda: {"wsum": 0.0, "games": 0, "team": ""}))
+    for r in read_csv(TEAM_ARENA_DRAW_BY_SEASON_CSV):
+        a = agg[r["building"]][r["teamId"]]
+        g = as_int(r["games"])
+        a["wsum"] += as_float(r["mean_delta"]) * g
+        a["games"] += g
+        a["team"] = f'{r["teamCity"]} {r["teamName"]}'.strip()
+    best = {}
+    for b, teams in agg.items():
+        cand = None
+        for tid, a in teams.items():
+            if a["games"] < BIGGEST_DRAW_MIN_GAMES:
+                continue
+            md = a["wsum"] / a["games"]
+            if cand is None or md > cand[0]:
+                cand = (md, {"team": a["team"], "mean_delta": round(md, 1), "games": a["games"]})
+        if cand:
+            best[b] = cand[1]
+    return best
+
+
+def load_sellout(data_dir):
+    """Per (building, season): the share of attended games within SELLOUT_WITHIN
+    of that arena-season's max recorded attendance (capacity proxy). Returns
+    {building: {season: {"pct", "games", "sellouts"}}}. Empty if attendance can't
+    be assembled (no historical builder inputs)."""
+    try:
+        import pandas as pd
+        import build_attendance_tables_historical as bath
+    except Exception:
+        return {}
+    games_path = os.path.join(data_dir, "Games.csv")
+    hist = os.path.join(data_dir, "historical_attendance.csv")
+    mp = os.path.join(data_dir, "arena_mapping.csv")
+    try:
+        ctx, _ = bath.load_games(games_path, hist, mp, 0.70)
+    except Exception:
+        return {}
+    d = ctx[ctx["attendance"].fillna(0) > 0].copy()
+    out = defaultdict(dict)
+    for (bld, season), sub in d.groupby(["building", "season"]):
+        att = sub["attendance"].astype(float)
+        cap = att.max()
+        if cap <= 0:
+            continue
+        sell = int((att >= cap * (1 - SELLOUT_WITHIN)).sum())
+        n = int(len(att))
+        out[bld][int(season)] = {"pct": round(sell / n, 4), "games": n, "sellouts": sell}
+    return dict(out)
+
+
+def load_winningest_teams(regular_only=True):
+    """Per building: the team with the best win_pct (min games). Scoped to
+    Regular Season by default so the overview card matches the default
+    leaderboard view."""
     agg = defaultdict(lambda: defaultdict(lambda: {"games": 0, "wins": 0}))
     label = {}
     for r in read_csv(TEAM_BUILDING_CSV):
+        if regular_only and r["gameType"] != "Regular Season":
+            continue
         b = r["building"]
         tid = r["teamId"]
         a = agg[b][tid]
@@ -664,7 +753,8 @@ def load_winningest_teams():
 
 def build_buildings(records, building_games, allstar_ids, draw_by_slug,
                     team_draw_by_slug=None, home_away_by_slug=None,
-                    season_by_building=None, season_draw_buildings=None):
+                    season_by_building=None, season_draw_buildings=None,
+                    sellout_by_building=None):
     team_draw_by_slug = team_draw_by_slug or {}
     home_away_by_slug = home_away_by_slug or {}
     season_by_building = season_by_building or {}
@@ -736,16 +826,21 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
         write_json(os.path.join(DATA_DIR, "buildings", slug + ".json"), detail)
 
     # overview table (Arena Records default view)
-    baseline_avgs = load_baseline_avgs()
-    winning_teams = load_winningest_teams()
+    baseline_avgs = load_baseline_avgs()          # 2026-only fallback
+    avg_att_all = load_avg_attendance_all()       # all-seasons, games-weighted
+    winning_teams = load_winningest_teams()       # Regular Season only
+    biggest_draw = load_biggest_draw()
     overview = []
     for name in sorted(by_building):
         recs = by_building[name]
-        # combine gameTypes per player at this building
+        # Cards are scoped to Regular Season so they match the default leaderboard
+        # view (the old code combined Regular Season + Playoffs, which disagreed
+        # with the RS-only board below).
+        regular = [r for r in recs if r["gameType"] == "Regular Season"]
         pts = defaultdict(int)
         wl = defaultdict(lambda: {"games": 0, "wins": 0})
         pname = {}
-        for r in recs:
+        for r in regular:
             pts[r["personId"]] += r["total_points"]
             w = wl[r["personId"]]
             w["games"] += r["games"]
@@ -770,7 +865,24 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
         if cand:
             winningest_player = cand[1]
 
-        avg_att = baseline_avgs.get(name)
+        # avg attendance: prefer the all-seasons games-weighted value + real range
+        aa = avg_att_all.get(name)
+        if aa:
+            avg_attendance = aa["avg"]
+            avg_label = (str(aa["first_season"]) if aa["first_season"] == aa["last_season"]
+                         else f'{aa["first_season"]}–{aa["last_season"]}')
+        else:
+            av = baseline_avgs.get(name)
+            avg_attendance = round(av, 1) if av is not None else None
+            avg_label = BASELINE_SEASON_LABEL
+
+        # sellout: latest season's share of near-capacity games
+        sellout = None
+        so = (sellout_by_building or {}).get(name)
+        if so:
+            latest = max(so)
+            sellout = {"pct": so[latest]["pct"], "season": latest, "games": so[latest]["games"]}
+
         overview.append({
             "slug": slugify(name),
             "name": name,
@@ -780,11 +892,14 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "total_games": building_games.get(name, 0),
             "first_season": min(r["first_season"] for r in recs),
             "last_season": max(r["last_season"] for r in recs),
+            "card_scope": "Regular Season",
             "top_scorer": top_scorer,
             "winningest_player": winningest_player,
             "winningest_team": winning_teams.get(name),
-            "avg_attendance": round(avg_att, 1) if avg_att is not None else None,
-            "avg_attendance_label": BASELINE_SEASON_LABEL,
+            "avg_attendance": avg_attendance,
+            "avg_attendance_label": avg_label,
+            "biggest_draw": biggest_draw.get(name),
+            "sellout": sellout,
         })
     write_json(os.path.join(DATA_DIR, "buildings", "overview.json"), overview)
     return len(index)
@@ -966,6 +1081,116 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
 
 
 # --------------------------------------------------------------------------- #
+# front page  (six ranking boxes)
+# --------------------------------------------------------------------------- #
+def _read_by_season(path, num_fields):
+    if not os.path.exists(path):
+        return []
+    rows = read_csv(path)
+    for r in rows:
+        for k in num_fields:
+            r[k] = as_float(r[k]) if "." in str(r.get(k, "")) else as_int(r.get(k, 0))
+    return rows
+
+
+def build_frontpage(records, home_away_by_slug, sellout_by_building):
+    """Emit docs/data/frontpage.json — six ranked boxes for the landing page."""
+    boxes = {}
+
+    # ---- latest season across the draw / baseline data ----
+    seasons = set()
+    pdraw = _read_by_season(PLAYER_DRAW_BY_SEASON_CSV, ["season", "games", "mean_delta"])
+    for r in pdraw:
+        seasons.add(as_int(r["season"]))
+    baselines = read_csv(ARENA_BASELINES_ALL_CSV) if os.path.exists(ARENA_BASELINES_ALL_CSV) else []
+    for r in baselines:
+        seasons.add(as_int(r["season"]))
+    for b, sm in (sellout_by_building or {}).items():
+        seasons.update(sm)
+    latest = max(seasons) if seasons else None
+
+    # ---- (1) arena attendance ranking, latest season ----
+    att = defaultdict(lambda: {"wsum": 0.0, "games": 0})
+    for r in baselines:
+        if as_int(r["season"]) != latest:
+            continue
+        g = as_int(r["games_with_attendance"]) or as_int(r["games"])
+        a = att[r["building"]]
+        a["wsum"] += as_float(r["mean_attendance"]) * g
+        a["games"] += g
+    arena_attendance = sorted(
+        ({"building": b, "slug": slugify(b), "avg": round(a["wsum"] / a["games"], 1),
+          "games": a["games"]} for b, a in att.items() if a["games"]),
+        key=lambda x: -x["avg"])[:FRONTPAGE_ROWS]
+    boxes["arena_attendance"] = arena_attendance
+
+    # ---- (2) biggest draws this season (league-wide players, min road games) ----
+    season_players = [r for r in pdraw if as_int(r["season"]) == latest
+                      and as_int(r["games"]) >= SEASON_DRAW_MIN_GAMES]
+    boxes["biggest_draws_season"] = [
+        {"personId": r["personId"], "playerName": r["playerName"],
+         "mean_delta": as_float(r["mean_delta"]), "games": as_int(r["games"])}
+        for r in sorted(season_players, key=lambda r: -as_float(r["mean_delta"]))[:FRONTPAGE_ROWS]]
+
+    # ---- (3) all-time draw kings (career mean delta, min 100 road games) ----
+    king = defaultdict(lambda: {"wsum": 0.0, "games": 0, "name": ""})
+    for r in pdraw:
+        a = king[r["personId"]]
+        g = as_int(r["games"])
+        a["wsum"] += as_float(r["mean_delta"]) * g
+        a["games"] += g
+        a["name"] = r["playerName"]
+    boxes["draw_kings_alltime"] = [
+        {"personId": pid, "playerName": a["name"],
+         "mean_delta": round(a["wsum"] / a["games"], 1), "games": a["games"]}
+        for pid, a in sorted(
+            ((pid, a) for pid, a in king.items() if a["games"] >= DRAW_KING_MIN_GAMES),
+            key=lambda kv: -(kv[1]["wsum"] / kv[1]["games"]))[:FRONTPAGE_ROWS]]
+
+    # ---- (4) sellout meter, latest season ----
+    sell = []
+    for b, sm in (sellout_by_building or {}).items():
+        if latest in sm:
+            sell.append({"building": b, "slug": slugify(b),
+                         "pct": sm[latest]["pct"], "games": sm[latest]["games"]})
+    boxes["sellout"] = sorted(sell, key=lambda x: -x["pct"])[:FRONTPAGE_ROWS]
+
+    # ---- per (player, building) career_high + points, for boxes 5 & 6 ----
+    pb = defaultdict(lambda: {"ch": 0, "pts": 0, "name": "", "building": ""})
+    for r in records:
+        k = (r["personId"], r["slug"])
+        a = pb[k]
+        a["ch"] = max(a["ch"], r["career_high"])
+        a["pts"] += r["total_points"]
+        a["name"] = r["playerName"]
+        a["building"] = r["building"]
+
+    per_arena_legend = {}
+    enemy = []
+    for (pid, slug), a in pb.items():
+        ha = home_away_by_slug.get(slug, {}).get(pid)
+        if not ha or ha["home_games"] != 0 or ha["away_games"] <= 0:
+            continue
+        cur = per_arena_legend.get(slug)
+        if cur is None or a["ch"] > cur["career_high"]:
+            per_arena_legend[slug] = {"building": a["building"], "slug": slug,
+                                      "personId": pid, "playerName": a["name"],
+                                      "career_high": a["ch"]}
+        enemy.append({"building": a["building"], "slug": slug, "personId": pid,
+                      "playerName": a["name"], "total_points": a["pts"],
+                      "away_games": ha["away_games"]})
+    boxes["road_legends"] = sorted(per_arena_legend.values(),
+                                   key=lambda x: -x["career_high"])[:FRONTPAGE_ROWS]
+    boxes["enemy_territory"] = sorted(enemy, key=lambda x: -x["total_points"])[:FRONTPAGE_ROWS]
+
+    write_json(os.path.join(DATA_DIR, "frontpage.json"),
+               {"latest_season": latest,
+                "latest_label": _season_label(latest) if latest else "",
+                "boxes": boxes})
+    return {k: len(v) for k, v in boxes.items()}
+
+
+# --------------------------------------------------------------------------- #
 # combined search index  (players, teams, arenas, cities)
 # --------------------------------------------------------------------------- #
 def build_search(records, city_records):
@@ -1031,6 +1256,7 @@ def main():
     season_draw_players = load_player_draw_by_season(slug_to_city)
     city_records = load_city_records()
     season_by_player, season_by_building, season_by_city = load_records_by_season()
+    sellout_by_building = load_sellout(args.data_dir)
     if season_draw_buildings:
         print(f"season-keyed draw: {len(season_draw_buildings)} buildings, "
               f"{len(season_draw_cities)} cities, {len(season_draw_players)} players")
@@ -1046,7 +1272,8 @@ def main():
 
     n_buildings = build_buildings(records, building_games, allstar_ids, draw_by_slug,
                                   team_draw_by_slug, home_away_by_slug,
-                                  season_by_building, season_draw_buildings)
+                                  season_by_building, season_draw_buildings,
+                                  sellout_by_building)
     print(f"buildings: index + overview + {n_buildings} detail files")
 
     # city -> its buildings (for cross-links on the city page)
@@ -1068,6 +1295,9 @@ def main():
 
     n_search = build_search(records, city_records)
     print(f"search.json: {n_search} entities")
+
+    fp = build_frontpage(records, home_away_by_slug, sellout_by_building)
+    print(f"frontpage.json: {fp}")
 
     print("Done.")
 
