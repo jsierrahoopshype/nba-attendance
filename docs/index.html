@@ -51,12 +51,14 @@
   <!-- TAB 2: ATTENDANCE DRAW -->
   <section class="view" id="view-draw">
     <p class="explainer" id="drawExplainer"></p>
+    <div class="controls" id="drawControls"></div>
     <div class="block">
       <div class="block-head"><h2>Teams</h2><span class="sub" id="teamCount"></span></div>
       <div id="teamTable"><div class="loading">Loading…</div></div>
     </div>
     <div class="block">
-      <div class="block-head"><h2>Players</h2><span class="sub">visiting players with 20+ qualifying road games</span></div>
+      <div class="block-head"><h2>Players</h2><span class="sub" id="playerDrawSub">visiting players with 20+ qualifying road games</span></div>
+      <div id="playerDrawAllstar" class="controls"></div>
       <div id="playerDrawTable"></div>
     </div>
   </section>
@@ -165,36 +167,84 @@ async function initPlayers() {
   input.addEventListener("input", () => { if (!input.value.trim()) apply(); });
 }
 
-/* ---------- TAB 2: attendance draw ---------- */
+/* ---------- TAB 2: attendance draw ----------
+   Season-keyed: All Seasons career aggregate by default, season selector to drill
+   into any covered season. Team table shows all; player table defaults to
+   All-Stars only (with the show-all toggle), mirroring the per-arena draw tables.
+   Columns use the same "Extra fans per game" naming as the arena pages, plus a
+   career/season "Total extra fans". */
+let DRAW = null, drawSeason = null;
 async function initDraw() {
-  let draw;
-  try { draw = await getJSON(DATA + "/draw.json"); }
-  catch (err) { document.getElementById("teamTable").innerHTML = '<div class="err">Failed to load draw data: ' + esc(err.message) + "</div>"; return; }
+  if (!DRAW) {
+    try { DRAW = normalizeDraw(await getJSON(DATA + "/draw.json")); }
+    catch (err) { document.getElementById("teamTable").innerHTML = '<div class="err">Failed to load draw data: ' + esc(err.message) + "</div>"; return; }
+    await loadAllstar();
+    document.getElementById("drawExplainer").textContent = DRAW_EXPLAINER;
+    makeSeasonPicker(document.getElementById("drawControls"),
+      [], s => { drawSeason = s; renderDraw(); }, DRAW.seasons || []);
+    makeAllstarToggle(document.getElementById("playerDrawAllstar"), renderDraw,
+      { label: "Players", get: () => drawAllstarMode, set: v => { drawAllstarMode = v; } });
+  }
+  renderDraw();
+}
 
-  document.getElementById("drawExplainer").textContent = DRAW_EXPLAINER;
-  document.getElementById("teamCount").textContent = draw.teams.length + " teams";
+/* Accept both the season-keyed shape and the older flat shape (teams/players as
+   plain arrays with actual/baseline/diff) so a stale committed draw.json still
+   renders as an "All Seasons" view instead of blanking the tab. */
+function normalizeDraw(d) {
+  const wrap = arr => ({
+    all: (arr || []).map(r => ({ ...r,
+      mean_delta: r.mean_delta != null ? r.mean_delta : (r.diff || 0),
+      total_delta: r.total_delta != null ? r.total_delta
+        : Math.round((r.diff || 0) * (r.games || 0) * 10) / 10 })),
+    by_season: {} });
+  if (Array.isArray(d.teams) || Array.isArray(d.players))
+    return { seasons: [], teams: wrap(d.teams), players: wrap(d.players) };
+  return { seasons: d.seasons || [], teams: d.teams || { all: [], by_season: {} },
+           players: d.players || { all: [], by_season: {} } };
+}
 
+function drawScope(node) {
+  // node = DRAW.players | DRAW.teams; pick career "all" or a season slice.
+  if (drawSeason == null) return node.all || [];
+  return (node.by_season || {})[String(drawSeason)] || [];
+}
+
+function renderDraw() {
   const attCols = (nameCol) => [
     nameCol,
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-    { key: "actual", label: "Avg Road Attendance", defaultDir: "desc", get: r => r.actual, cell: r => fmtInt(r.actual) },
-    { key: "baseline", label: "Arena Baseline", defaultDir: "desc", get: r => r.baseline, cell: r => fmtInt(r.baseline) },
-    { key: "diff", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.diff,
-      cell: r => '<span class="delta ' + deltaCls(r.diff) + '">' + signed(r.diff) + "</span>" },
+    { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
+      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    { key: "total_delta", label: "Total extra fans", defaultDir: "desc", get: r => r.total_delta,
+      cell: r => '<span class="delta ' + deltaCls(r.total_delta) + '">' + signed(Math.round(r.total_delta)) + "</span>" },
   ];
+  const scopeLabel = drawSeason == null ? "All Seasons" : seasonLabel(drawSeason);
 
-  const teamRows = draw.teams.map(t => ({ ...t, team: t.teamCity + " " + t.teamName }));
-  sortableTable(document.getElementById("teamTable"),
-    attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) }),
-    teamRows, { key: "diff", dir: "desc" });
+  // Teams — always all.
+  const teamRows = drawScope(DRAW.teams).map(t => ({ ...t, team: t.teamCity + " " + t.teamName }));
+  document.getElementById("teamCount").textContent = teamRows.length + " teams · " + scopeLabel;
+  const tmount = document.getElementById("teamTable");
+  tmount.innerHTML = teamRows.length ? "" : '<div class="empty">No team draw for ' + esc(scopeLabel) + ".</div>";
+  if (teamRows.length)
+    sortableTable(tmount,
+      attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) }),
+      teamRows, { key: "total_delta", dir: "desc" });
 
-  // Draw tables show everyone by default — never filtered to All-Stars.
-  const playerRows = draw.players.map(p => ({ ...p, _href: playerHref(p.personId) }));
+  // Players — All-Stars only by default, toggleable.
+  const allPlayers = drawScope(DRAW.players);
+  const playerRows = filterAllstar(allPlayers, p => p.personId, drawAllstarMode)
+    .map(p => ({ ...p, _href: playerHref(p.personId) }));
+  document.getElementById("playerDrawSub").textContent =
+    playerRows.length + (drawAllstarMode ? " All-Star" : "") + " visiting players · 20+ road games · " + scopeLabel;
   const pmount = document.getElementById("playerDrawTable");
-  sortableTable(pmount,
-    attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
-    playerRows, { key: "diff", dir: "desc" });
-  wireRowNav(pmount);
+  pmount.innerHTML = playerRows.length ? "" : '<div class="empty">No player draw for ' + esc(scopeLabel) + ".</div>";
+  if (playerRows.length) {
+    sortableTable(pmount,
+      attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
+      playerRows, { key: "total_delta", dir: "desc" });
+    wireRowNav(pmount);
+  }
 }
 
 /* ---------- TAB 3: arena overview ---------- */
@@ -261,28 +311,32 @@ async function initHome() {
   const b = fp.boxes || {};
   const sl = fp.latest_label || "";
   const draw = r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>";
+  const totalDraw = r => '<span class="delta ' + deltaCls(r.total_delta) + '">' + signed(Math.round(r.total_delta)) + "</span>";
   const arenaCol = { key: "building", label: "Arena", align: "left", defaultDir: "asc", get: r => r.building, cell: r => arenaLink(r.slug, r.building) };
+  const cityCol = { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
+    cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" };
   const playerCol = { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) };
   const gCol = { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) };
+  const meanCol = { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw };
+  const totalCol = { key: "total_delta", label: "Total extra fans", defaultDir: "desc", get: r => r.total_delta, cell: totalDraw };
 
   const boxes = [
     { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
-      rows: b.arena_attendance, tab: "records", cols: [arenaCol,
+      rows: b.arena_attendance, tab: "records", cols: [arenaCol, cityCol,
         { key: "avg", label: "Avg Att", defaultDir: "desc", get: r => r.avg, cell: r => fmtInt(r.avg) }] },
     { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top visiting players, min 15 road games",
-      rows: b.biggest_draws_season, tab: "draw", cols: [playerCol, gCol,
-        { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw }] },
-    { title: "All-time draw kings", sub: "career avg draw, min 100 road games",
-      rows: b.draw_kings_alltime, tab: "draw", cols: [playerCol, gCol,
-        { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw }] },
+      rows: b.biggest_draws_season, tab: "draw", cols: [playerCol, gCol, meanCol] },
+    { title: "All-time draw kings", sub: "career total & avg draw, min 100 road games",
+      rows: b.draw_kings_alltime, tab: "draw", initial: { key: "total_delta", dir: "desc" },
+      cols: [playerCol, gCol, meanCol, totalCol] },
     { title: "Sellout meter" + (sl ? " · " + sl : ""), sub: "share of games within 0.5% of capacity",
-      rows: b.sellout, tab: "records", cols: [arenaCol,
+      rows: b.sellout, tab: "records", cols: [arenaCol, cityCol,
         { key: "pct", label: "Sellout%", defaultDir: "desc", get: r => r.pct, cell: r => pct(r.pct) }] },
     { title: "Road legends", sub: "highest visiting single game, by arena",
-      rows: b.road_legends, tab: "records", cols: [arenaCol, playerCol,
+      rows: b.road_legends, tab: "records", cols: [arenaCol, cityCol, playerCol,
         { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) }] },
     { title: "Enemy territory", sub: "top scorers who never played home there",
-      rows: b.enemy_territory, tab: "players", cols: [playerCol, arenaCol,
+      rows: b.enemy_territory, tab: "players", cols: [playerCol, arenaCol, cityCol,
         { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) }] },
   ];
 
@@ -300,7 +354,7 @@ async function initHome() {
     const rows = (box.rows || []).map(r => ({ ...r,
       _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId) : null) }));
     if (rows.length) {
-      sortableTable(tm, box.cols, rows, { key: box.cols[box.cols.length - 1].key, dir: "desc" });
+      sortableTable(tm, box.cols, rows, box.initial || { key: box.cols[box.cols.length - 1].key, dir: "desc" });
       wireRowNav(tm);
     } else {
       tm.innerHTML = '<div class="empty">No data yet.</div>';
