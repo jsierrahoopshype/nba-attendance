@@ -119,6 +119,7 @@ function renderArenaDraw(mount) {
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Attendance draw by arena " +
     "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
 
   if (absent) {
     mount.insertAdjacentHTML("beforeend",
@@ -137,11 +138,47 @@ function renderArenaDraw(mount) {
     { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
       cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" },
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-    { key: "mean_delta", label: "Avg Draw vs Baseline", defaultDir: "desc", get: r => r.mean_delta,
+    { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
       cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
   ];
   sortableTable(dm, cols, rows, { key: "mean_delta", dir: "desc" });
   wireRowNav(dm);
+
+  // Fix 6 — same draw aggregated to cities (games-weighted), cities linked.
+  renderCityDraw(mount, draw);
+}
+
+/* Aggregate this player's arena draw rows up to cities, games-weighted. */
+function renderCityDraw(mount, draw) {
+  const byCity = new Map();
+  for (const r of draw) {
+    const key = r.city_slug || r.city || "";
+    if (!key) continue;
+    const a = byCity.get(key) || { city: r.city, city_slug: r.city_slug, wsum: 0, games: 0 };
+    a.wsum += r.mean_delta * r.games;
+    a.games += r.games;
+    byCity.set(key, a);
+  }
+  const rows = [...byCity.values()]
+    .filter(a => a.games > 0)
+    .map(a => ({ city: a.city, city_slug: a.city_slug, games: a.games,
+                 mean_delta: Math.round((a.wsum / a.games) * 10) / 10 }));
+  if (!rows.length) return;
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Attendance draw by city " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— arenas combined per city</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
+  const cm = document.createElement("div");
+  mount.appendChild(cm);
+  const r2 = rows.map(r => ({ ...r, _href: r.city_slug ? cityHref(r.city_slug) : null }));
+  sortableTable(cm, [
+    { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
+      cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" },
+    { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+    { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
+      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+  ], r2, { key: "mean_delta", dir: "desc" });
+  wireRowNav(cm);
 }
 
 boot();

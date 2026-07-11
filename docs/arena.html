@@ -117,18 +117,28 @@ function renderCards() {
     (sub ? '<div class="sub">' + sub + "</div>" : "") + "</div>";
   let html = "";
   if (o) {
-    html += card("Top Scorer",
+    const scope = esc(o.card_scope || "Regular Season");
+    html += card("Top Scorer · " + scope,
       o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
       o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
-    html += card("Winningest Player",
+    html += card("Winningest Player · " + scope,
       o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
       o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
-    html += card("Winningest Team",
+    html += card("Winningest Team · " + scope,
       o.winningest_team ? esc(o.winningest_team.team) : "—",
       o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
     html += card("Avg Attendance",
       o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
-      esc(o.avg_attendance_label));
+      esc(o.avg_attendance_label || ""));
+    if (o.biggest_draw) {
+      html += card("Biggest Draw · all-time",
+        esc(o.biggest_draw.team),
+        signed(o.biggest_draw.mean_delta) + " extra fans/game · " + o.biggest_draw.games + " g (min 15)");
+    }
+    if (o.sellout) {
+      html += card("Sellout Rate · " + seasonLabel(o.sellout.season),
+        pct(o.sellout.pct), "within 0.5% of capacity · " + o.sellout.games + " g");
+    }
   }
   document.getElementById("cards").innerHTML = html ? '<div class="stat-cards">' + html + "</div>" : "";
 }
@@ -227,6 +237,7 @@ function renderDrawTables(mount) {
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Who drew the most here " +
     "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
 
   if (absent) {
     mount.insertAdjacentHTML("beforeend",
@@ -259,7 +270,7 @@ function renderDrawTables(mount) {
     sortableTable(pm, [
       { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
         cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
     ], prows, { key: "mean_delta", dir: "desc" });
     wireRowNav(pm);
@@ -277,7 +288,7 @@ function renderDrawTables(mount) {
     sortableTable(tm, [
       { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
         cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
     ], teams.slice(), { key: "mean_delta", dir: "desc" });
   } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }

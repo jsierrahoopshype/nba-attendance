@@ -146,6 +146,12 @@ function autocomplete(input, box, items, opts) {
 /* ---------- query param ---------- */
 const qp = k => new URLSearchParams(window.location.search).get(k);
 
+/* ---------- draw wording (shared across every draw table) ---------- */
+const DRAW_DELTA_LABEL = "Extra fans per game";
+const DRAW_EXPLAINER = "How many more (or fewer) spectators attended these road games, " +
+  "compared to a typical game at the same arena in the same season.";
+const drawExplainerHTML = () => '<div class="draw-explainer">' + esc(DRAW_EXPLAINER) + "</div>";
+
 /* ---------- season filter (detail pages) ----------
    Detail pages embed a records_by_season array alongside their all-time data.
    "All Seasons" (season === null) keeps the existing all-time render untouched;

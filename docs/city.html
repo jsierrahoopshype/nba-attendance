@@ -203,6 +203,7 @@ function renderDrawTables(mount) {
   mount.insertAdjacentHTML("beforeend",
     "<div class='section-title'>Who drew the most in " + esc(city.name) + " " +
     "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
 
   if (absent) {
     mount.insertAdjacentHTML("beforeend",
@@ -234,7 +235,7 @@ function renderDrawTables(mount) {
     sortableTable(pm, [
       { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
         cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
     ], prows, { key: "mean_delta", dir: "desc" });
     wireRowNav(pm);
@@ -250,7 +251,7 @@ function renderDrawTables(mount) {
     sortableTable(tm, [
       { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: "Avg Draw", defaultDir: "desc", get: r => r.mean_delta,
+      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
         cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
     ], teams.slice(), { key: "mean_delta", dir: "desc" });
   } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
