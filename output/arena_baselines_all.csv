@@ -1,4 +1,987 @@
 ﻿building,season,gameType,games,games_with_attendance,coverage_pct,mean_attendance
+Arizona Veterans Memorial Coliseum,1980,Playoffs,4,4,100.0,12321.5
+Boston Garden,1980,Playoffs,5,5,100.0,15320.0
+Capital Centre,1980,Playoffs,1,1,100.0,18397.0
+HemisFair Arena,1980,Playoffs,1,1,100.0,12894.0
+Kemper Arena,1980,Playoffs,1,1,100.0,9637.0
+Kingdome,1980,Playoffs,8,7,87.5,20057.4
+Memorial Coliseum,1980,Playoffs,1,1,100.0,12666.0
+The Forum,1980,Playoffs,9,8,88.9,16901.0
+The Omni,1980,Playoffs,2,2,100.0,15617.0
+The Spectrum,1980,Playoffs,9,8,88.9,16598.0
+The Summit,1980,Playoffs,4,4,100.0,14369.8
+Arizona Veterans Memorial Coliseum,1980,Regular Season,42,38,90.5,11733.5
+Boston Garden,1980,Regular Season,41,30,73.2,14466.8
+Capital Centre,1980,Regular Season,41,29,70.7,11911.7
+Chicago Stadium,1980,Regular Season,41,34,82.9,8773.0
+HemisFair Arena,1980,Regular Season,41,33,80.5,11104.2
+Kemper Arena,1980,Regular Season,41,30,73.2,9212.7
+Kingdome,1980,Regular Season,41,37,90.2,21668.8
+MECCA Arena,1980,Regular Season,40,31,77.5,10890.1
+Madison Square Garden,1980,Regular Season,41,35,85.4,12918.8
+Market Square Arena,1980,Regular Season,41,38,92.7,10592.7
+McNichols Sports Arena,1980,Regular Season,41,34,82.9,12644.3
+Memorial Coliseum,1980,Regular Season,41,31,75.6,12666.0
+Oracle Arena,1980,Regular Season,41,33,80.5,8631.7
+Pontiac Silverdome,1980,Regular Season,41,37,90.2,7465.7
+Richfield Coliseum,1980,Regular Season,41,34,82.9,8231.6
+Rutgers Athletic Center,1980,Regular Season,41,34,82.9,6432.4
+Salt Palace,1980,Regular Season,41,37,90.2,7804.9
+San Diego Sports Arena,1980,Regular Season,41,32,78.0,9138.1
+The Forum,1980,Regular Season,41,33,80.5,14287.8
+The Omni,1980,Regular Season,41,35,85.4,10743.9
+The Spectrum,1980,Regular Season,41,38,92.7,11932.4
+The Summit,1980,Regular Season,41,36,87.8,10239.5
+Arizona Veterans Memorial Coliseum,1981,Playoffs,4,3,75.0,12660.0
+Boston Garden,1981,Playoffs,9,9,100.0,15320.0
+Chicago Stadium,1981,Playoffs,3,3,100.0,19381.7
+HemisFair Arena,1981,Playoffs,4,3,75.0,13853.7
+Kemper Arena,1981,Playoffs,7,6,85.7,13824.5
+Madison Square Garden,1981,Playoffs,1,1,100.0,14822.0
+Market Square Arena,1981,Playoffs,1,1,100.0,8921.0
+Memorial Coliseum,1981,Playoffs,2,2,100.0,12666.0
+The Spectrum,1981,Playoffs,8,6,75.0,13937.7
+Arizona Veterans Memorial Coliseum,1981,Regular Season,41,38,92.7,11742.7
+Boston Garden,1981,Regular Season,41,33,80.5,14402.2
+Capital Centre,1981,Regular Season,41,31,75.6,8440.4
+Chicago Stadium,1981,Regular Season,41,36,87.8,9346.2
+HemisFair Arena,1981,Regular Season,41,39,95.1,10695.3
+Kemper Arena,1981,Regular Season,41,34,82.9,8039.5
+Kingdome,1981,Regular Season,41,34,82.9,16550.3
+MECCA Arena,1981,Regular Season,41,32,78.0,10905.3
+Madison Square Garden,1981,Regular Season,41,37,90.2,13055.8
+Market Square Arena,1981,Regular Season,41,35,85.4,10029.6
+McNichols Sports Arena,1981,Regular Season,41,32,78.0,10602.6
+Memorial Coliseum,1981,Regular Season,41,36,87.8,12666.0
+Oracle Arena,1981,Regular Season,41,35,85.4,10123.2
+Pontiac Silverdome,1981,Regular Season,41,34,82.9,5678.9
+Reunion Arena,1981,Regular Season,41,29,70.7,7182.5
+Richfield Coliseum,1981,Regular Season,41,29,70.7,5620.8
+Rutgers Athletic Center,1981,Regular Season,41,38,92.7,7391.2
+Salt Palace,1981,Regular Season,41,34,82.9,7628.6
+San Diego Sports Arena,1981,Regular Season,41,33,80.5,6277.2
+The Forum,1981,Regular Season,41,33,80.5,13387.9
+The Omni,1981,Regular Season,41,37,90.2,8923.6
+The Spectrum,1981,Regular Season,41,35,85.4,11273.0
+The Summit,1981,Regular Season,41,38,92.7,9508.5
+Arizona Veterans Memorial Coliseum,1982,Playoffs,3,3,100.0,13136.0
+Boston Garden,1982,Playoffs,7,6,85.7,15320.0
+HemisFair Arena,1982,Playoffs,4,3,75.0,14940.3
+Izod Center,1982,Playoffs,1,1,100.0,14015.0
+Kingdome,1982,Playoffs,5,4,80.0,16444.8
+MECCA Arena,1982,Playoffs,3,3,100.0,11052.0
+The Omni,1982,Playoffs,1,1,100.0,8703.0
+The Spectrum,1982,Playoffs,10,9,90.0,16060.0
+The Summit,1982,Playoffs,1,1,100.0,15676.0
+Arizona Veterans Memorial Coliseum,1982,Regular Season,41,34,82.9,11831.1
+Boston Garden,1982,Regular Season,41,32,78.0,15151.0
+Capital Centre,1982,Regular Season,41,30,73.2,9567.5
+Chicago Stadium,1982,Regular Season,41,33,80.5,8361.6
+HemisFair Arena,1982,Regular Season,41,37,90.2,10656.4
+Izod Center,1982,Regular Season,41,30,73.2,13437.0
+Kemper Arena,1982,Regular Season,41,32,78.0,7598.8
+Kingdome,1982,Regular Season,41,37,90.2,17331.0
+MECCA Arena,1982,Regular Season,41,34,82.9,10857.4
+Madison Square Garden,1982,Regular Season,41,35,85.4,11171.9
+Market Square Arena,1982,Regular Season,41,31,75.6,7540.3
+McNichols Sports Arena,1982,Regular Season,41,33,80.5,11692.6
+Memorial Coliseum,1982,Regular Season,41,37,90.2,12665.9
+Oracle Arena,1982,Regular Season,41,36,87.8,9701.7
+Pontiac Silverdome,1982,Regular Season,41,35,85.4,9860.5
+Reunion Arena,1982,Regular Season,41,34,82.9,9574.1
+Richfield Coliseum,1982,Regular Season,41,35,85.4,5671.6
+Salt Palace,1982,Regular Season,41,33,80.5,7687.8
+San Diego Sports Arena,1982,Regular Season,41,33,80.5,5676.0
+The Forum,1982,Regular Season,41,32,78.0,14424.4
+The Omni,1982,Regular Season,41,35,85.4,7465.4
+The Spectrum,1982,Regular Season,41,36,87.8,12158.5
+The Summit,1982,Regular Season,41,38,92.7,11714.0
+Arizona Veterans Memorial Coliseum,1983,Playoffs,2,2,100.0,13280.5
+HemisFair Arena,1983,Playoffs,6,6,100.0,13484.3
+Izod Center,1983,Playoffs,1,1,100.0,15672.0
+MECCA Arena,1983,Playoffs,4,3,75.0,11052.0
+Madison Square Garden,1983,Playoffs,3,3,100.0,17594.3
+McNichols Sports Arena,1983,Playoffs,3,3,100.0,15968.0
+Memorial Coliseum,1983,Playoffs,3,3,100.0,12665.3
+The Forum,1983,Playoffs,8,8,100.0,16494.1
+The Omni,1983,Playoffs,1,1,100.0,10405.0
+The Spectrum,1983,Playoffs,7,6,85.7,17355.5
+Arizona Veterans Memorial Coliseum,1983,Regular Season,41,34,82.9,11319.9
+Boston Garden,1983,Regular Season,41,35,85.4,15140.3
+Capital Centre,1983,Regular Season,41,34,82.9,8835.5
+Chicago Stadium,1983,Regular Season,41,33,80.5,7548.8
+HemisFair Arena,1983,Regular Season,41,31,75.6,9517.6
+Izod Center,1983,Regular Season,41,36,87.8,13049.6
+Kemper Arena,1983,Regular Season,41,33,80.5,8098.3
+Kingdome,1983,Regular Season,41,30,73.2,14284.5
+MECCA Arena,1983,Regular Season,41,35,85.4,10398.9
+Madison Square Garden,1983,Regular Season,41,35,85.4,10642.1
+Market Square Arena,1983,Regular Season,41,31,75.6,4686.4
+McNichols Sports Arena,1983,Regular Season,41,35,85.4,12497.3
+Memorial Coliseum,1983,Regular Season,41,35,85.4,12380.4
+Oracle Arena,1983,Regular Season,41,35,85.4,8385.6
+Pontiac Silverdome,1983,Regular Season,41,34,82.9,12604.1
+Reunion Arena,1983,Regular Season,41,35,85.4,11651.3
+Richfield Coliseum,1983,Regular Season,41,38,92.7,3988.4
+Salt Palace,1983,Regular Season,41,30,73.2,8758.0
+San Diego Sports Arena,1983,Regular Season,41,39,95.1,4803.8
+The Forum,1983,Regular Season,41,35,85.4,15720.1
+The Omni,1983,Regular Season,41,34,82.9,7141.8
+The Spectrum,1983,Regular Season,41,31,75.6,15923.7
+The Summit,1983,Regular Season,41,34,82.9,7407.1
+Arizona Veterans Memorial Coliseum,1984,Playoffs,8,7,87.5,14227.3
+Boston Garden,1984,Playoffs,13,13,100.0,14890.0
+Capital Centre,1984,Playoffs,2,2,100.0,11106.0
+Izod Center,1984,Playoffs,5,5,100.0,15664.4
+Kemper Arena,1984,Playoffs,1,1,100.0,7261.0
+Kingdome,1984,Playoffs,2,2,100.0,11061.0
+MECCA Arena,1984,Playoffs,8,8,100.0,10933.9
+Madison Square Garden,1984,Playoffs,5,5,100.0,17916.2
+Memorial Coliseum,1984,Playoffs,3,3,100.0,12666.0
+Reunion Arena,1984,Playoffs,5,4,80.0,15007.0
+The Forum,1984,Playoffs,11,9,81.8,15514.8
+The Omni,1984,Playoffs,2,2,100.0,5915.0
+The Spectrum,1984,Playoffs,3,3,100.0,14819.0
+Arizona Veterans Memorial Coliseum,1984,Regular Season,41,35,85.4,10825.4
+Boston Garden,1984,Regular Season,41,35,85.4,14829.5
+Capital Centre,1984,Regular Season,41,31,75.6,7679.0
+Chicago Stadium,1984,Regular Season,41,37,90.2,6452.7
+HemisFair Arena,1984,Regular Season,41,36,87.8,9248.0
+Izod Center,1984,Regular Season,41,37,90.2,12252.2
+Kemper Arena,1984,Regular Season,41,37,90.2,9132.2
+Kingdome,1984,Regular Season,41,36,87.8,10692.0
+MECCA Arena,1984,Regular Season,41,36,87.8,10036.1
+Madison Square Garden,1984,Regular Season,41,38,92.7,12108.3
+Market Square Arena,1984,Regular Season,41,32,78.0,10427.9
+McNichols Sports Arena,1984,Regular Season,41,37,90.2,11181.8
+Memorial Coliseum,1984,Regular Season,41,37,90.2,12638.6
+Oracle Arena,1984,Regular Season,41,36,87.8,7755.7
+Pontiac Silverdome,1984,Regular Season,41,34,82.9,15912.6
+Reunion Arena,1984,Regular Season,41,36,87.8,14164.9
+Richfield Coliseum,1984,Regular Season,41,34,82.9,5188.7
+Salt Palace,1984,Regular Season,41,33,80.5,9624.8
+San Diego Sports Arena,1984,Regular Season,41,34,82.9,5268.6
+The Forum,1984,Regular Season,41,37,90.2,15120.9
+The Omni,1984,Regular Season,41,34,82.9,7481.8
+The Spectrum,1984,Regular Season,41,37,90.2,14513.4
+The Summit,1984,Regular Season,41,34,82.9,10326.8
+Arizona Veterans Memorial Coliseum,1985,Regular Season,41,35,85.4,11953.7
+Boston Garden,1985,Regular Season,41,35,85.4,14883.1
+Capital Centre,1985,Regular Season,41,37,90.2,9145.8
+Chicago Stadium,1985,Regular Season,41,37,90.2,11738.6
+HemisFair Arena,1985,Regular Season,41,36,87.8,8841.3
+Izod Center,1985,Regular Season,41,37,90.2,12334.5
+Kemper Arena,1985,Regular Season,41,34,82.9,6176.6
+Kingdome,1985,Regular Season,41,38,92.7,7501.2
+LA Memorial Sports Arena,1985,Regular Season,41,34,82.9,9330.1
+MECCA Arena,1985,Regular Season,41,38,92.7,10313.9
+Madison Square Garden,1985,Regular Season,41,37,90.2,11136.9
+Market Square Arena,1985,Regular Season,41,38,92.7,10674.2
+McNichols Sports Arena,1985,Regular Season,41,36,87.8,10850.9
+Memorial Coliseum,1985,Regular Season,41,37,90.2,12666.2
+Oracle Arena,1985,Regular Season,41,35,85.4,7392.4
+Pontiac Silverdome,1985,Regular Season,41,34,82.9,15825.3
+Reunion Arena,1985,Regular Season,41,37,90.2,16672.4
+Richfield Coliseum,1985,Regular Season,41,39,95.1,8042.5
+Salt Palace,1985,Regular Season,41,33,80.5,9322.8
+The Forum,1985,Regular Season,41,37,90.2,14894.6
+The Omni,1985,Regular Season,41,31,75.6,7788.1
+The Spectrum,1985,Regular Season,41,38,92.7,13858.9
+The Summit,1985,Regular Season,41,34,82.9,13735.4
+ARCO Arena I,1986,Playoffs,1,1,100.0,10333.0
+Boston Garden,1986,Playoffs,10,8,80.0,14890.0
+Capital Centre,1986,Playoffs,2,2,100.0,14862.5
+Chicago Stadium,1986,Playoffs,1,1,100.0,18968.0
+HemisFair Arena,1986,Playoffs,1,1,100.0,7918.0
+Izod Center,1986,Playoffs,1,1,100.0,7784.0
+MECCA Arena,1986,Playoffs,8,8,100.0,11053.2
+McNichols Sports Arena,1986,Playoffs,5,5,100.0,14625.8
+Memorial Coliseum,1986,Playoffs,2,2,100.0,12666.0
+Reunion Arena,1986,Playoffs,5,5,100.0,17007.0
+Salt Palace,1986,Playoffs,2,2,100.0,12159.0
+The Forum,1986,Playoffs,8,7,87.5,17519.3
+The Omni,1986,Playoffs,4,3,75.0,12417.3
+The Spectrum,1986,Playoffs,6,5,83.3,14429.8
+The Summit,1986,Playoffs,10,10,100.0,15867.7
+ARCO Arena I,1986,Regular Season,41,39,95.1,10333.0
+Arizona Veterans Memorial Coliseum,1986,Regular Season,41,36,87.8,11209.6
+Boston Garden,1986,Regular Season,41,32,78.0,14892.8
+Capital Centre,1986,Regular Season,41,36,87.8,9462.9
+Chicago Stadium,1986,Regular Season,41,35,85.4,11405.4
+HemisFair Arena,1986,Regular Season,41,33,80.5,8100.1
+Izod Center,1986,Regular Season,41,35,85.4,11681.0
+KeyArena,1986,Regular Season,41,39,95.1,8045.1
+LA Memorial Sports Arena,1986,Regular Season,41,35,85.4,8334.3
+MECCA Arena,1986,Regular Season,41,36,87.8,10816.8
+Madison Square Garden,1986,Regular Season,41,41,100.0,14451.0
+Market Square Arena,1986,Regular Season,41,38,92.7,11157.1
+McNichols Sports Arena,1986,Regular Season,41,36,87.8,12910.3
+Memorial Coliseum,1986,Regular Season,41,39,95.1,12666.1
+Oracle Arena,1986,Regular Season,41,37,90.2,9698.4
+Pontiac Silverdome,1986,Regular Season,41,34,82.9,17609.4
+Reunion Arena,1986,Regular Season,41,36,87.8,16907.0
+Richfield Coliseum,1986,Regular Season,41,34,82.9,9918.4
+Salt Palace,1986,Regular Season,41,33,80.5,11626.4
+The Forum,1986,Regular Season,41,36,87.8,16908.6
+The Omni,1986,Regular Season,41,38,92.7,9242.0
+The Spectrum,1986,Regular Season,41,38,92.7,12636.9
+The Summit,1986,Regular Season,41,36,87.8,14676.2
+Boston Garden,1987,Playoffs,13,10,76.9,14890.0
+Capital Centre,1987,Playoffs,1,1,100.0,10831.0
+Chicago Stadium,1987,Playoffs,1,1,100.0,18122.0
+KeyArena,1987,Playoffs,7,6,85.7,13530.2
+MECCA Arena,1987,Playoffs,6,5,83.3,11052.0
+Market Square Arena,1987,Playoffs,2,2,100.0,13171.0
+McNichols Sports Arena,1987,Playoffs,1,1,100.0,15137.0
+Memorial Coliseum,1987,Playoffs,2,2,100.0,12555.0
+Oracle Arena,1987,Playoffs,4,4,100.0,15025.0
+Pontiac Silverdome,1987,Playoffs,7,5,71.4,21252.0
+Reunion Arena,1987,Playoffs,2,2,100.0,17007.0
+Salt Palace,1987,Playoffs,3,3,100.0,11780.7
+The Forum,1987,Playoffs,10,8,80.0,17505.1
+The Spectrum,1987,Playoffs,2,2,100.0,14912.5
+ARCO Arena I,1987,Regular Season,41,35,85.4,10333.0
+Arizona Veterans Memorial Coliseum,1987,Regular Season,41,35,85.4,11498.4
+Boston Garden,1987,Regular Season,41,37,90.2,14909.5
+Capital Centre,1987,Regular Season,41,34,82.9,12034.6
+Chicago Stadium,1987,Regular Season,41,34,82.9,16037.1
+HemisFair Arena,1987,Regular Season,41,34,82.9,7804.3
+Izod Center,1987,Regular Season,41,36,87.8,10816.1
+KeyArena,1987,Regular Season,41,36,87.8,8805.0
+LA Memorial Sports Arena,1987,Regular Season,41,38,92.7,7823.2
+MECCA Arena,1987,Regular Season,41,34,82.9,11000.1
+Madison Square Garden,1987,Regular Season,41,36,87.8,13120.9
+Market Square Arena,1987,Regular Season,41,39,95.1,12602.6
+McNichols Sports Arena,1987,Regular Season,41,38,92.7,11888.7
+Memorial Coliseum,1987,Regular Season,41,35,85.4,12666.1
+Oracle Arena,1987,Regular Season,41,32,78.0,10278.6
+Pontiac Silverdome,1987,Regular Season,41,33,80.5,20856.7
+Reunion Arena,1987,Regular Season,41,35,85.4,16979.8
+Richfield Coliseum,1987,Regular Season,41,40,97.6,10977.3
+Salt Palace,1987,Regular Season,41,36,87.8,12033.3
+The Forum,1987,Regular Season,41,36,87.8,16803.4
+The Omni,1987,Regular Season,41,33,80.5,13034.7
+The Spectrum,1987,Regular Season,41,34,82.9,14273.1
+The Summit,1987,Regular Season,41,34,82.9,15919.8
+Boston Garden,1988,Playoffs,9,9,100.0,14890.0
+Capital Centre,1988,Playoffs,2,2,100.0,10093.0
+Chicago Stadium,1988,Playoffs,5,5,100.0,18336.2
+HemisFair Arena,1988,Playoffs,1,1,100.0,11542.0
+KeyArena,1988,Playoffs,2,2,100.0,14250.0
+MECCA Arena,1988,Playoffs,2,2,100.0,11052.0
+Madison Square Garden,1988,Playoffs,2,2,100.0,19591.0
+Memorial Coliseum,1988,Playoffs,2,2,100.0,12666.0
+Pontiac Silverdome,1988,Playoffs,12,9,75.0,26964.9
+Reunion Arena,1988,Playoffs,8,8,100.0,17007.0
+Richfield Coliseum,1988,Playoffs,2,2,100.0,20047.0
+Salt Palace,1988,Playoffs,5,4,80.0,12444.0
+The Forum,1988,Playoffs,14,12,85.7,17504.7
+The Omni,1988,Playoffs,6,5,83.3,13677.2
+The Summit,1988,Playoffs,2,2,100.0,16611.0
+ARCO Arena I,1988,Regular Season,41,38,92.7,10333.0
+Arizona Veterans Memorial Coliseum,1988,Regular Season,41,37,90.2,11109.4
+Boston Garden,1988,Regular Season,41,39,95.1,14786.3
+Capital Centre,1988,Regular Season,41,36,87.8,10631.5
+Chicago Stadium,1988,Regular Season,41,36,87.8,18095.6
+HemisFair Arena,1988,Regular Season,41,35,85.4,8776.6
+Izod Center,1988,Regular Season,41,36,87.8,11741.8
+KeyArena,1988,Regular Season,41,37,90.2,11991.8
+LA Memorial Sports Arena,1988,Regular Season,41,39,95.1,8831.8
+MECCA Arena,1988,Regular Season,41,38,92.7,11260.1
+Madison Square Garden,1988,Regular Season,41,35,85.4,14680.7
+Market Square Arena,1988,Regular Season,41,38,92.7,12273.8
+McNichols Sports Arena,1988,Regular Season,41,34,82.9,12798.9
+Memorial Coliseum,1988,Regular Season,41,33,80.5,12787.2
+Oracle Arena,1988,Regular Season,41,36,87.8,11442.4
+Pontiac Silverdome,1988,Regular Season,41,32,78.0,26062.0
+Reunion Arena,1988,Regular Season,41,37,90.2,16977.2
+Richfield Coliseum,1988,Regular Season,41,36,87.8,12935.7
+Salt Palace,1988,Regular Season,41,39,95.1,12290.1
+The Forum,1988,Regular Season,41,36,87.8,16977.8
+The Omni,1988,Regular Season,41,36,87.8,14346.0
+The Spectrum,1988,Regular Season,41,35,85.4,12906.9
+The Summit,1988,Regular Season,41,32,78.0,16606.5
+Arizona Veterans Memorial Coliseum,1989,Playoffs,7,6,85.7,14471.0
+Boston Garden,1989,Playoffs,1,1,100.0,14890.0
+Bradley Center,1989,Playoffs,4,4,100.0,18641.8
+Chicago Stadium,1989,Playoffs,8,7,87.5,18464.1
+KeyArena,1989,Playoffs,4,3,75.0,13714.3
+Madison Square Garden,1989,Playoffs,5,4,80.0,19591.0
+McNichols Sports Arena,1989,Playoffs,1,1,100.0,12660.0
+Memorial Coliseum,1989,Playoffs,1,1,100.0,12880.0
+Oracle Arena,1989,Playoffs,3,3,100.0,15025.3
+Richfield Coliseum,1989,Playoffs,3,3,100.0,19952.7
+Salt Palace,1989,Playoffs,2,2,100.0,12444.0
+The Forum,1989,Playoffs,8,7,87.5,17505.7
+The Omni,1989,Playoffs,3,3,100.0,15501.0
+The Palace of Auburn Hills,1989,Playoffs,9,8,88.9,21454.0
+The Spectrum,1989,Playoffs,1,1,100.0,16236.0
+The Summit,1989,Playoffs,2,2,100.0,16611.0
+Arizona Veterans Memorial Coliseum,1989,Regular Season,41,36,87.8,12356.3
+Boston Garden,1989,Regular Season,41,35,85.4,14919.9
+Bradley Center,1989,Regular Season,41,37,90.2,17122.0
+Capital Centre,1989,Regular Season,41,38,92.7,9468.0
+Charlotte Coliseum,1989,Regular Season,41,32,78.0,23113.9
+Chicago Stadium,1989,Regular Season,41,35,85.4,17954.9
+HemisFair Arena,1989,Regular Season,41,36,87.8,11138.8
+Izod Center,1989,Regular Season,41,35,85.4,12163.4
+KeyArena,1989,Regular Season,41,37,90.2,12979.9
+LA Memorial Sports Arena,1989,Regular Season,41,36,87.8,10995.2
+Madison Square Garden,1989,Regular Season,41,37,90.2,18232.8
+Market Square Arena,1989,Regular Season,41,35,85.4,11215.6
+McNichols Sports Arena,1989,Regular Season,41,37,90.2,13591.5
+Memorial Coliseum,1989,Regular Season,41,35,85.4,12853.0
+Miami Arena,1989,Regular Season,41,34,82.9,14981.4
+Oracle Arena,1989,Regular Season,41,33,80.5,13932.8
+Reunion Arena,1989,Regular Season,41,35,85.4,16943.3
+Richfield Coliseum,1989,Regular Season,41,37,90.2,17873.9
+Salt Palace,1989,Regular Season,41,32,78.0,12506.5
+Sleep Train Arena,1989,Regular Season,41,36,87.8,15990.6
+The Forum,1989,Regular Season,41,37,90.2,17495.4
+The Omni,1989,Regular Season,41,38,92.7,15714.4
+The Palace of Auburn Hills,1989,Regular Season,41,36,87.8,21454.0
+The Spectrum,1989,Regular Season,41,38,92.7,13780.1
+The Summit,1989,Regular Season,41,36,87.8,16602.0
+Arizona Veterans Memorial Coliseum,1990,Playoffs,7,5,71.4,14487.0
+Boston Garden,1990,Playoffs,3,3,100.0,14890.0
+Bradley Center,1990,Playoffs,2,2,100.0,18604.0
+Chicago Stadium,1990,Playoffs,8,7,87.5,18676.0
+HemisFair Arena,1990,Playoffs,5,5,100.0,15910.0
+Madison Square Garden,1990,Playoffs,4,3,75.0,18212.0
+Market Square Arena,1990,Playoffs,1,1,100.0,15301.0
+McNichols Sports Arena,1990,Playoffs,1,1,100.0,15604.0
+Memorial Coliseum,1990,Playoffs,12,11,91.7,12840.0
+Reunion Arena,1990,Playoffs,1,1,100.0,17007.0
+Salt Palace,1990,Playoffs,3,3,100.0,12616.0
+The Forum,1990,Playoffs,5,5,100.0,17505.2
+The Palace of Auburn Hills,1990,Playoffs,11,10,90.9,21454.0
+The Spectrum,1990,Playoffs,5,4,80.0,17455.8
+The Summit,1990,Playoffs,2,2,100.0,16611.0
+Amway Arena,1990,Regular Season,41,37,90.2,15058.4
+Arizona Veterans Memorial Coliseum,1990,Regular Season,41,35,85.4,15108.0
+Boston Garden,1990,Regular Season,41,37,90.2,14918.3
+Bradley Center,1990,Regular Season,41,35,85.4,16253.0
+Capital Centre,1990,Regular Season,41,37,90.2,11646.9
+Charlotte Coliseum,1990,Regular Season,41,36,87.8,23901.0
+Chicago Stadium,1990,Regular Season,41,36,87.8,18399.3
+HemisFair Arena,1990,Regular Season,41,34,82.9,14590.1
+Hubert H. Humphrey Metrodome,1990,Regular Season,41,37,90.2,26621.4
+Izod Center,1990,Regular Season,41,36,87.8,11939.4
+KeyArena,1990,Regular Season,41,36,87.8,12160.4
+LA Memorial Sports Arena,1990,Regular Season,41,38,92.7,11637.7
+Madison Square Garden,1990,Regular Season,41,37,90.2,17788.7
+Market Square Arena,1990,Regular Season,41,37,90.2,12937.8
+McNichols Sports Arena,1990,Regular Season,41,37,90.2,12321.4
+Memorial Coliseum,1990,Regular Season,41,35,85.4,12880.8
+Miami Arena,1990,Regular Season,41,38,92.7,14908.6
+Oracle Arena,1990,Regular Season,41,38,92.7,15025.0
+Reunion Arena,1990,Regular Season,41,37,90.2,16850.3
+Richfield Coliseum,1990,Regular Season,41,35,85.4,16912.8
+Salt Palace,1990,Regular Season,41,35,85.4,12615.8
+Sleep Train Arena,1990,Regular Season,41,38,92.7,17016.4
+The Forum,1990,Regular Season,41,37,90.2,17382.2
+The Omni,1990,Regular Season,41,32,78.0,14304.6
+The Palace of Auburn Hills,1990,Regular Season,41,33,80.5,21456.8
+The Spectrum,1990,Regular Season,41,33,80.5,13972.9
+The Summit,1990,Regular Season,41,37,90.2,15820.6
+Arizona Veterans Memorial Coliseum,1991,Playoffs,2,2,100.0,14487.0
+Boston Garden,1991,Playoffs,6,5,83.3,14891.2
+Bradley Center,1991,Playoffs,2,2,100.0,14605.0
+Chicago Stadium,1991,Playoffs,9,9,100.0,18676.0
+HemisFair Arena,1991,Playoffs,2,2,100.0,15908.0
+KeyArena,1991,Playoffs,2,2,100.0,13921.5
+Market Square Arena,1991,Playoffs,2,2,100.0,16530.0
+Memorial Coliseum,1991,Playoffs,9,9,100.0,12884.0
+Oracle Arena,1991,Playoffs,4,3,75.0,15025.0
+The Forum,1991,Playoffs,11,10,90.9,17505.3
+The Palace of Auburn Hills,1991,Playoffs,8,8,100.0,21454.0
+The Spectrum,1991,Playoffs,3,3,100.0,17307.0
+The Summit,1991,Playoffs,1,1,100.0,16611.0
+Amway Arena,1991,Regular Season,41,38,92.7,15064.1
+Arizona Veterans Memorial Coliseum,1991,Regular Season,41,36,87.8,14365.4
+Boston Garden,1991,Regular Season,41,32,78.0,14911.8
+Bradley Center,1991,Regular Season,41,38,92.7,16460.1
+Capital Centre,1991,Regular Season,41,35,85.4,11438.5
+Charlotte Coliseum,1991,Regular Season,41,34,82.9,23906.9
+Chicago Stadium,1991,Regular Season,41,39,95.1,18470.4
+HemisFair Arena,1991,Regular Season,41,35,85.4,15936.5
+Izod Center,1991,Regular Season,41,37,90.2,11981.6
+KeyArena,1991,Regular Season,41,33,80.5,12553.3
+LA Memorial Sports Arena,1991,Regular Season,41,40,97.6,12773.2
+Madison Square Garden,1991,Regular Season,41,39,95.1,15986.9
+Market Square Arena,1991,Regular Season,41,35,85.4,11695.7
+McNichols Sports Arena,1991,Regular Season,41,37,90.2,10731.6
+Memorial Coliseum,1991,Regular Season,41,35,85.4,12884.0
+Miami Arena,1991,Regular Season,41,39,95.1,15007.8
+Oracle Arena,1991,Regular Season,41,36,87.8,15052.8
+Reunion Arena,1991,Regular Season,41,37,90.2,16384.9
+Richfield Coliseum,1991,Regular Season,41,34,82.9,15365.5
+Salt Palace,1991,Regular Season,41,36,87.8,12546.5
+Sleep Train Arena,1991,Regular Season,41,36,87.8,17014.8
+Target Center,1991,Regular Season,41,37,90.2,18929.9
+The Forum,1991,Regular Season,41,35,85.4,17111.7
+The Omni,1991,Regular Season,41,37,90.2,12931.1
+The Palace of Auburn Hills,1991,Regular Season,41,32,78.0,21454.0
+The Spectrum,1991,Regular Season,41,38,92.7,15698.6
+The Summit,1991,Regular Season,41,39,95.1,14869.5
+Arizona Veterans Memorial Coliseum,1992,Playoffs,4,4,100.0,14496.5
+Boston Garden,1992,Playoffs,5,4,80.0,14890.0
+Chicago Stadium,1992,Playoffs,12,9,75.0,18676.0
+Delta Center,1992,Playoffs,9,8,88.9,19911.0
+Izod Center,1992,Playoffs,2,2,100.0,14164.5
+KeyArena,1992,Playoffs,4,4,100.0,14215.0
+LA Memorial Sports Arena,1992,Playoffs,2,2,100.0,10617.0
+Madison Square Garden,1992,Playoffs,6,5,83.3,19443.4
+Market Square Arena,1992,Playoffs,1,1,100.0,16530.0
+Memorial Coliseum,1992,Playoffs,11,9,81.8,12888.0
+Miami Arena,1992,Playoffs,1,1,100.0,15008.0
+Oracle Arena,1992,Playoffs,2,2,100.0,15025.0
+Richfield Coliseum,1992,Playoffs,9,9,100.0,19546.6
+The Forum,1992,Playoffs,2,2,100.0,16084.0
+Amway Arena,1992,Regular Season,41,38,92.7,15151.0
+Arizona Veterans Memorial Coliseum,1992,Regular Season,41,35,85.4,14495.7
+Boston Garden,1992,Regular Season,41,37,90.2,14897.7
+Bradley Center,1992,Regular Season,41,35,85.4,15463.6
+Capital Centre,1992,Regular Season,41,37,90.2,12490.9
+Charlotte Coliseum,1992,Regular Season,41,37,90.2,23698.0
+Chicago Stadium,1992,Regular Season,41,38,92.7,18544.4
+Delta Center,1992,Regular Season,41,35,85.4,19703.4
+HemisFair Arena,1992,Regular Season,41,33,80.5,16057.0
+Izod Center,1992,Regular Season,41,38,92.7,12533.4
+KeyArena,1992,Regular Season,41,40,97.6,13758.0
+LA Memorial Sports Arena,1992,Regular Season,41,38,92.7,12233.1
+Madison Square Garden,1992,Regular Season,41,33,80.5,17664.0
+Market Square Arena,1992,Regular Season,41,38,92.7,12675.6
+McNichols Sports Arena,1992,Regular Season,41,38,92.7,13037.1
+Memorial Coliseum,1992,Regular Season,41,34,82.9,12888.0
+Miami Arena,1992,Regular Season,41,38,92.7,14962.1
+Oracle Arena,1992,Regular Season,41,38,92.7,15025.0
+Reunion Arena,1992,Regular Season,41,36,87.8,15935.2
+Richfield Coliseum,1992,Regular Season,41,37,90.2,16299.7
+Sleep Train Arena,1992,Regular Season,41,33,80.5,17014.0
+Target Center,1992,Regular Season,41,34,82.9,18767.3
+The Forum,1992,Regular Season,41,34,82.9,17103.0
+The Omni,1992,Regular Season,41,36,87.8,12387.6
+The Palace of Auburn Hills,1992,Regular Season,41,35,85.4,21454.0
+The Spectrum,1992,Regular Season,41,37,90.2,13917.8
+The Summit,1992,Regular Season,41,37,90.2,14409.4
+Charlotte Coliseum,1993,Playoffs,4,4,100.0,23698.0
+Chicago Stadium,1993,Playoffs,10,10,100.0,18676.0
+Delta Center,1993,Playoffs,2,2,100.0,19911.0
+HemisFair Arena,1993,Playoffs,5,5,100.0,16057.0
+Izod Center,1993,Playoffs,2,2,100.0,15845.5
+KeyArena,1993,Playoffs,10,9,90.0,14623.0
+LA Memorial Sports Arena,1993,Playoffs,2,2,100.0,13669.0
+Madison Square Garden,1993,Playoffs,8,7,87.5,19763.0
+Memorial Coliseum,1993,Playoffs,2,2,100.0,12888.0
+Richfield Coliseum,1993,Playoffs,5,5,100.0,19309.4
+The Omni,1993,Playoffs,1,1,100.0,15141.0
+The Summit,1993,Playoffs,6,5,83.3,16611.0
+Amway Arena,1993,Regular Season,41,37,90.2,15151.0
+Boston Garden,1993,Regular Season,41,36,87.8,14878.8
+Bradley Center,1993,Regular Season,41,33,80.5,16149.2
+Capital Centre,1993,Regular Season,41,39,95.1,13370.6
+Charlotte Coliseum,1993,Regular Season,41,35,85.4,23705.5
+Chicago Stadium,1993,Regular Season,41,39,95.1,18520.6
+Delta Center,1993,Regular Season,41,36,87.8,19898.2
+HemisFair Arena,1993,Regular Season,41,36,87.8,16057.0
+Izod Center,1993,Regular Season,41,38,92.7,14989.4
+KeyArena,1993,Regular Season,41,37,90.2,15468.4
+LA Memorial Sports Arena,1993,Regular Season,41,34,82.9,13195.9
+Madison Square Garden,1993,Regular Season,41,32,78.0,19686.1
+Market Square Arena,1993,Regular Season,41,36,87.8,12894.6
+McNichols Sports Arena,1993,Regular Season,41,38,92.7,14604.6
+Memorial Coliseum,1993,Regular Season,41,35,85.4,12888.0
+Miami Arena,1993,Regular Season,41,36,87.8,14996.5
+Mortgage Matchup Center,1993,Regular Season,41,38,92.7,19023.0
+Oracle Arena,1993,Regular Season,41,33,80.5,15025.0
+Reunion Arena,1993,Regular Season,41,36,87.8,13621.1
+Richfield Coliseum,1993,Regular Season,41,36,87.8,18317.5
+Sleep Train Arena,1993,Regular Season,41,34,82.9,17317.0
+Target Center,1993,Regular Season,41,35,85.4,18425.4
+The Forum,1993,Regular Season,41,39,95.1,15449.5
+The Omni,1993,Regular Season,41,38,92.7,11955.2
+The Palace of Auburn Hills,1993,Regular Season,41,37,90.2,21724.3
+The Spectrum,1993,Regular Season,41,34,82.9,12031.5
+The Summit,1993,Regular Season,41,36,87.8,13805.8
+Alamodome,1994,Regular Season,41,34,82.9,22881.4
+Amway Arena,1994,Regular Season,41,35,85.4,15291.0
+Boston Garden,1994,Regular Season,41,37,90.2,14738.0
+Bradley Center,1994,Regular Season,41,39,95.1,15373.6
+Capital Centre,1994,Regular Season,41,34,82.9,14955.3
+Charlotte Coliseum,1994,Regular Season,41,36,87.8,23697.8
+Chicago Stadium,1994,Regular Season,41,36,87.8,18562.9
+Delta Center,1994,Regular Season,41,38,92.7,19862.3
+Izod Center,1994,Regular Season,41,34,82.9,15988.7
+KeyArena,1994,Regular Season,41,32,78.0,14680.6
+LA Memorial Sports Arena,1994,Regular Season,41,36,87.8,11801.8
+Madison Square Garden,1994,Regular Season,41,35,85.4,19763.0
+Market Square Arena,1994,Regular Season,41,38,92.7,13059.7
+McNichols Sports Arena,1994,Regular Season,41,37,90.2,16352.8
+Memorial Coliseum,1994,Regular Season,41,39,95.1,12888.0
+Miami Arena,1994,Regular Season,41,37,90.2,15052.0
+Mortgage Matchup Center,1994,Regular Season,41,39,95.1,19023.2
+Oracle Arena,1994,Regular Season,41,33,80.5,15025.0
+Reunion Arena,1994,Regular Season,41,37,90.2,12741.1
+Richfield Coliseum,1994,Regular Season,41,36,87.8,18445.3
+Sleep Train Arena,1994,Regular Season,41,38,92.7,17330.2
+Target Center,1994,Regular Season,41,39,95.1,17867.5
+The Forum,1994,Regular Season,41,38,92.7,13455.9
+The Omni,1994,Regular Season,41,35,85.4,13364.3
+The Palace of Auburn Hills,1994,Regular Season,41,34,82.9,19546.2
+The Spectrum,1994,Regular Season,41,38,92.7,12543.8
+The Summit,1994,Regular Season,41,37,90.2,15127.4
+Alamodome,1995,Playoffs,8,6,75.0,32060.5
+Amway Arena,1995,Playoffs,11,10,90.9,16010.0
+Delta Center,1995,Playoffs,3,3,100.0,19911.0
+Madison Square Garden,1995,Playoffs,6,5,83.3,19763.0
+Market Square Arena,1995,Playoffs,8,8,100.0,16575.0
+McNichols Sports Arena,1995,Playoffs,1,1,100.0,17171.0
+Memorial Coliseum,1995,Playoffs,1,1,100.0,12888.0
+Mortgage Matchup Center,1995,Playoffs,6,5,83.3,19023.0
+Rocket Arena,1995,Playoffs,2,2,100.0,18963.5
+Tacoma Dome,1995,Playoffs,2,2,100.0,14377.0
+The Forum,1995,Playoffs,5,4,80.0,17505.0
+The Omni,1995,Playoffs,1,1,100.0,12106.0
+United Center,1995,Playoffs,5,5,100.0,24259.2
+Alamodome,1995,Regular Season,41,33,80.5,22687.3
+Amway Arena,1995,Regular Season,41,38,92.7,16010.0
+Boston Garden,1995,Regular Season,41,33,80.5,14756.1
+Bradley Center,1995,Regular Season,41,33,80.5,16205.6
+Capital Centre,1995,Regular Season,41,37,90.2,16823.9
+Charlotte Coliseum,1995,Regular Season,41,34,82.9,23698.0
+Delta Center,1995,Regular Season,41,34,82.9,19785.8
+Izod Center,1995,Regular Season,41,39,95.1,21523.7
+LA Memorial Sports Arena,1995,Regular Season,41,38,92.7,10448.6
+Madison Square Garden,1995,Regular Season,41,30,73.2,19763.0
+Market Square Arena,1995,Regular Season,41,37,90.2,15943.3
+McNichols Sports Arena,1995,Regular Season,41,39,95.1,17171.0
+Memorial Coliseum,1995,Regular Season,41,35,85.4,12926.6
+Miami Arena,1995,Regular Season,41,39,95.1,14615.0
+Mortgage Matchup Center,1995,Regular Season,41,35,85.4,19023.0
+Oracle Arena,1995,Regular Season,41,34,82.9,15025.0
+Reunion Arena,1995,Regular Season,41,37,90.2,16578.4
+Rocket Arena,1995,Regular Season,41,39,95.1,20335.9
+Sleep Train Arena,1995,Regular Season,41,40,97.6,17317.0
+Tacoma Dome,1995,Regular Season,41,31,75.6,15280.9
+Target Center,1995,Regular Season,41,39,95.1,17988.9
+The Forum,1995,Regular Season,41,36,87.8,14225.2
+The Omni,1995,Regular Season,41,40,97.6,12211.0
+The Palace of Auburn Hills,1995,Regular Season,41,37,90.2,17821.4
+The Spectrum,1995,Regular Season,41,34,82.9,12601.4
+The Summit,1995,Regular Season,41,38,92.7,15916.4
+United Center,1995,Regular Season,41,36,87.8,22554.6
+Alamodome,1996,Regular Season,41,35,85.4,19877.2
+Amway Arena,1996,Regular Season,41,35,85.4,17248.0
+Bradley Center,1996,Regular Season,41,34,82.9,15812.2
+Capital Centre,1996,Regular Season,41,37,90.2,16914.5
+Charlotte Coliseum,1996,Regular Season,41,33,80.5,24042.0
+Delta Center,1996,Regular Season,41,35,85.4,19854.9
+Izod Center,1996,Regular Season,41,37,90.2,15896.1
+KeyArena,1996,Regular Season,41,39,95.1,17014.9
+LA Memorial Sports Arena,1996,Regular Season,41,37,90.2,9637.6
+Madison Square Garden,1996,Regular Season,41,37,90.2,19763.0
+Market Square Arena,1996,Regular Season,41,36,87.8,16408.2
+McNichols Sports Arena,1996,Regular Season,41,40,97.6,16456.4
+Miami Arena,1996,Regular Season,41,39,95.1,14787.5
+Moda Center,1996,Regular Season,41,34,82.9,20726.1
+Mortgage Matchup Center,1996,Regular Season,41,34,82.9,19023.0
+Oracle Arena,1996,Regular Season,41,33,80.5,15025.0
+Reunion Arena,1996,Regular Season,41,36,87.8,16600.7
+Rocket Arena,1996,Regular Season,41,37,90.2,17877.6
+Rogers Arena,1996,Regular Season,41,38,92.7,17169.7
+SkyDome,1996,Regular Season,41,36,87.8,23715.6
+Sleep Train Arena,1996,Regular Season,41,38,92.7,17317.0
+TD Garden,1996,Regular Season,41,34,82.9,17865.2
+Target Center,1996,Regular Season,41,39,95.1,14303.0
+The Forum,1996,Regular Season,41,36,87.8,15770.6
+The Omni,1996,Regular Season,41,38,92.7,11956.8
+The Palace of Auburn Hills,1996,Regular Season,41,38,92.7,17812.9
+The Spectrum,1996,Regular Season,41,34,82.9,12241.1
+The Summit,1996,Regular Season,41,35,85.4,16285.0
+United Center,1996,Regular Season,41,38,92.7,23652.1
+Amway Arena,1997,Playoffs,2,2,100.0,16901.5
+Charlotte Coliseum,1997,Playoffs,1,1,100.0,24042.0
+Delta Center,1997,Playoffs,11,9,81.8,19911.0
+KeyArena,1997,Playoffs,6,6,100.0,17072.0
+LA Memorial Sports Arena,1997,Playoffs,1,1,100.0,11747.0
+Madison Square Garden,1997,Playoffs,5,5,100.0,19763.0
+Miami Arena,1997,Playoffs,9,8,88.9,14945.2
+Moda Center,1997,Playoffs,2,2,100.0,21538.0
+Mortgage Matchup Center,1997,Playoffs,2,2,100.0,19023.0
+Target Center,1997,Playoffs,1,1,100.0,19006.0
+The Forum,1997,Playoffs,4,4,100.0,17505.0
+The Omni,1997,Playoffs,5,4,80.0,16232.2
+The Palace of Auburn Hills,1997,Playoffs,2,2,100.0,20756.5
+The Summit,1997,Playoffs,9,9,100.0,16285.0
+United Center,1997,Playoffs,11,11,100.0,24467.1
+Alamodome,1997,Regular Season,41,34,82.9,17527.0
+Amway Arena,1997,Regular Season,41,36,87.8,17799.1
+Bradley Center,1997,Regular Season,41,38,92.7,15469.6
+Capital Centre,1997,Regular Season,41,35,85.4,17162.3
+Charlotte Coliseum,1997,Regular Season,41,38,92.7,24042.0
+Delta Center,1997,Regular Season,41,38,92.7,19781.7
+Izod Center,1997,Regular Season,41,39,95.1,16314.7
+KeyArena,1997,Regular Season,41,33,80.5,17072.0
+LA Memorial Sports Arena,1997,Regular Season,41,36,87.8,9832.2
+Madison Square Garden,1997,Regular Season,41,36,87.8,19763.0
+Market Square Arena,1997,Regular Season,41,35,85.4,15573.0
+McNichols Sports Arena,1997,Regular Season,41,37,90.2,11000.2
+Miami Arena,1997,Regular Season,41,33,80.5,15020.6
+Moda Center,1997,Regular Season,41,36,87.8,20820.2
+Mortgage Matchup Center,1997,Regular Season,41,34,82.9,19023.0
+Reunion Arena,1997,Regular Season,41,35,85.4,15135.6
+Rocket Arena,1997,Regular Season,41,35,85.4,16728.1
+Rogers Arena,1997,Regular Season,41,39,95.1,16638.9
+San Jose Arena,1997,Regular Season,41,37,90.2,15084.2
+SkyDome,1997,Regular Season,41,35,85.4,18500.3
+Sleep Train Arena,1997,Regular Season,41,33,80.5,17317.0
+TD Garden,1997,Regular Season,41,34,82.9,16006.2
+Target Center,1997,Regular Season,41,34,82.9,16947.8
+The Forum,1997,Regular Season,41,33,80.5,17006.3
+The Omni,1997,Regular Season,41,36,87.8,14623.1
+The Palace of Auburn Hills,1997,Regular Season,41,35,85.4,19860.2
+The Summit,1997,Regular Season,41,34,82.9,16285.0
+United Center,1997,Regular Season,41,38,92.7,23869.8
+Xfinity Mobile Arena,1997,Regular Season,41,38,92.7,15307.2
+Alamodome,1998,Playoffs,4,4,100.0,25671.8
+Charlotte Coliseum,1998,Playoffs,4,4,100.0,21791.0
+Delta Center,1998,Playoffs,11,10,90.9,19911.0
+Georgia Dome,1998,Playoffs,2,2,100.0,20909.5
+Izod Center,1998,Playoffs,1,1,100.0,19889.0
+Madison Square Garden,1998,Playoffs,4,4,100.0,19763.0
+Market Square Arena,1998,Playoffs,8,7,87.5,16642.1
+Moda Center,1998,Playoffs,2,2,100.0,21587.0
+Mortgage Matchup Center,1998,Playoffs,2,2,100.0,19023.0
+Rocket Arena,1998,Playoffs,2,2,100.0,17841.5
+Target Center,1998,Playoffs,2,2,100.0,19006.0
+The Forum,1998,Playoffs,6,5,83.3,17505.0
+United Center,1998,Playoffs,12,10,83.3,23844.0
+Alamodome,1998,Regular Season,41,36,87.8,19383.5
+Amway Arena,1998,Regular Season,41,39,95.1,17106.4
+Bradley Center,1998,Regular Season,41,36,87.8,15430.7
+Capital One Arena,1998,Regular Season,41,36,87.8,19531.9
+Charlotte Coliseum,1998,Regular Season,41,39,95.1,23373.1
+Delta Center,1998,Regular Season,41,39,95.1,19899.2
+Georgia Dome,1998,Regular Season,41,35,85.4,15500.4
+Izod Center,1998,Regular Season,41,37,90.2,17705.3
+KeyArena,1998,Regular Season,41,35,85.4,17072.0
+LA Memorial Sports Arena,1998,Regular Season,41,40,97.6,10070.8
+Madison Square Garden,1998,Regular Season,41,36,87.8,19763.0
+Market Square Arena,1998,Regular Season,41,36,87.8,15776.2
+McNichols Sports Arena,1998,Regular Season,41,34,82.9,11779.4
+Miami Arena,1998,Regular Season,41,38,92.7,14984.2
+Moda Center,1998,Regular Season,41,37,90.2,20569.5
+Mortgage Matchup Center,1998,Regular Season,41,40,97.6,19023.0
+Oracle Arena,1998,Regular Season,41,34,82.9,12176.2
+Reunion Arena,1998,Regular Season,41,36,87.8,13254.4
+Rocket Arena,1998,Regular Season,41,36,87.8,16879.9
+Rogers Arena,1998,Regular Season,41,38,92.7,16169.2
+SkyDome,1998,Regular Season,41,36,87.8,16655.6
+Sleep Train Arena,1998,Regular Season,41,36,87.8,14697.0
+TD Garden,1998,Regular Season,41,33,80.5,18049.8
+Target Center,1998,Regular Season,41,38,92.7,17961.9
+The Forum,1998,Regular Season,41,37,90.2,16932.2
+The Palace of Auburn Hills,1998,Regular Season,41,38,92.7,19166.8
+The Summit,1998,Regular Season,41,34,82.9,16285.0
+United Center,1998,Regular Season,41,35,85.4,23977.7
+Xfinity Mobile Arena,1998,Regular Season,41,37,90.2,15998.9
+Alamodome,1999,Playoffs,8,7,87.5,31109.7
+Amway Arena,1999,Playoffs,2,2,100.0,15806.0
+Bradley Center,1999,Playoffs,1,1,100.0,18717.0
+Delta Center,1999,Playoffs,6,6,100.0,19911.0
+Georgia Dome,1999,Playoffs,5,5,100.0,17358.4
+Madison Square Garden,1999,Playoffs,10,10,100.0,19763.0
+Market Square Arena,1999,Playoffs,7,7,100.0,16626.9
+Moda Center,1999,Playoffs,7,7,100.0,20608.9
+Mortgage Matchup Center,1999,Playoffs,1,1,100.0,17306.0
+Target Center,1999,Playoffs,2,2,100.0,16671.0
+The Forum,1999,Playoffs,4,4,100.0,17505.0
+The Summit,1999,Playoffs,2,2,100.0,16285.0
+Xfinity Mobile Arena,1999,Playoffs,4,4,100.0,20799.5
+Alamodome,1999,Regular Season,25,23,92.0,20647.0
+Amway Arena,1999,Regular Season,25,22,88.0,16394.6
+Bradley Center,1999,Regular Season,25,23,92.0,15203.5
+Capital One Arena,1999,Regular Season,25,24,96.0,16115.8
+Charlotte Coliseum,1999,Regular Season,25,20,80.0,19328.4
+Delta Center,1999,Regular Season,25,24,96.0,19717.0
+Georgia Dome,1999,Regular Season,25,22,88.0,13149.5
+Izod Center,1999,Regular Season,25,20,80.0,16849.0
+KeyArena,1999,Regular Season,25,24,96.0,17072.0
+LA Memorial Sports Arena,1999,Regular Season,25,24,96.0,10208.5
+Madison Square Garden,1999,Regular Season,25,23,92.0,19763.0
+Market Square Arena,1999,Regular Season,25,23,92.0,16261.9
+McNichols Sports Arena,1999,Regular Season,25,23,92.0,12187.4
+Miami Arena,1999,Regular Season,25,25,100.0,15152.5
+Moda Center,1999,Regular Season,25,20,80.0,19648.6
+Mortgage Matchup Center,1999,Regular Season,25,22,88.0,18873.4
+Oracle Arena,1999,Regular Season,25,20,80.0,13115.0
+Reunion Arena,1999,Regular Season,25,25,100.0,14513.5
+Rocket Arena,1999,Regular Season,25,20,80.0,14335.4
+Rogers Arena,1999,Regular Season,25,22,88.0,16675.8
+SkyDome,1999,Regular Season,25,25,100.0,17567.6
+Sleep Train Arena,1999,Regular Season,25,22,88.0,16815.6
+TD Garden,1999,Regular Season,25,19,76.0,17493.0
+Target Center,1999,Regular Season,25,23,92.0,17223.7
+The Forum,1999,Regular Season,25,25,100.0,17200.3
+The Palace of Auburn Hills,1999,Regular Season,25,24,96.0,17834.0
+The Summit,1999,Regular Season,25,23,92.0,16285.0
+United Center,1999,Regular Season,25,22,88.0,22402.9
+Xfinity Mobile Arena,1999,Regular Season,25,25,100.0,17457.8
+Alamodome,2000,Regular Season,41,38,92.7,21316.1
+Amway Arena,2000,Regular Season,41,36,87.8,14122.4
+Ball Arena,2000,Regular Season,41,37,90.2,15665.5
+Bradley Center,2000,Regular Season,41,40,97.6,15334.2
+Capital One Arena,2000,Regular Season,41,37,90.2,15177.1
+Charlotte Coliseum,2000,Regular Season,41,38,92.7,17826.2
+Crypto.com Arena,2000,Regular Season,82,73,89.0,16246.1
+Delta Center,2000,Regular Season,41,38,92.7,19537.1
+Gainbridge Fieldhouse,2000,Regular Season,41,36,87.8,18345.0
+Izod Center,2000,Regular Season,41,37,90.2,15552.6
+Kaseya Center,2000,Regular Season,41,38,92.7,17097.7
+KeyArena,2000,Regular Season,41,34,82.9,15083.5
+Madison Square Garden,2000,Regular Season,41,36,87.8,19763.0
+Moda Center,2000,Regular Season,41,39,95.1,20369.3
+Mortgage Matchup Center,2000,Regular Season,41,37,90.2,18848.8
+Oracle Arena,2000,Regular Season,41,36,87.8,12561.9
+Reunion Arena,2000,Regular Season,41,41,100.0,14784.8
+Rocket Arena,2000,Regular Season,41,38,92.7,14413.2
+Rogers Arena,2000,Regular Season,41,36,87.8,13895.8
+Scotiabank Arena,2000,Regular Season,41,36,87.8,18559.6
+Sleep Train Arena,2000,Regular Season,41,34,82.9,17612.2
+State Farm Arena,2000,Regular Season,41,39,95.1,14704.6
+TD Garden,2000,Regular Season,41,33,80.5,16651.0
+Target Center,2000,Regular Season,41,39,95.1,16806.5
+The Palace of Auburn Hills,2000,Regular Season,41,34,82.9,16628.7
+The Summit,2000,Regular Season,41,36,87.8,15179.4
+United Center,2000,Regular Season,41,38,92.7,22121.9
+Xfinity Mobile Arena,2000,Regular Season,41,37,90.2,18482.9
+Alamodome,2001,Playoffs,7,7,100.0,31960.7
+Amway Arena,2001,Playoffs,2,2,100.0,17248.0
+Bradley Center,2001,Playoffs,9,8,88.9,18717.0
+Charlotte Coliseum,2001,Playoffs,4,4,100.0,20485.0
+Crypto.com Arena,2001,Playoffs,8,7,87.5,18997.0
+Kaseya Center,2001,Playoffs,2,2,100.0,18292.5
+Madison Square Garden,2001,Playoffs,3,3,100.0,19763.0
+Moda Center,2001,Playoffs,1,1,100.0,20580.0
+Mortgage Matchup Center,2001,Playoffs,2,2,100.0,18929.5
+Reunion Arena,2001,Playoffs,4,4,100.0,18227.8
+Scotiabank Arena,2001,Playoffs,5,5,100.0,20357.0
+Sleep Train Arena,2001,Playoffs,4,4,100.0,17317.0
+Target Center,2001,Playoffs,2,2,100.0,17006.0
+Xfinity Mobile Arena,2001,Playoffs,13,10,76.9,20935.1
+Alamodome,2001,Regular Season,41,38,92.7,22399.8
+Amway Arena,2001,Regular Season,41,37,90.2,14737.3
+Ball Arena,2001,Regular Season,41,34,82.9,14811.5
+Bradley Center,2001,Regular Season,41,35,85.4,16506.3
+Capital One Arena,2001,Regular Season,41,36,87.8,15637.6
+Charlotte Coliseum,2001,Regular Season,41,41,100.0,15010.3
+Crypto.com Arena,2001,Regular Season,82,73,89.0,16733.8
+Delta Center,2001,Regular Season,41,35,85.4,19270.3
+Gainbridge Fieldhouse,2001,Regular Season,41,38,92.7,17809.6
+Izod Center,2001,Regular Season,41,37,90.2,13705.8
+Kaseya Center,2001,Regular Season,41,38,92.7,16581.7
+KeyArena,2001,Regular Season,41,37,90.2,15649.5
+Madison Square Garden,2001,Regular Season,41,40,97.6,19763.0
+Moda Center,2001,Regular Season,41,35,85.4,20272.2
+Mortgage Matchup Center,2001,Regular Season,41,35,85.4,17991.2
+Oracle Arena,2001,Regular Season,41,37,90.2,14385.9
+Reunion Arena,2001,Regular Season,41,35,85.4,16464.7
+Rocket Arena,2001,Regular Season,41,35,85.4,15900.1
+Rogers Arena,2001,Regular Season,41,36,87.8,13652.0
+Scotiabank Arena,2001,Regular Season,41,39,95.1,19365.0
+Sleep Train Arena,2001,Regular Season,41,36,87.8,17317.0
+State Farm Arena,2001,Regular Season,41,35,85.4,13831.7
+TD Garden,2001,Regular Season,41,37,90.2,15399.4
+Target Center,2001,Regular Season,41,38,92.7,17450.0
+The Palace of Auburn Hills,2001,Regular Season,41,36,87.8,14668.4
+The Summit,2001,Regular Season,41,34,82.9,12565.6
+United Center,2001,Regular Season,41,39,95.1,21666.3
+Xfinity Mobile Arena,2001,Regular Season,41,37,90.2,19801.8
+Alamodome,2002,Regular Season,41,31,75.6,21807.1
+American Airlines Center,2002,Regular Season,41,39,95.1,19551.0
+Amway Arena,2002,Regular Season,41,39,95.1,15179.7
+Ball Arena,2002,Regular Season,41,39,95.1,15515.9
+Bradley Center,2002,Regular Season,41,35,85.4,18135.3
+Capital One Arena,2002,Regular Season,41,35,85.4,20674.0
+Charlotte Coliseum,2002,Regular Season,41,36,87.8,11045.0
+Crypto.com Arena,2002,Regular Season,82,76,92.7,18480.9
+Delta Center,2002,Regular Season,41,39,95.1,18704.0
+Gainbridge Fieldhouse,2002,Regular Season,41,36,87.8,16730.3
+Izod Center,2002,Regular Season,41,39,95.1,13751.9
+Kaseya Center,2002,Regular Season,41,37,90.2,15775.9
+KeyArena,2002,Regular Season,41,38,92.7,15540.3
+Madison Square Garden,2002,Regular Season,41,35,85.4,19763.0
+Moda Center,2002,Regular Season,41,36,87.8,19471.1
+Mortgage Matchup Center,2002,Regular Season,41,34,82.9,16207.1
+Oracle Arena,2002,Regular Season,41,34,82.9,14369.5
+Pyramid Arena,2002,Regular Season,41,37,90.2,14497.2
+Rocket Arena,2002,Regular Season,41,39,95.1,14625.2
+Scotiabank Arena,2002,Regular Season,41,34,82.9,19744.5
+Sleep Train Arena,2002,Regular Season,41,38,92.7,17317.0
+State Farm Arena,2002,Regular Season,41,38,92.7,12045.2
+TD Garden,2002,Regular Season,41,38,92.7,16173.2
+Target Center,2002,Regular Season,41,38,92.7,17839.2
+The Palace of Auburn Hills,2002,Regular Season,41,35,85.4,18572.6
+The Summit,2002,Regular Season,41,35,85.4,11750.3
+United Center,2002,Regular Season,41,39,95.1,18972.5
+Xfinity Mobile Arena,2002,Regular Season,41,38,92.7,20556.7
+American Airlines Center,2003,Playoffs,11,11,100.0,20513.3
+Amway Arena,2003,Playoffs,3,3,100.0,17158.3
+Bradley Center,2003,Playoffs,3,3,100.0,18215.7
+Crypto.com Arena,2003,Playoffs,6,6,100.0,18997.0
+Delta Center,2003,Playoffs,2,2,100.0,19911.0
+Frost Bank Center,2003,Playoffs,12,9,75.0,18890.3
+Gainbridge Fieldhouse,2003,Playoffs,3,3,100.0,15862.3
+Izod Center,2003,Playoffs,10,8,80.0,18466.5
+Moda Center,2003,Playoffs,3,3,100.0,20187.3
+Sleep Train Arena,2003,Playoffs,6,5,83.3,17317.0
+Smoothie King Center,2003,Playoffs,3,3,100.0,17377.7
+TD Garden,2003,Playoffs,5,5,100.0,18624.0
+Target Center,2003,Playoffs,3,3,100.0,18109.0
+The Palace of Auburn Hills,2003,Playoffs,9,7,77.8,22076.0
+Xfinity Mobile Arena,2003,Playoffs,6,5,83.3,20127.0
+American Airlines Center,2003,Regular Season,41,36,87.8,19915.2
+Amway Arena,2003,Regular Season,41,40,97.6,14741.4
+Ball Arena,2003,Regular Season,41,37,90.2,14824.6
+Bradley Center,2003,Regular Season,41,38,92.7,16310.7
+Capital One Arena,2003,Regular Season,41,38,92.7,20173.0
+Crypto.com Arena,2003,Regular Season,82,75,91.5,18054.2
+Delta Center,2003,Regular Season,41,39,95.1,19139.9
+Frost Bank Center,2003,Regular Season,41,35,85.4,18030.9
+Gainbridge Fieldhouse,2003,Regular Season,41,33,80.5,16417.0
+Izod Center,2003,Regular Season,41,36,87.8,15391.6
+Kaseya Center,2003,Regular Season,41,35,85.4,15291.4
+KeyArena,2003,Regular Season,41,35,85.4,15468.8
+Madison Square Garden,2003,Regular Season,41,30,73.2,18969.8
+Moda Center,2003,Regular Season,41,33,80.5,19415.3
+Mortgage Matchup Center,2003,Regular Season,41,36,87.8,16120.8
+Oracle Arena,2003,Regular Season,41,37,90.2,15431.7
+Pyramid Arena,2003,Regular Season,41,38,92.7,14922.4
+Rocket Arena,2003,Regular Season,41,35,85.4,11723.2
+Scotiabank Arena,2003,Regular Season,41,35,85.4,19077.7
+Sleep Train Arena,2003,Regular Season,41,38,92.7,17317.0
+Smoothie King Center,2003,Regular Season,41,39,95.1,15609.0
+State Farm Arena,2003,Regular Season,41,39,95.1,12785.0
+TD Garden,2003,Regular Season,41,38,92.7,17268.6
+Target Center,2003,Regular Season,41,35,85.4,15565.9
+The Palace of Auburn Hills,2003,Regular Season,41,35,85.4,20696.1
+The Summit,2003,Regular Season,41,35,85.4,13746.3
+United Center,2003,Regular Season,41,33,80.5,19454.8
+Xfinity Mobile Arena,2003,Regular Season,41,36,87.8,19718.0
+Ball Arena,2004,Playoffs,2,2,100.0,19703.5
+Bradley Center,2004,Playoffs,2,2,100.0,18016.5
+Frost Bank Center,2004,Playoffs,5,4,80.0,18797.0
+Gainbridge Fieldhouse,2004,Playoffs,8,7,87.5,17953.9
+Izod Center,2004,Playoffs,5,5,100.0,19390.4
+Kaseya Center,2004,Playoffs,7,6,85.7,20136.2
+Madison Square Garden,2004,Playoffs,2,2,100.0,19763.0
+Pyramid Arena,2004,Playoffs,2,2,100.0,19351.0
+Smoothie King Center,2004,Playoffs,3,3,100.0,15852.3
+TD Garden,2004,Playoffs,2,2,100.0,17034.5
+The Palace of Auburn Hills,2004,Playoffs,13,12,92.3,22076.0
+Toyota Center,2004,Playoffs,2,2,100.0,18222.5
+American Airlines Center,2004,Regular Season,41,40,97.6,20137.5
+Amway Arena,2004,Regular Season,41,36,87.8,14380.4
+Ball Arena,2004,Regular Season,41,38,92.7,17629.9
+Bradley Center,2004,Regular Season,41,34,82.9,16844.6
+Capital One Arena,2004,Regular Season,41,36,87.8,15643.8
+Crypto.com Arena,2004,Regular Season,82,75,91.5,17587.8
+Delta Center,2004,Regular Season,41,36,87.8,19137.4
+Frost Bank Center,2004,Regular Season,41,31,75.6,18037.6
+Gainbridge Fieldhouse,2004,Regular Season,41,37,90.2,16483.7
+Izod Center,2004,Regular Season,41,35,85.4,15070.1
+Kaseya Center,2004,Regular Season,41,39,95.1,15279.8
+KeyArena,2004,Regular Season,41,36,87.8,15336.2
+Madison Square Garden,2004,Regular Season,41,37,90.2,19129.4
+Moda Center,2004,Regular Season,41,35,85.4,16782.5
+Mortgage Matchup Center,2004,Regular Season,41,37,90.2,16421.9
+Oracle Arena,2004,Regular Season,41,34,82.9,16118.7
+Pyramid Arena,2004,Regular Season,41,38,92.7,15344.4
+Rocket Arena,2004,Regular Season,41,35,85.4,18240.1
+Scotiabank Arena,2004,Regular Season,41,40,97.6,18305.1
+Sleep Train Arena,2004,Regular Season,41,35,85.4,17317.0
+Smoothie King Center,2004,Regular Season,41,36,87.8,14381.0
+State Farm Arena,2004,Regular Season,41,32,78.0,13341.5
+TD Garden,2004,Regular Season,41,36,87.8,16366.8
+Target Center,2004,Regular Season,41,37,90.2,17507.6
+The Palace of Auburn Hills,2004,Regular Season,41,39,95.1,21342.4
+Toyota Center,2004,Regular Season,41,36,87.8,15717.0
+United Center,2004,Regular Season,41,31,75.6,19833.4
+Xfinity Mobile Arena,2004,Regular Season,41,39,95.1,19200.1
+American Airlines Center,2005,Playoffs,7,7,100.0,20876.4
+Ball Arena,2005,Playoffs,2,2,100.0,19844.5
+Capital One Arena,2005,Playoffs,5,4,80.0,20173.0
+FedExForum,2005,Playoffs,2,2,100.0,17681.0
+Frost Bank Center,2005,Playoffs,12,9,75.0,18797.0
+Gainbridge Fieldhouse,2005,Playoffs,6,6,100.0,18345.0
+Izod Center,2005,Playoffs,2,2,100.0,20174.0
+Kaseya Center,2005,Playoffs,8,7,87.5,20219.4
+KeyArena,2005,Playoffs,6,6,100.0,17072.0
+Mortgage Matchup Center,2005,Playoffs,8,7,87.5,18422.0
+Sleep Train Arena,2005,Playoffs,2,2,100.0,17317.0
+TD Garden,2005,Playoffs,4,4,100.0,18624.0
+The Palace of Auburn Hills,2005,Playoffs,12,11,91.7,22076.0
+Toyota Center,2005,Playoffs,3,3,100.0,18208.3
+Xfinity Mobile Arena,2005,Playoffs,2,2,100.0,16400.5
+American Airlines Center,2005,Regular Season,41,36,87.8,20072.7
+Amway Arena,2005,Regular Season,41,37,90.2,14661.1
+Ball Arena,2005,Regular Season,41,36,87.8,17575.9
+Bradley Center,2005,Regular Season,41,35,85.4,15478.9
+Capital One Arena,2005,Regular Season,41,41,100.0,17196.8
+Charlotte Coliseum,2005,Regular Season,41,35,85.4,14665.2
+Crypto.com Arena,2005,Regular Season,82,76,92.7,17819.2
+Delta Center,2005,Regular Season,41,37,90.2,18662.7
+FedExForum,2005,Regular Season,41,36,87.8,16760.3
+Frost Bank Center,2005,Regular Season,41,37,90.2,18298.3
+Gainbridge Fieldhouse,2005,Regular Season,41,38,92.7,16911.4
+Izod Center,2005,Regular Season,41,35,85.4,14762.2
+Kaseya Center,2005,Regular Season,41,38,92.7,19883.7
+KeyArena,2005,Regular Season,41,38,92.7,16469.7
+Madison Square Garden,2005,Regular Season,41,40,97.6,19509.5
+Moda Center,2005,Regular Season,41,35,85.4,16490.3
+Mortgage Matchup Center,2005,Regular Season,41,38,92.7,17652.6
+Oracle Arena,2005,Regular Season,41,35,85.4,16554.3
+Rocket Arena,2005,Regular Season,41,39,95.1,19157.2
+Scotiabank Arena,2005,Regular Season,41,34,82.9,17068.4
+Sleep Train Arena,2005,Regular Season,41,36,87.8,17317.0
+Smoothie King Center,2005,Regular Season,41,34,82.9,14044.2
+State Farm Arena,2005,Regular Season,41,36,87.8,14492.6
+TD Garden,2005,Regular Season,41,38,92.7,15954.6
+Target Center,2005,Regular Season,41,38,92.7,17139.8
+The Palace of Auburn Hills,2005,Regular Season,41,35,85.4,22076.0
+Toyota Center,2005,Regular Season,41,37,90.2,16087.1
+United Center,2005,Regular Season,41,36,87.8,20283.5
+Xfinity Mobile Arena,2005,Regular Season,41,37,90.2,17766.1
+American Airlines Center,2006,Regular Season,41,37,90.2,20139.2
+Amway Arena,2006,Regular Season,41,36,87.8,15472.2
+Ball Arena,2006,Regular Season,41,35,85.4,16852.4
+Bradley Center,2006,Regular Season,41,38,92.7,16646.2
+Capital One Arena,2006,Regular Season,41,39,95.1,17179.6
+Crypto.com Arena,2006,Regular Season,82,70,85.4,18033.1
+Delta Center,2006,Regular Season,41,33,80.5,18266.7
+FedExForum,2006,Regular Season,41,39,95.1,15869.2
+Frost Bank Center,2006,Regular Season,41,39,95.1,18797.0
+Gainbridge Fieldhouse,2006,Regular Season,41,33,80.5,16005.3
+Izod Center,2006,Regular Season,41,35,85.4,16737.1
+Kaseya Center,2006,Regular Season,41,39,95.1,19973.1
+KeyArena,2006,Regular Season,41,40,97.6,16201.1
+Madison Square Garden,2006,Regular Season,41,37,90.2,18864.5
+Moda Center,2006,Regular Season,41,37,90.2,15112.4
+Mortgage Matchup Center,2006,Regular Season,41,40,97.6,17796.3
+Oracle Arena,2006,Regular Season,41,34,82.9,18345.6
+Paycom Center,2006,Regular Season,41,34,82.9,17976.5
+Rocket Arena,2006,Regular Season,41,35,85.4,19365.9
+Scotiabank Arena,2006,Regular Season,41,35,85.4,17131.3
+Sleep Train Arena,2006,Regular Season,41,35,85.4,17317.0
+Spectrum Center,2006,Regular Season,41,39,95.1,16229.7
+State Farm Arena,2006,Regular Season,41,33,80.5,14781.0
+TD Garden,2006,Regular Season,41,38,92.7,16856.3
+Target Center,2006,Regular Season,41,38,92.7,16177.5
+The Palace of Auburn Hills,2006,Regular Season,41,39,95.1,22076.0
+Toyota Center,2006,Regular Season,41,35,85.4,15464.7
+United Center,2006,Regular Season,41,36,87.8,21184.6
+Xfinity Mobile Arena,2006,Regular Season,41,39,95.1,16329.6
 Amway Arena,2007,Playoffs,2,2,100.0,17451.0
 Capital One Arena,2007,Playoffs,2,2,100.0,20173.0
 Crypto.com Arena,2007,Playoffs,2,2,100.0,18997.0
