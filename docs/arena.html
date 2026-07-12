@@ -270,9 +270,8 @@ function renderDrawTables(mount) {
     sortableTable(pm, [
       { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
-        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
-    ], prows, { key: "mean_delta", dir: "desc" });
+      ...drawDeltaCols(),
+    ], prows, { key: "total_delta", dir: "desc" });
     wireRowNav(pm);
   } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
 
@@ -286,11 +285,10 @@ function renderDrawTables(mount) {
   tcard.appendChild(tm); grid.appendChild(tcard);
   if (teams.length) {
     sortableTable(tm, [
-      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: r => esc(r.team) },
+      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team || "", cell: teamNameCell },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-      { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
-        cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
-    ], teams.slice(), { key: "mean_delta", dir: "desc" });
+      ...drawDeltaCols(),
+    ], teams.slice(), { key: "total_delta", dir: "desc" });
   } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
 }
 

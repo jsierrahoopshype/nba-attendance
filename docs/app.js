@@ -148,9 +148,29 @@ const qp = k => new URLSearchParams(window.location.search).get(k);
 
 /* ---------- draw wording (shared across every draw table) ---------- */
 const DRAW_DELTA_LABEL = "Extra fans per game";
+const DRAW_TOTAL_LABEL = "Total extra fans";
 const DRAW_EXPLAINER = "How many more (or fewer) spectators attended these road games, " +
   "compared to a typical game at the same arena in the same season.";
 const drawExplainerHTML = () => '<div class="draw-explainer">' + esc(DRAW_EXPLAINER) + "</div>";
+
+/* Career/aggregate total extra fans = sum of per-game deltas. Exact when the
+   server supplied total_delta (draw tab, merged franchises); otherwise mean x
+   games, which equals the summed delta because the mean is games-weighted. */
+const drawTotal = r => (r.total_delta != null ? r.total_delta : (r.mean_delta || 0) * (r.games || 0));
+/* Signed per-game delta cell. */
+const drawMeanCell = r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>";
+/* Signed total-delta cell (rounded to whole fans). */
+const drawTotalCell = r => { const t = drawTotal(r);
+  return '<span class="delta ' + deltaCls(t) + '">' + signed(Math.round(t)) + "</span>"; };
+/* The per-game + total column pair shared by every draw table. */
+const drawDeltaCols = () => [
+  { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: drawMeanCell },
+  { key: "total_delta", label: DRAW_TOTAL_LABEL, defaultDir: "desc", get: drawTotal, cell: drawTotalCell },
+];
+/* All-time team rows carry `historical` (era names folded in) -> subnote. */
+const teamNameCell = r => esc(r.team || ((r.teamCity || "") + " " + (r.teamName || "")).trim()) +
+  (r.historical && r.historical.length
+    ? '<span class="sub team-hist">incl. games as ' + esc(r.historical.join(", ")) + "</span>" : "");
 
 /* ---------- season filter (detail pages) ----------
    Detail pages embed a records_by_season array alongside their all-time data.

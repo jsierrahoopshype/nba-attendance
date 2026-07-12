@@ -138,10 +138,9 @@ function renderArenaDraw(mount) {
     { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
       cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" },
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-    { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
-      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
+    ...drawDeltaCols(),
   ];
-  sortableTable(dm, cols, rows, { key: "mean_delta", dir: "desc" });
+  sortableTable(dm, cols, rows, { key: "total_delta", dir: "desc" });
   wireRowNav(dm);
 
   // Fix 6 — same draw aggregated to cities (games-weighted), cities linked.
@@ -175,9 +174,8 @@ function renderCityDraw(mount, draw) {
     { key: "city", label: "City", align: "left", defaultDir: "asc", get: r => r.city || "",
       cell: r => r.city_slug ? cityLink(r.city_slug, r.city) : '<span class="sub">' + esc(r.city || "") + "</span>" },
     { key: "games", label: "Road Games", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
-    { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta,
-      cell: r => '<span class="delta ' + deltaCls(r.mean_delta) + '">' + signed(r.mean_delta) + "</span>" },
-  ], r2, { key: "mean_delta", dir: "desc" });
+    ...drawDeltaCols(),
+  ], r2, { key: "total_delta", dir: "desc" });
   wireRowNav(cm);
 }
 
