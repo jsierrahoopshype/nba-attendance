@@ -302,7 +302,6 @@ async function initCities() {
 }
 
 /* ---------- HOME: six ranking boxes ---------- */
-let fpBiggestAllstar = true;   // frontpage "Biggest draws" defaults to All-Stars
 const FP_ROWS = 10;
 async function initHome() {
   let fp;
@@ -325,7 +324,7 @@ async function initHome() {
     { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
       rows: b.arena_attendance, tab: "records", cols: [arenaCol, cityCol,
         { key: "avg", label: "Avg Att", defaultDir: "desc", get: r => r.avg, cell: r => fmtInt(r.avg) }] },
-    { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top visiting players, min 15 road games",
+    { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top All-Star visiting players, min 15 road games",
       rows: b.biggest_draws_season, tab: "draw", allstar: true, cols: [playerCol, gCol, meanCol] },
     { title: "All-time draw kings", sub: "career total & avg draw, min 100 road games",
       rows: b.draw_kings_alltime, tab: "draw", initial: { key: "total_delta", dir: "desc" },
@@ -349,14 +348,6 @@ async function initHome() {
     el.className = "block fp-box";
     el.innerHTML = '<div class="block-head"><h2>' + esc(box.title) + '</h2>' +
       '<span class="sub">' + esc(box.sub) + "</span></div>";
-    // Optional All-Star toggle (Biggest draws) — same pattern as the draw tables.
-    if (box.allstar) {
-      const tc = document.createElement("div");
-      tc.className = "controls";
-      makeAllstarToggle(tc, () => fillBox(box, tm), {
-        label: "Players", get: () => fpBiggestAllstar, set: v => { fpBiggestAllstar = v; } });
-      el.appendChild(tc);
-    }
     const tm = document.createElement("div");
     el.appendChild(tm);
     grid.appendChild(el);
@@ -366,11 +357,11 @@ async function initHome() {
   });
 }
 
-/* Render one frontpage box's table into `tm`. All-Star boxes filter first, then
-   slice to FP_ROWS, so the box still fills after the client-side filter. */
+/* Render one frontpage box's table into `tm`. All-Star boxes filter to All-Stars
+   (fixed — no interactive toggle on the frontpage), then slice to FP_ROWS. */
 function fillBox(box, tm) {
   let rows = (box.rows || []).slice();
-  if (box.allstar) rows = filterAllstar(rows, r => r.personId, fpBiggestAllstar);
+  if (box.allstar) rows = filterAllstar(rows, r => r.personId, true);
   rows = rows.slice(0, FP_ROWS).map(r => ({ ...r,
     _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId) : null) }));
   tm.innerHTML = "";
