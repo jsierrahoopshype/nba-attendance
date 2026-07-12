@@ -76,7 +76,8 @@ function sortableTable(mount, cols, rows, initial, opts) {
     }).join("");
     mount.innerHTML =
       '<div class="table-wrap"><table class="lb"><thead><tr>' + head +
-      "</tr></thead><tbody>" + (body || '<tr><td class="dash">No data</td></tr>') + "</tbody></table></div>";
+      "</tr></thead><tbody>" + (body || '<tr><td class="dash">No data</td></tr>') + "</tbody></table></div>" +
+      cardsHtml(cols, arr, opts);
   }
   draw();
   mount.addEventListener("click", e => {
@@ -91,12 +92,36 @@ function sortableTable(mount, cols, rows, initial, opts) {
   return { setRows(r) { rows = r; draw(); } };
 }
 
-/* whole-row navigation (ignore clicks that landed on a real link) */
+/* Mobile card fallback for a sortable table — same cols/cell renderers, no
+   separate markup to maintain. Hidden on desktop, shown in place of
+   .table-wrap under the 860px breakpoint (see styles.css). The first
+   left-aligned column becomes the card title; the rest render as label:value
+   pairs in row order, so every table gets a matching card automatically. */
+function cardsHtml(cols, rows, opts) {
+  if (!rows.length) return "";
+  const titleCol = cols.find(c => c.align === "left") || cols[0];
+  const restCols = cols.filter(c => c !== titleCol);
+  const items = rows.map(row => {
+    const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
+    const rc = opts.rowClass ? opts.rowClass(row) : "";
+    const rowCls = rc ? " " + esc(rc) : "";
+    const stats = restCols.map(c =>
+      '<div class="card-stat"><span class="card-lbl">' + esc(c.label) + '</span>' +
+      '<span class="card-val">' + c.cell(row) + "</span></div>").join("");
+    return '<div class="card' + rowCls + '"' + href + '>' +
+      '<div class="card-title">' + titleCol.cell(row) + "</div>" +
+      '<div class="card-grid">' + stats + "</div></div>";
+  }).join("");
+  return '<div class="cards">' + items + "</div>";
+}
+
+/* whole-row navigation (ignore clicks that landed on a real link). Covers both
+   the desktop table row and its mobile .card counterpart. */
 function wireRowNav(root) {
   root.addEventListener("click", e => {
     if (e.target.closest("a")) return;
-    const tr = e.target.closest("tr[data-href]");
-    if (tr) window.location.href = tr.dataset.href;
+    const el = e.target.closest("tr[data-href], .card[data-href]");
+    if (el) window.location.href = el.dataset.href;
   });
 }
 
