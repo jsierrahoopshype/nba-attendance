@@ -188,6 +188,9 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
 /* fixed explainer above every draw section */
 .draw-explainer{color:var(--text-secondary);font-size:.82rem;margin:.1rem 0 .8rem;max-width:60rem}
 
+/* all-time team-draw rows: "incl. games as <old names>" under the current name */
+.team-hist{display:block;font-size:.64rem;color:var(--text-secondary);font-weight:400;margin-top:.12rem;line-height:1.2}
+
 /* frontpage: responsive grid of ranking boxes */
 .fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:.4rem}
 .fp-box{margin-bottom:0;border:1px solid var(--border);border-radius:12px;

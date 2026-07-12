@@ -50,6 +50,9 @@ TEAM_DRAW_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "team_draw_by_season.csv")
 ARENA_BASELINES_ALL_CSV = os.path.join(OUTPUT_DIR, "arena_baselines_all.csv")
 PLAYER_HOME_AWAY_CSV = os.path.join(OUTPUT_DIR, "player_arena_home_away.csv")
 ARENA_MAPPING_CSV = os.path.join(HERE, "data", "arena_mapping.csv")
+# Committed, inspectable era-name -> current-franchise mapping (drives the all-time
+# team-draw merge). See build note / Hornets hard rule in load_franchise_map().
+FRANCHISE_NAMES_CSV = os.path.join(HERE, "data", "franchise_names.csv")
 
 NEVER_HOME_MIN_AWAY = 3         # min visiting games for the "never played home" list
 NEVER_HOME_TOP = 40
@@ -103,6 +106,69 @@ def write_json(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, separators=(",", ":"), ensure_ascii=False)
+
+
+# --------------------------------------------------------------------------- #
+# franchise-name handling for team draw tables
+# --------------------------------------------------------------------------- #
+_FRANCHISE = {}   # "City Name" (era display) -> current franchise display name
+
+
+def load_franchise_map():
+    """Load data/franchise_names.csv into { "City Name" -> current-franchise name }.
+
+    Drives mode (a) of team-draw display: ALL-TIME/aggregated views merge every
+    era name of a franchise under its current name. Single-season views never
+    consult this (one franchise = one name per season). The mapping is a committed
+    CSV rather than derived from the source team tables because the source's
+    attribution of the Hornets lineage is wrong: per the NBA's 2014 records
+    reassignment the CSV puts Charlotte Hornets 1989-2002 under today's Charlotte
+    Hornets and New Orleans (incl. OKC-displaced) Hornets 2003-2013 under the New
+    Orleans Pelicans. Absent file -> empty map -> every name stands alone."""
+    fmap = {}
+    if not os.path.exists(FRANCHISE_NAMES_CSV):
+        return fmap
+    for r in read_csv(FRANCHISE_NAMES_CSV):
+        disp = f'{r["teamCity"]} {r["teamName"]}'.strip()
+        fmap[disp] = r["franchise_current_name"].strip()
+    return fmap
+
+
+def merge_team_franchise(rows):
+    """Mode (a): collapse team-draw rows onto their current franchise.
+
+    Sums games and total delta across every era name, recomputes the per-game
+    average, displays the current name, and attaches `historical` = the prior
+    display names folded in (for the "includes games as …" subnote). Prefers each
+    row's exact `total_delta` when present, else mean x games. Sorted by total
+    delta desc. `rows`: [{team, games, mean_delta, total_delta?, teamId?}]."""
+    agg, order = {}, []
+    for r in rows:
+        disp = r["team"]
+        cur = _FRANCHISE.get(disp, disp)
+        a = agg.get(cur)
+        if a is None:
+            a = {"team": cur, "teamId": r.get("teamId"), "wsum": 0.0, "games": 0, "hist": []}
+            agg[cur] = a
+            order.append(cur)
+        a["wsum"] += r["total_delta"] if r.get("total_delta") is not None else r["mean_delta"] * r["games"]
+        a["games"] += r["games"]
+        if disp != cur and disp not in a["hist"]:
+            a["hist"].append(disp)
+    out = []
+    for cur in order:
+        a = agg[cur]
+        g = a["games"]
+        row = {"team": cur, "games": g,
+               "mean_delta": round(a["wsum"] / g, 1) if g else 0.0,
+               "total_delta": round(a["wsum"], 1)}
+        if a.get("teamId"):
+            row["teamId"] = a["teamId"]
+        if a["hist"]:
+            row["historical"] = a["hist"]
+        out.append(row)
+    out.sort(key=lambda x: -x["total_delta"])
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -190,6 +256,11 @@ def build_draw(data_dir, player_filename, chunksize):
         p_extra, t_extra = ["playerName"], ["teamCity", "teamName"]
         seasons = sorted({as_int(r["season"]) for r in prows} |
                          {as_int(r["season"]) for r in trows}, reverse=True)
+        # Teams: ALL-TIME merges era names onto the current franchise (mode a);
+        # per-season keeps the name the team used that season (mode b).
+        team_all_input = [{"team": f'{r["teamCity"]} {r["teamName"]}'.strip(),
+                           "games": as_int(r["games"]), "mean_delta": as_float(r["mean_delta"]),
+                           "total_delta": as_float(r["total_delta"])} for r in trows]
         return {
             "seasons": seasons,
             "players": {
@@ -197,7 +268,7 @@ def build_draw(data_dir, player_filename, chunksize):
                 "by_season": _draw_by_season(prows, "personId", p_extra, PLAYER_DRAW_MIN_GAMES),
             },
             "teams": {
-                "all": _draw_aggregate(trows, "teamId", t_extra, 0),
+                "all": merge_team_franchise(team_all_input),
                 "by_season": _draw_by_season(trows, "teamId", t_extra, 0),
             },
         }
@@ -274,10 +345,14 @@ def _build_draw_2026(data_dir, player_filename, chunksize):
         })
     players.sort(key=lambda p: -p["total_delta"])
 
+    team_all = merge_team_franchise([
+        {"team": f'{t["teamCity"]} {t["teamName"]}'.strip(), "teamId": t["teamId"],
+         "games": t["games"], "mean_delta": t["mean_delta"], "total_delta": t["total_delta"]}
+        for t in teams])
     return {
         "seasons": [],
         "players": {"all": players, "by_season": {}},
-        "teams": {"all": teams, "by_season": {}},
+        "teams": {"all": team_all, "by_season": {}},
     }
 
 
@@ -1252,12 +1327,15 @@ def build_frontpage(records, home_away_by_slug, sellout_by_building):
     boxes["arena_attendance"] = arena_attendance
 
     # ---- (2) biggest draws this season (league-wide players, min road games) ----
+    # Emit ALL qualifiers (not just the top FRONTPAGE_ROWS) so the box can default
+    # to All-Stars only and still fill up after the client-side filter.
     season_players = [r for r in pdraw if as_int(r["season"]) == latest
                       and as_int(r["games"]) >= SEASON_DRAW_MIN_GAMES]
     boxes["biggest_draws_season"] = [
         {"personId": r["personId"], "playerName": r["playerName"],
-         "mean_delta": as_float(r["mean_delta"]), "games": as_int(r["games"])}
-        for r in sorted(season_players, key=lambda r: -as_float(r["mean_delta"]))[:FRONTPAGE_ROWS]]
+         "mean_delta": as_float(r["mean_delta"]), "games": as_int(r["games"]),
+         "total_delta": round(as_float(r["mean_delta"]) * as_int(r["games"]), 1)}
+        for r in sorted(season_players, key=lambda r: -as_float(r["mean_delta"]))]
 
     # ---- (3) all-time draw kings — career total & mean delta, min 100 road games.
     # total_delta = sum of per-game deltas across the career (Fix C); default sort
@@ -1372,6 +1450,11 @@ def main():
     records = load_records()
     print(f"Loaded {len(records)} player-arena records")
 
+    global _FRANCHISE
+    _FRANCHISE = load_franchise_map()
+    print(f"franchise map: {len(_FRANCHISE)} era names -> "
+          f"{len(set(_FRANCHISE.values()))} current franchises")
+
     # building slug -> city (for draw city-links and city-level draw aggregation)
     slug_to_city = {slugify(r["building"]): r["city"] for r in records}
 
@@ -1384,6 +1467,16 @@ def main():
     home_away_by_slug = load_home_away()
     city_player_draw, city_team_draw = load_city_draw(slug_to_city)
     season_draw_buildings, season_draw_cities = load_arena_draw_by_season(slug_to_city)
+
+    # Mode (a): merge every ALL-TIME team-draw list onto the current franchise.
+    # Single-season lists (season_draw_*[*]["teams"][<year>]) are left untouched.
+    team_draw_by_slug = {s: merge_team_franchise(rows) for s, rows in team_draw_by_slug.items()}
+    city_team_draw = {c: merge_team_franchise(rows) for c, rows in city_team_draw.items()}
+    for coll in (season_draw_buildings, season_draw_cities):
+        for entry in coll.values():
+            t = entry.get("teams")
+            if t and "all" in t:
+                t["all"] = merge_team_franchise(t["all"])
     season_draw_players = load_player_draw_by_season(slug_to_city)
     city_records = load_city_records()
     season_by_player, season_by_building, season_by_city = load_records_by_season()
