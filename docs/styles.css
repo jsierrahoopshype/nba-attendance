@@ -1,11 +1,12 @@
 /* ==========================================================================
    NBA Arena Records & Attendance Draw — shared stylesheet.
 
-   Structure, component classes and the sortable table.lb pattern are lifted
-   from the sibling nba-polymarket tracker so this reads as the same family of
-   tools; the color tokens are the polymarket light theme, fetched from that
-   repo and mirrored exactly. Tables stay visible and scroll horizontally on
-   mobile (this is a table-heavy tool), rather than collapsing to cards.
+   Structure, component classes, the sortable table.lb pattern, and the mobile
+   card fallback are lifted from the sibling nba-polymarket tracker so this
+   reads as the same family of tools; the color tokens are the polymarket light
+   theme, fetched from that repo and mirrored exactly. Under the 860px
+   breakpoint, table.lb hides and its sortableTable()-generated .cards fallback
+   takes over — same data, one column of cards instead of a wide table.
    ========================================================================== */
 
 :root{
@@ -35,8 +36,6 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 /* header */
 .hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.35rem;flex-wrap:wrap}
 .hdr h1{font-size:1.45rem;font-weight:700;letter-spacing:-.03em}
-.hdr .brand{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-secondary);
-  text-transform:uppercase;letter-spacing:.08em}
 .subtitle{color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem;max-width:62rem}
 
 /* section blocks */
@@ -82,6 +81,26 @@ table.lb td.sub{color:var(--text-secondary)}
 .dash{color:var(--text-secondary)}
 .pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text-secondary);
   border:1px solid var(--border);border-radius:20px;padding:.05rem .5rem;text-transform:capitalize;margin-left:.4rem;vertical-align:middle}
+
+/* mobile card fallback for table.lb — built generically by sortableTable() from
+   the same cols, so every table gets one automatically. Hidden on desktop; swaps
+   in for .table-wrap under the 860px breakpoint (nba-polymarket's pattern). */
+.cards{display:none}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:.8rem .9rem;margin-bottom:.6rem;transition:border-color .12s}
+.card[data-href]{cursor:pointer}
+.card:hover{border-color:var(--accent)}
+.card:last-child{margin-bottom:0}
+.card.no-home{background:rgba(0,0,0,.045)}
+.card-title{font-family:'DM Sans',sans-serif;font-weight:600;font-size:.92rem;color:var(--text);
+  margin-bottom:.55rem;line-height:1.3}
+.card-title a{color:var(--text)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(6.5rem,1fr));gap:.55rem .8rem}
+.card-stat{display:flex;flex-direction:column;gap:.2rem;min-width:0}
+.card-stat .card-lbl{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text-secondary);
+  text-transform:uppercase;letter-spacing:.05em}
+.card-stat .card-val{font-family:'JetBrains Mono',monospace;font-size:.86rem;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* stat cards (detail pages) */
 .stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin-bottom:1.3rem}
@@ -140,21 +159,20 @@ table.lb td.sub{color:var(--text-secondary)}
 /* in-page tab views */
 .view{display:none}.view.active{display:block}
 
-/* ---------- persistent site search (fixed top + bottom, every page) ---------- */
-body.has-site-search{padding-top:3.2rem;padding-bottom:3.2rem}
-.site-search{position:fixed;left:0;right:0;z-index:300;background:var(--surface);
-  border-bottom:1px solid var(--border);padding:.45rem 1rem}
-.site-search.top{top:0}
-.site-search.bottom{bottom:0;border-bottom:none;border-top:1px solid var(--border)}
-.site-search .ss-inner{max-width:1400px;margin:0 auto;position:relative}
-.site-search input{width:100%;padding:.5rem .8rem;font-size:16px;font-family:inherit;
-  border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text)}
+/* ---------- site search (top + bottom of content, normal document flow) ----------
+   Matches nba-polymarket's own pattern: a search box repeated near the top and
+   bottom of the page content, not pinned to the viewport. Previously this used
+   position:fixed at both edges, which permanently ate two chunks of vertical
+   space on every page — worst on phones, where that's a third of the viewport. */
+.site-search{max-width:1400px;margin:0 auto 1.1rem;padding:0 1.5rem}
+.site-search.bottom{margin:1.6rem auto 0}
+.site-search .ss-inner{position:relative}
+.site-search input{width:100%;padding:.6rem .9rem;font-size:16px;font-family:inherit;
+  border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
 .site-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-.site-search .gsearch-results{position:absolute;left:0;right:0;background:var(--surface);
+.site-search .gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.25rem;background:var(--surface);
   border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
-  max-height:20rem;overflow-y:auto;z-index:310;display:none}
-.site-search.top .gsearch-results{top:100%;margin-top:.25rem}
-.site-search.bottom .gsearch-results{bottom:100%;margin-bottom:.25rem}
+  max-height:20rem;overflow-y:auto;z-index:200;display:none}
 .site-search .gsearch-results.open{display:block}
 .gs-item .gs-type{font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;
   letter-spacing:.05em;color:var(--accent);border:1px solid var(--border);border-radius:20px;
@@ -209,13 +227,27 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
 
 @media(max-width:860px){
   .container{padding:1rem 1rem 3rem}
-  .hdr h1{font-size:1.2rem}.hdr .brand{display:none}
+  .site-search{padding:0 1rem}
+  .hdr h1{font-size:1.2rem}
   .stat-cards{grid-template-columns:1fr 1fr;gap:.6rem}
   .stat-card .num{font-size:1.15rem}
   .ehead h1{font-size:1.3rem}
   table.lb thead th{position:static}
   .fp-grid{grid-template-columns:1fr}
+  /* mobile card fallback: same data as table.lb, one column of cards instead
+     of a wide table that would otherwise need horizontal scrolling. */
+  .table-wrap{display:none}
+  .cards{display:block}
+  /* controls row: each field takes the full width and stacks, instead of
+     shrinking inputs/selects/toggles down to an unreadable sliver. */
+  .controls{gap:.7rem}
+  .controls .field{width:100%}
+  .controls .field.grow{flex-basis:100%}
+  .controls .field .toggle{width:100%}
+  .controls .field .toggle button{flex:1}
+  .season-field .season-select{width:100%;min-width:0}
 }
 @media(max-width:520px){
   .stat-cards{grid-template-columns:1fr 1fr}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))}
 }
