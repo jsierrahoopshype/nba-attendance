@@ -37,7 +37,6 @@ DATA_DIR = os.path.join(HERE, "docs", "data")
 RECORDS_CSV = os.path.join(OUTPUT_DIR, "player_arena_records_2007.csv")
 TEAM_BUILDING_CSV = os.path.join(OUTPUT_DIR, "team_building_records.csv")
 ARENA_BASELINES_CSV = os.path.join(OUTPUT_DIR, "arena_baselines.csv")
-CITY_RECORDS_CSV = os.path.join(OUTPUT_DIR, "city_records.csv")
 RECORDS_BY_SEASON_CSV = os.path.join(OUTPUT_DIR, "player_arena_records_by_season.csv")
 ALLSTAR_CSV = os.path.join(OUTPUT_DIR, "allstar_players.csv")
 PLAYER_ARENA_DRAW_CSV = os.path.join(OUTPUT_DIR, "player_arena_draw.csv")
@@ -707,29 +706,58 @@ def load_records_by_season():
     return dict(by_player), dict(by_building), dict(by_city)
 
 
-def load_city_records():
-    """City-level player records (mirrors load_records but keyed by city)."""
-    records = []
-    if not os.path.exists(CITY_RECORDS_CSV):
-        return records
-    for r in read_csv(CITY_RECORDS_CSV):
-        records.append({
-            "personId": r["personId"],
-            "playerName": r["playerName"],
-            "city": r["city"],
-            "slug": slugify(r["city"]),
-            "gameType": r["gameType"],
-            "games": as_int(r["games"]),
-            "wins": as_int(r["wins"]),
-            "losses": as_int(r["losses"]),
-            "win_pct": as_float(r["win_pct"]),
-            "total_points": as_int(r["total_points"]),
-            "ppg": as_float(r["ppg"]),
-            "career_high": as_int(r["career_high"]),
-            "first_season": as_int(r["first_season"]),
-            "last_season": as_int(r["last_season"]),
+def city_records_from(records):
+    """City-level player records, aggregated in-process from `records` — the
+    already-loaded, proven-correct player_arena_records_2007.csv rows — grouped
+    by (personId, city, gameType). Mirrors build_city_records.py's aggregation
+    exactly, but computed live against whatever `records` the generator just
+    loaded instead of read from the separately-built output/city_records.csv.
+
+    That separate build step is exactly the staleness trap that under-reported
+    city cards: city_records.csv only reflects player_arena_records_2007.csv as
+    of whenever build_city_records.py last ran, so regenerating the 1980-2026
+    extension into player_arena_records_2007.csv without rerunning
+    build_city_records.py silently left city cards on the old, pre-extension
+    numbers (e.g. Dallas/Dirk Nowitzki missing Reunion Arena entirely). Deriving
+    city_records here removes that intermediate — and the possibility of it
+    going stale — altogether."""
+    agg = defaultdict(lambda: {
+        "games": 0, "wins": 0, "losses": 0, "total_points": 0,
+        "career_high": 0, "first_season": 9999, "last_season": 0, "playerName": "",
+    })
+    for r in records:
+        city = r["city"]
+        if not city:
+            continue
+        a = agg[(r["personId"], city, r["gameType"])]
+        a["games"] += r["games"]
+        a["wins"] += r["wins"]
+        a["losses"] += r["losses"]
+        a["total_points"] += r["total_points"]
+        a["career_high"] = max(a["career_high"], r["career_high"])
+        a["first_season"] = min(a["first_season"], r["first_season"])
+        a["last_season"] = max(a["last_season"], r["last_season"])
+        a["playerName"] = r["playerName"]
+    out = []
+    for (pid, city, gtype), a in agg.items():
+        g = a["games"]
+        out.append({
+            "personId": pid,
+            "playerName": a["playerName"],
+            "city": city,
+            "slug": slugify(city),
+            "gameType": gtype,
+            "games": g,
+            "wins": a["wins"],
+            "losses": a["losses"],
+            "win_pct": round(a["wins"] / g, 3) if g else 0.0,
+            "total_points": a["total_points"],
+            "ppg": round(a["total_points"] / g, 1) if g else 0.0,
+            "career_high": a["career_high"],
+            "first_season": a["first_season"],
+            "last_season": a["last_season"],
         })
-    return records
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -787,22 +815,29 @@ def record_public(rec):
     }
 
 
-def load_baseline_avgs():
+def load_baseline_avgs(group_of=None):
     """Games-weighted mean attendance per arena across its baseline rows
-    (all baseline rows are 2026 in the current data)."""
+    (all baseline rows are 2026 in the current data). `group_of`, if given,
+    remaps each arenaName to a different key (e.g. its city) before
+    aggregating — so the same proven-correct source drives both the
+    building-level and city-level cards, never a separately-built rollup."""
     sums = defaultdict(lambda: {"wsum": 0.0, "games": 0})
     for r in read_csv(ARENA_BASELINES_CSV):
         g = as_int(r["games_with_attendance"]) or as_int(r["games"])
-        s = sums[r["arenaName"]]
+        key = group_of(r["arenaName"]) if group_of else r["arenaName"]
+        if not key:
+            continue
+        s = sums[key]
         s["wsum"] += as_float(r["mean_attendance"]) * g
         s["games"] += g
     return {a: (v["wsum"] / v["games"]) for a, v in sums.items() if v["games"]}
 
 
-def load_avg_attendance_all():
-    """Games-weighted mean attendance per building across every season/gameType
-    that carries attendance (arena_baselines_all.csv), with the covered season
-    range. Empty when the all-seasons baselines file is absent."""
+def load_avg_attendance_all(group_of=None):
+    """Games-weighted mean attendance per building (or, with `group_of`, per
+    some other key such as city) across every season/gameType that carries
+    attendance (arena_baselines_all.csv), with the covered season range.
+    Empty when the all-seasons baselines file is absent."""
     if not os.path.exists(ARENA_BASELINES_ALL_CSV):
         return {}
     agg = defaultdict(lambda: {"wsum": 0.0, "games": 0, "lo": 9999, "hi": 0})
@@ -810,7 +845,10 @@ def load_avg_attendance_all():
         g = as_int(r["games_with_attendance"]) or as_int(r["games"])
         if not g:
             continue
-        a = agg[r["building"]]
+        key = group_of(r["building"]) if group_of else r["building"]
+        if not key:
+            continue
+        a = agg[key]
         s = as_int(r["season"])
         a["wsum"] += as_float(r["mean_attendance"]) * g
         a["games"] += g
@@ -821,15 +859,19 @@ def load_avg_attendance_all():
             for b, a in agg.items() if a["games"]}
 
 
-def load_biggest_draw():
-    """Per building: the visiting team with the highest games-weighted mean LOO
-    delta across all covered seasons (min games). LOO deltas sum to zero per
-    group, so this is a max, never an average-of-all stat."""
+def load_biggest_draw(group_of=None):
+    """Per building (or, with `group_of`, per some other key such as city): the
+    visiting team with the highest games-weighted mean LOO delta across all
+    covered seasons (min games). LOO deltas sum to zero per group, so this is
+    a max, never an average-of-all stat."""
     if not os.path.exists(TEAM_ARENA_DRAW_BY_SEASON_CSV):
         return {}
     agg = defaultdict(lambda: defaultdict(lambda: {"wsum": 0.0, "games": 0, "team": ""}))
     for r in read_csv(TEAM_ARENA_DRAW_BY_SEASON_CSV):
-        a = agg[r["building"]][r["teamId"]]
+        key = group_of(r["building"]) if group_of else r["building"]
+        if not key:
+            continue
+        a = agg[key][r["teamId"]]
         g = as_int(r["games"])
         a["wsum"] += as_float(r["mean_delta"]) * g
         a["games"] += g
@@ -897,16 +939,18 @@ def load_sellout(data_dir):
     return dict(out)
 
 
-def load_winningest_teams(regular_only=True):
-    """Per building: the team with the best win_pct (min games). Scoped to
-    Regular Season by default so the overview card matches the default
-    leaderboard view."""
+def load_winningest_teams(regular_only=True, group_field="building"):
+    """Per building (group_field="building") or per city (group_field="city" —
+    team_building_records.csv carries both columns on every row, so no separate
+    building->city map is needed): the team with the best win_pct (min games).
+    Scoped to Regular Season by default so the overview card matches the
+    default leaderboard view."""
     agg = defaultdict(lambda: defaultdict(lambda: {"games": 0, "wins": 0}))
     label = {}
     for r in read_csv(TEAM_BUILDING_CSV):
         if regular_only and r["gameType"] != "Regular Season":
             continue
-        b = r["building"]
+        b = r[group_field]
         tid = r["teamId"]
         a = agg[b][tid]
         a["games"] += as_int(r["games"])
@@ -1164,7 +1208,11 @@ def city_record_public(rec):
 def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
                  season_by_city=None, city_player_draw=None, city_team_draw=None,
                  season_draw_cities=None, city_range=None):
-    """Write docs/data/cities/{index,overview,slug}.json from city_records.csv.
+    """Write docs/data/cities/{index,overview,slug}.json.
+
+    city_records is built by city_records_from(records) — aggregated live from
+    the same player_arena_records_2007.csv rows the building pages use, never
+    from a separately-built rollup that could go stale.
 
     buildings_by_city[city] -> sorted list of {name, slug} buildings in the city,
     so a city page can link out to its arenas."""
@@ -1178,6 +1226,12 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
     by_city = {}
     for rec in city_records:
         by_city.setdefault(rec["city"], []).append(rec)
+
+    # building -> city, for grouping the building-keyed source tables
+    # (arena_baselines*.csv, team_arena_draw_by_season.csv, team_building_records.csv
+    # already carries its own city column, see load_winningest_teams below) up to
+    # city level — the same trusted sources the arena cards use, never a cache.
+    bld_city = {b["name"]: city for city, blds in buildings_by_city.items() for b in blds}
 
     # Season range from the game-derived building-level span (1980-2026 via
     # arena_resolver), falling back to the player-record span (Fix F). This is why
@@ -1201,13 +1255,23 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
         })
     write_json(os.path.join(DATA_DIR, "cities", "index.json"), index)
 
+    # overview cards — same methodology and sources as the arena overview cards
+    # in build_buildings(): Regular-Season-scoped (so the card matches the
+    # default leaderboard view below it), summed/maxed directly from the
+    # already-loaded, proven-correct tables, grouped by city instead of building.
+    baseline_avgs = load_baseline_avgs(group_of=lambda b: bld_city.get(b))
+    avg_att_all = load_avg_attendance_all(group_of=lambda b: bld_city.get(b))
+    winning_teams = load_winningest_teams(regular_only=True, group_field="city")
+    biggest_draw = load_biggest_draw(group_of=lambda b: bld_city.get(b))
+
     overview = []
     for name in sorted(by_city):
         recs = by_city[name]
+        regular = [r for r in recs if r["gameType"] == "Regular Season"]
         pts = defaultdict(int)
         wl = defaultdict(lambda: {"games": 0, "wins": 0})
         pname = {}
-        for r in recs:
+        for r in regular:
             pts[r["personId"]] += r["total_points"]
             w = wl[r["personId"]]
             w["games"] += r["games"]
@@ -1229,6 +1293,17 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
                               "win_pct": round(wp, 3), "games": w["games"]})
         if cand:
             winningest_player = cand[1]
+
+        aa = avg_att_all.get(name)
+        if aa:
+            avg_attendance = aa["avg"]
+            avg_label = (str(aa["first_season"]) if aa["first_season"] == aa["last_season"]
+                         else f'{aa["first_season"]}–{aa["last_season"]}')
+        else:
+            av = baseline_avgs.get(name)
+            avg_attendance = round(av, 1) if av is not None else None
+            avg_label = BASELINE_SEASON_LABEL
+
         overview.append({
             "slug": slugify(name),
             "name": name,
@@ -1236,8 +1311,13 @@ def build_cities(city_records, city_games, allstar_ids, buildings_by_city,
             "total_games": city_games.get(name, 0),
             "first_season": span(name, recs)[0],
             "last_season": span(name, recs)[1],
+            "card_scope": "Regular Season",
             "top_scorer": top_scorer,
             "winningest_player": winningest_player,
+            "winningest_team": winning_teams.get(name),
+            "avg_attendance": avg_attendance,
+            "avg_attendance_label": avg_label,
+            "biggest_draw": biggest_draw.get(name),
         })
     write_json(os.path.join(DATA_DIR, "cities", "overview.json"), overview)
 
@@ -1478,7 +1558,7 @@ def main():
             if t and "all" in t:
                 t["all"] = merge_team_franchise(t["all"])
     season_draw_players = load_player_draw_by_season(slug_to_city)
-    city_records = load_city_records()
+    city_records = city_records_from(records)
     season_by_player, season_by_building, season_by_city = load_records_by_season()
     sellout_by_building = load_sellout(args.data_dir)
     if season_draw_buildings:
