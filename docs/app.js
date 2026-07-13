@@ -31,7 +31,11 @@ const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").r
 /* ---------- sortable table ----------
    cols: [{key, label, align:'left'|'right', sortable:bool, defaultDir:'asc'|'desc',
            get(row) -> sort value (number or string), cell(row) -> html, tdcls(row)}]
-   Every column is sortable unless sortable:false. */
+   Every column is sortable unless sortable:false.
+   opts.ranked: prepend a rank column (table) / rank badge (card) reflecting
+   the row's position in the current sort — for simple ranked lists (frontpage
+   boxes, "Most Points"-style mini leaderboards), not detailed multi-column
+   tables where sort order isn't "the" ranking. */
 function sortableTable(mount, cols, rows, initial, opts) {
   opts = opts || {};
   let sort = initial || firstSortable(cols);
@@ -54,18 +58,20 @@ function sortableTable(mount, cols, rows, initial, opts) {
         return sort.dir === "desc" ? (y - x) : (x - y);
       });
     }
-    const head = cols.map(c => {
+    const rankHead = opts.ranked ? '<th class="rank"></th>' : "";
+    const head = rankHead + cols.map(c => {
       const left = c.align === "left" ? " left" : "";
       if (c.sortable === false) return '<th class="' + left.trim() + '">' + esc(c.label) + "</th>";
       const sb = sort.key === c.key ? " sorted-by" : "";
       const arrow = sort.key === c.key ? '<span class="arr">' + (sort.dir === "desc" ? "▼" : "▲") + "</span>" : "";
       return '<th class="sortable' + left + sb + '" data-k="' + esc(c.key) + '">' + esc(c.label) + arrow + "</th>";
     }).join("");
-    const body = arr.map(row => {
+    const body = arr.map((row, i) => {
       const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
       const rc = opts.rowClass ? opts.rowClass(row) : "";
       const rowCls = rc ? ' class="' + esc(rc) + '"' : "";
-      const tds = cols.map(c => {
+      const rankCell = opts.ranked ? '<td class="rank">' + (i + 1) + "</td>" : "";
+      const tds = rankCell + cols.map(c => {
         const cls = [];
         if (c.align === "left") cls.push("name");
         if (c.tdcls) { const x = c.tdcls(row); if (x) cls.push(x); }
@@ -96,23 +102,45 @@ function sortableTable(mount, cols, rows, initial, opts) {
    separate markup to maintain. Hidden on desktop, shown in place of
    .table-wrap under the 860px breakpoint (see styles.css). The first
    left-aligned column becomes the card title; the rest render as label:value
-   pairs in row order, so every table gets a matching card automatically. */
+   pairs in row order, so every table gets a matching card automatically.
+   Names/values wrap instead of truncating (styles.css) so nothing is lost.
+   opts.ranked adds a rank badge before the title (see sortableTable above).
+   opts.alwaysVisible renders the ".cards.always" variant — a responsive
+   multi-column grid shown at every width, not just under the mobile
+   breakpoint (used for the "you might also like" related-entity footers,
+   which are cards-only, with no companion desktop table). */
 function cardsHtml(cols, rows, opts) {
+  opts = opts || {};
   if (!rows.length) return "";
   const titleCol = cols.find(c => c.align === "left") || cols[0];
   const restCols = cols.filter(c => c !== titleCol);
-  const items = rows.map(row => {
+  const items = rows.map((row, i) => {
     const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
     const rc = opts.rowClass ? opts.rowClass(row) : "";
     const rowCls = rc ? " " + esc(rc) : "";
+    const rankBadge = opts.ranked ? '<span class="card-rank">' + (i + 1) + "</span>" : "";
     const stats = restCols.map(c =>
       '<div class="card-stat"><span class="card-lbl">' + esc(c.label) + '</span>' +
       '<span class="card-val">' + c.cell(row) + "</span></div>").join("");
     return '<div class="card' + rowCls + '"' + href + '>' +
-      '<div class="card-title">' + titleCol.cell(row) + "</div>" +
+      '<div class="card-title">' + rankBadge + titleCol.cell(row) + "</div>" +
       '<div class="card-grid">' + stats + "</div></div>";
   }).join("");
-  return '<div class="cards">' + items + "</div>";
+  const cls = "cards" + (opts.ranked ? " ranked" : "") + (opts.alwaysVisible ? " always" : "");
+  return '<div class="' + cls + '">' + items + "</div>";
+}
+
+/* ---------- "you might also like" related-entity footer ----------
+   Always-visible cards (opts.alwaysVisible), reusing the exact same .card
+   component the mobile table fallback uses, so names wrap instead of
+   truncating here too. Each page supplies its own cols/rows — the ranking
+   rule (same-city-first for arenas, games-hosted for cities, All-Star-first
+   for players) lives on the page, this just renders the result. */
+function renderRelated(mount, heading, cols, rows) {
+  if (!rows || !rows.length) { mount.innerHTML = ""; return; }
+  mount.innerHTML = "<div class='section-title'>" + esc(heading) + "</div>" +
+    cardsHtml(cols, rows, { alwaysVisible: true });
+  wireRowNav(mount);
 }
 
 /* whole-row navigation (ignore clicks that landed on a real link). Covers both
