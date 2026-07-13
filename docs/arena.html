@@ -25,6 +25,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
+  <div class="block" id="related"></div>
   <div class="foot" id="foot">Leaderboards · minimum 15 games for the win% board.</div>
 </div>
 
@@ -82,6 +83,7 @@ async function boot() {
     " seasons · minimum 15 games for the win% board.";
   await loadAllstar();
   renderCards();
+  renderRelatedArenas();
   document.getElementById("controls").style.display = "";
   makeSeasonPicker(document.getElementById("controls"), building.records_by_season, s => { season = s; render(); }, building.draw_seasons);
   makeAllstarToggle(document.getElementById("controls"), render);
@@ -112,35 +114,65 @@ function currentView(gtLabel) {
 
 function renderCards() {
   const o = (over || []).find(x => x.slug === building.slug);
-  const card = (lbl, num, sub) =>
-    '<div class="stat-card"><div class="lbl">' + lbl + '</div><div class="num">' + num + "</div>" +
+  // The scope ("Regular Season", "all-time", a season) renders on its own
+  // line (.lbl-scope) instead of being concatenated onto the label — on a
+  // narrow 2-column card "TOP SCORER · REGULAR SEASON" has no clean break
+  // point and wraps mid-word; split, each line is short enough to fit alone.
+  const card = (lbl, num, sub, scope) =>
+    '<div class="stat-card"><div class="lbl">' + lbl +
+    (scope ? '<span class="lbl-scope">' + scope + "</span>" : "") + '</div><div class="num">' + num + "</div>" +
     (sub ? '<div class="sub">' + sub + "</div>" : "") + "</div>";
   let html = "";
   if (o) {
     const scope = esc(o.card_scope || "Regular Season");
-    html += card("Top Scorer · " + scope,
+    html += card("Top Scorer",
       o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
-      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
-    html += card("Winningest Player · " + scope,
+      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "", scope);
+    html += card("Winningest Player",
       o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
-      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
-    html += card("Winningest Team · " + scope,
+      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "", scope);
+    html += card("Winningest Team",
       o.winningest_team ? esc(o.winningest_team.team) : "—",
-      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
+      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "", scope);
     html += card("Avg Attendance",
       o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
       esc(o.avg_attendance_label || ""));
     if (o.biggest_draw) {
-      html += card("Biggest Draw · all-time",
+      html += card("Biggest Draw",
         esc(o.biggest_draw.team),
-        signed(o.biggest_draw.mean_delta) + " extra fans/game · " + o.biggest_draw.games + " g (min 15)");
+        signed(o.biggest_draw.mean_delta) + " extra fans/game · " + o.biggest_draw.games + " g (min 15)", "all-time");
     }
     if (o.sellout) {
-      html += card("Sellout Rate · " + seasonLabel(o.sellout.season),
-        pct(o.sellout.pct), "within 0.5% of capacity · " + o.sellout.games + " g");
+      html += card("Sellout Rate",
+        pct(o.sellout.pct), "within 0.5% of capacity · " + o.sellout.games + " g", seasonLabel(o.sellout.season));
     }
   }
   document.getElementById("cards").innerHTML = html ? '<div class="stat-cards">' + html + "</div>" : "";
+}
+
+/* "You might also like" — other arenas, same city first, then by games hosted.
+   Sourced client-side from buildings/index.json (already fetched sitewide for
+   the overview table); city_slug isn't on that index, so it's derived with
+   the same slugify() the generator uses — no new field needed. */
+async function renderRelatedArenas() {
+  const mount = document.getElementById("related");
+  let idx;
+  try { idx = await getJSON(DATA + "/buildings/index.json"); }
+  catch (e) { return; }
+  const others = idx.filter(b => b.slug !== building.slug);
+  const sameCity = others.filter(b => b.city === building.city)
+    .sort((a, b) => b.total_games - a.total_games);
+  const rest = others.filter(b => b.city !== building.city)
+    .sort((a, b) => b.total_games - a.total_games);
+  const picks = [...sameCity, ...rest].slice(0, 6)
+    .map(b => ({ ...b, _href: arenaHref(b.slug) }));
+  const cols = [
+    { key: "name", label: "Arena", align: "left", get: r => r.name, cell: r => arenaLink(r.slug, r.name) },
+    { key: "city", label: "City", align: "left", get: r => r.city,
+      cell: r => cityLink(slugify(r.city), r.city) },
+    { key: "total_games", label: "Games", get: r => r.total_games, cell: r => fmtInt(r.total_games) + " hosted" },
+  ];
+  renderRelated(mount, "You might also like", cols, picks);
 }
 
 const LB_DEFS = [
@@ -180,7 +212,7 @@ function render() {
       { key: def.key, label: def.col, defaultDir: "desc", get: def.sort, cell: def.val },
     ];
     // drop the placeholder rank col (kept simple: index handled by sort order)
-    sortableTable(tm, cols.slice(1), rows, { key: def.key, dir: "desc" }, { rowClass: noHomeClass });
+    sortableTable(tm, cols.slice(1), rows, { key: def.key, dir: "desc" }, { rowClass: noHomeClass, ranked: true });
     wireRowNav(tm);
   });
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +

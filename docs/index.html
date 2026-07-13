@@ -365,7 +365,8 @@ function fillBox(box, tm) {
     _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId) : null) }));
   tm.innerHTML = "";
   if (rows.length) {
-    sortableTable(tm, box.cols, rows, box.initial || { key: box.cols[box.cols.length - 1].key, dir: "desc" });
+    sortableTable(tm, box.cols, rows, box.initial || { key: box.cols[box.cols.length - 1].key, dir: "desc" },
+      { ranked: true });
     wireRowNav(tm);
   } else {
     tm.innerHTML = '<div class="empty">No data yet.</div>';

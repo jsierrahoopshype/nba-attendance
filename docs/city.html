@@ -26,6 +26,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
+  <div class="block" id="related"></div>
   <div class="foot" id="foot">Every arena in the city is combined · minimum 15 games for the win% board.</div>
 </div>
 
@@ -75,6 +76,7 @@ async function boot() {
     seasons(city.first_season, city.last_season) + " seasons · minimum 15 games for the win% board.";
   await loadAllstar();
   renderCards();
+  renderRelatedCities();
   document.getElementById("controls").style.display = "";
   makeSeasonPicker(document.getElementById("controls"), city.records_by_season, s => { season = s; render(); }, city.draw_seasons);
   makeAllstarToggle(document.getElementById("controls"), render);
@@ -120,6 +122,25 @@ function renderCards() {
   document.getElementById("cards").innerHTML = html ? '<div class="stat-cards">' + html + "</div>" : "";
 }
 
+/* "You might also like" — other cities ranked by games hosted, from the
+   already-existing cities/index.json (fetched sitewide for the overview tab). */
+async function renderRelatedCities() {
+  const mount = document.getElementById("related");
+  let idx;
+  try { idx = await getJSON(DATA + "/cities/index.json"); }
+  catch (e) { return; }
+  const picks = idx.filter(c => c.slug !== city.slug)
+    .sort((a, b) => b.total_games - a.total_games)
+    .slice(0, 6)
+    .map(c => ({ ...c, _href: cityHref(c.slug) }));
+  const cols = [
+    { key: "name", label: "City", align: "left", get: r => r.name, cell: r => cityLink(r.slug, r.name) },
+    { key: "arenas", label: "Arenas", get: r => (r.buildings || []).length, cell: r => fmtInt((r.buildings || []).length) },
+    { key: "total_games", label: "Games", get: r => r.total_games, cell: r => fmtInt(r.total_games) + " hosted" },
+  ];
+  renderRelated(mount, "You might also like", cols, picks);
+}
+
 const LB_DEFS = [
   { key: "total_points", title: "Most Points", cap: "total points here", col: "Pts", val: r => fmtInt(r.total_points), sort: r => r.total_points },
   { key: "wins", title: "Most Wins", cap: "games won", col: "W", val: r => fmtInt(r.wins), sort: r => r.wins },
@@ -155,7 +176,7 @@ function render() {
       { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
       { key: def.key, label: def.col, defaultDir: "desc", get: def.sort, cell: def.val },
     ];
-    sortableTable(tm, cols, rows, { key: def.key, dir: "desc" });
+    sortableTable(tm, cols, rows, { key: def.key, dir: "desc" }, { ranked: true });
     wireRowNav(tm);
   });
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +

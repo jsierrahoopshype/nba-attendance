@@ -24,6 +24,7 @@
     </div>
   </div>
   <div id="result"><div class="loading">Loading…</div></div>
+  <div class="block" id="related"></div>
   <div class="foot" id="foot">One row per building where the player logged minutes.</div>
 </div>
 
@@ -31,6 +32,31 @@
 <script>
 "use strict";
 let player = null, gt = "Regular Season", season = null;
+
+/* "You might also like" — other players, All-Stars first (for quality),
+   falling back to a broader sample (ranked by career games, so the fallback
+   favors recognizable players over one-game call-ups) if fewer than 6
+   All-Stars remain. Sourced client-side from players/index.json + the
+   already-shared allstar.json (loadAllstar()/isAllstar()). */
+async function renderRelatedPlayers() {
+  const mount = document.getElementById("related");
+  let idx;
+  try { idx = await getJSON(DATA + "/players/index.json"); }
+  catch (e) { return; }
+  await loadAllstar();
+  const others = idx.filter(p => String(p.personId) !== String(player.personId));
+  const allStars = others.filter(p => isAllstar(p.personId)).sort((a, b) => b.games - a.games);
+  const rest = others.filter(p => !isAllstar(p.personId)).sort((a, b) => b.games - a.games);
+  const picks = [...allStars, ...rest].slice(0, 6)
+    .map(p => ({ ...p, _href: playerHref(p.personId) }));
+  const cols = [
+    { key: "name", label: "Player", align: "left", get: r => r.name,
+      cell: r => (isAllstar(r.personId) ? '<span title="All-Star">★</span> ' : "") + playerLink(r.personId, r.name) },
+    { key: "buildings", label: "Buildings", get: r => r.buildings, cell: r => fmtInt(r.buildings) },
+    { key: "games", label: "Games", get: r => r.games, cell: r => fmtInt(r.games) },
+  ];
+  renderRelated(mount, "You might also like", cols, picks);
+}
 
 async function boot() {
   const id = qp("id");
@@ -50,6 +76,7 @@ async function boot() {
     "Records span the " + seasons(fs, ls) + " seasons · one row per building where the player logged minutes.";
   document.getElementById("controls").style.display = "";
   makeSeasonPicker(document.getElementById("controls"), player.records_by_season, s => { season = s; render(); }, player.draw_seasons);
+  renderRelatedPlayers();
 
   document.querySelectorAll("#gtToggle button").forEach(b =>
     b.addEventListener("click", () => {
