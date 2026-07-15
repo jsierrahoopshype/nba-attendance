@@ -95,11 +95,16 @@ function render() {
         .map(r => ({ ...r, first_season: r.season, last_season: r.season }));
   const mount = document.getElementById("result");
   mount.innerHTML = "";
+
+  // Attendance draw (by arena, then by city) leads the page, ahead of the
+  // win/loss/scoring records table below.
+  renderArenaDraw(mount);
+
   const h = document.createElement("div");
   h.className = "section-title";
   h.innerHTML = "Record at every building <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + esc(gt) + " · " + esc(seasonScope) + "</span>";
   mount.appendChild(h);
-  if (!recs.length) { mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + esc(gt) + " games on record for " + esc(seasonScope) + ".</div>"); renderArenaDraw(mount); return; }
+  if (!recs.length) { mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + esc(gt) + " games on record for " + esc(seasonScope) + ".</div>"); return; }
 
   const tableMount = document.createElement("div");
   mount.appendChild(tableMount);
@@ -120,8 +125,6 @@ function render() {
   ];
   sortableTable(tableMount, cols, rows, { key: "games", dir: "desc" });
   wireRowNav(tableMount);
-
-  renderArenaDraw(mount);
 }
 
 /* This player's road-attendance draw at each arena. Follows the season selector:
