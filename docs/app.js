@@ -136,8 +136,22 @@ function cardsHtml(cols, rows, opts) {
    right-aligned — one line per row (two if a long name wraps), instead of a
    bordered block per row with the field label repeated every time. Field
    meaning is established ONCE via a slim uppercase header row, matching
-   nba-polymarket's own micro-label sizing (.6rem) measured at 390px. */
+   nba-polymarket's own micro-label sizing (.6rem) measured at 390px.
+
+   Lists shaped like games/mean_delta/total_delta (all-time draw kings, and
+   any other ranked list built from the same per-game+total metric pair) skip
+   the header row entirely: at mobile width a long name already wraps the row
+   to 2 lines, which puts the header's column positions out of sync with the
+   values under it. Instead each row self-labels on its own second line —
+   "+255,027 total extra fans (+498/g · 512 g)" — the same inline pattern the
+   arena stat-card sub-line already uses ("62.5% · 16 g · Regular Season"), so
+   no column-to-value correspondence needs to survive a wrap. */
 function rankedRowsHtml(titleCol, restCols, rows, opts) {
+  const gCol = restCols.find(c => c.key === "games");
+  const meanCol = restCols.find(c => c.key === "mean_delta");
+  const totalCol = restCols.find(c => c.key === "total_delta");
+  if (meanCol && totalCol && restCols.length <= 3) return selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts);
+
   const headVals = restCols.map(c => '<span class="rval">' + esc(c.label) + "</span>").join("");
   const head = '<div class="rrow rrow-head"><span class="rrank"></span><span class="rname"></span>' +
     '<span class="rvals">' + headVals + "</span></div>";
@@ -152,6 +166,22 @@ function rankedRowsHtml(titleCol, restCols, rows, opts) {
       '<span class="rvals">' + vals + "</span></div>";
   }).join("");
   return '<div class="cards rlist">' + head + items + "</div>";
+}
+
+function selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts) {
+  const totalLabel = esc((totalCol.label || "total").toLowerCase());
+  const items = rows.map((row, i) => {
+    const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
+    const rc = opts.rowClass ? opts.rowClass(row) : "";
+    const rowCls = rc ? " " + esc(rc) : "";
+    const secondary = [meanCol.cell(row) + "/g", gCol ? gCol.cell(row) + " g" : ""].filter(Boolean).join(" · ");
+    return '<div class="rrow rrow-self' + rowCls + '"' + href + '>' +
+      '<div class="rrow-top"><span class="rrank">' + (i + 1) + '</span>' +
+      '<span class="rname">' + titleCol.cell(row) + "</span></div>" +
+      '<div class="rrow-meta">' + totalCol.cell(row) + " " + totalLabel +
+      ' <span class="rsecondary">(' + secondary + ")</span></div></div>";
+  }).join("");
+  return '<div class="cards rlist">' + items + "</div>";
 }
 
 /* ---------- "you might also like" related-entity footer ----------

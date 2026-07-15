@@ -125,16 +125,18 @@ function renderCards() {
   };
   let html = "";
   if (o) {
-    const scope = esc(o.card_scope || "Regular Season");
+    // The "Regular Season"/"Playoffs" scope is NOT folded into these three
+    // cards' sub-lines — the Game Type toggle directly below the grid already
+    // states it, so repeating it on every card is pure redundancy.
     html += card("Top Scorer",
       o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
-      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "", scope);
+      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
     html += card("Winningest Player",
       o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
-      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "", scope);
+      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
     html += card("Winningest Team",
       o.winningest_team ? esc(o.winningest_team.team) : "—",
-      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "", scope);
+      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
     html += card("Avg Attendance",
       o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
       esc(o.avg_attendance_label || ""));

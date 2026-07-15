@@ -153,6 +153,18 @@ table.lb thead th.rank{width:2.2rem}
 .rrow-head .rval{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;
   letter-spacing:.05em;font-weight:600}
 
+/* self-labeling rows (games/mean_delta/total_delta lists, e.g. all-time draw
+   kings): no header row, so each row is a genuine 2-line stack instead of a
+   single flex line — rank+name on top, then a plain-language second line
+   ("+255,027 total extra fans (+498/g · 512 g)") that carries its own label,
+   the same inline pattern the arena stat-card sub-line already uses. */
+.rrow-self{display:block}
+.rrow-top{display:flex;align-items:baseline;gap:.6rem}
+.rrow-top .rname{min-width:0}
+.rrow-meta{margin-top:.2rem;padding-left:1.9rem;font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;color:var(--text);overflow-wrap:break-word}
+.rsecondary{color:var(--text-secondary);font-size:.72rem;font-weight:500}
+
 /* stat cards (detail pages) — each is a genuinely distinct stat type, so these
    keep their own labeled card, but sized to read as a compact stat card, not
    a page heading: value size, label size and padding match nba-polymarket's
