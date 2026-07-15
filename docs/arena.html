@@ -114,26 +114,29 @@ function currentView(gtLabel) {
 
 function renderCards() {
   const o = (over || []).find(x => x.slug === building.slug);
-  // The scope ("Regular Season", "all-time", a season) renders on its own
-  // line (.lbl-scope) instead of being concatenated onto the label — on a
-  // narrow 2-column card "TOP SCORER · REGULAR SEASON" has no clean break
-  // point and wraps mid-word; split, each line is short enough to fit alone.
-  const card = (lbl, num, sub, scope) =>
-    '<div class="stat-card"><div class="lbl">' + lbl +
-    (scope ? '<span class="lbl-scope">' + scope + "</span>" : "") + '</div><div class="num">' + num + "</div>" +
-    (sub ? '<div class="sub">' + sub + "</div>" : "") + "</div>";
+  // The scope ("Regular Season", "all-time", a season) folds into the .sub
+  // line instead of being concatenated onto the label — "TOP SCORER ·
+  // REGULAR SEASON" has no clean break point on a narrow card and wraps
+  // mid-word; .sub is plain text that already wraps at word boundaries.
+  const card = (lbl, num, sub, scope) => {
+    const subText = scope ? (sub ? sub + " · " + scope : scope) : sub;
+    return '<div class="stat-card"><div class="lbl">' + lbl + '</div><div class="num">' + num + "</div>" +
+      (subText ? '<div class="sub">' + subText + "</div>" : "") + "</div>";
+  };
   let html = "";
   if (o) {
-    const scope = esc(o.card_scope || "Regular Season");
+    // The "Regular Season"/"Playoffs" scope is NOT folded into these three
+    // cards' sub-lines — the Game Type toggle directly below the grid already
+    // states it, so repeating it on every card is pure redundancy.
     html += card("Top Scorer",
       o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
-      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "", scope);
+      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
     html += card("Winningest Player",
       o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
-      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "", scope);
+      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
     html += card("Winningest Team",
       o.winningest_team ? esc(o.winningest_team.team) : "—",
-      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "", scope);
+      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
     html += card("Avg Attendance",
       o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
       esc(o.avg_attendance_label || ""));

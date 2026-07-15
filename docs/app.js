@@ -100,34 +100,88 @@ function sortableTable(mount, cols, rows, initial, opts) {
 
 /* Mobile card fallback for a sortable table — same cols/cell renderers, no
    separate markup to maintain. Hidden on desktop, shown in place of
-   .table-wrap under the 860px breakpoint (see styles.css). The first
-   left-aligned column becomes the card title; the rest render as label:value
-   pairs in row order, so every table gets a matching card automatically.
-   Names/values wrap instead of truncating (styles.css) so nothing is lost.
-   opts.ranked adds a rank badge before the title (see sortableTable above).
+   .table-wrap under the 860px breakpoint (see styles.css).
    opts.alwaysVisible renders the ".cards.always" variant — a responsive
    multi-column grid shown at every width, not just under the mobile
    breakpoint (used for the "you might also like" related-entity footers,
-   which are cards-only, with no companion desktop table). */
+   which are cards-only, with no companion desktop table).
+   opts.ranked switches to the compact row-list format below, for simple
+   ranked lists (frontpage boxes, "Most Points"-style mini leaderboards) —
+   everything else (detailed multi-column tables, draw tables) keeps the
+   block-card format, since those rows carry more than a name + 1-2 numbers. */
 function cardsHtml(cols, rows, opts) {
   opts = opts || {};
   if (!rows.length) return "";
   const titleCol = cols.find(c => c.align === "left") || cols[0];
   const restCols = cols.filter(c => c !== titleCol);
-  const items = rows.map((row, i) => {
+
+  if (opts.ranked) return rankedRowsHtml(titleCol, restCols, rows, opts);
+
+  const items = rows.map(row => {
     const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
     const rc = opts.rowClass ? opts.rowClass(row) : "";
     const rowCls = rc ? " " + esc(rc) : "";
-    const rankBadge = opts.ranked ? '<span class="card-rank">' + (i + 1) + "</span>" : "";
     const stats = restCols.map(c =>
       '<div class="card-stat"><span class="card-lbl">' + esc(c.label) + '</span>' +
       '<span class="card-val">' + c.cell(row) + "</span></div>").join("");
     return '<div class="card' + rowCls + '"' + href + '>' +
-      '<div class="card-title">' + rankBadge + titleCol.cell(row) + "</div>" +
+      '<div class="card-title">' + titleCol.cell(row) + "</div>" +
       '<div class="card-grid">' + stats + "</div></div>";
   }).join("");
-  const cls = "cards" + (opts.ranked ? " ranked" : "") + (opts.alwaysVisible ? " always" : "");
+  const cls = "cards" + (opts.alwaysVisible ? " always" : "");
   return '<div class="' + cls + '">' + items + "</div>";
+}
+
+/* Compact ranked-list rows: rank, name (wraps, never truncates), values
+   right-aligned — one line per row (two if a long name wraps), instead of a
+   bordered block per row with the field label repeated every time. Field
+   meaning is established ONCE via a slim uppercase header row, matching
+   nba-polymarket's own micro-label sizing (.6rem) measured at 390px.
+
+   Lists shaped like games/mean_delta/total_delta (all-time draw kings, and
+   any other ranked list built from the same per-game+total metric pair) skip
+   the header row entirely: at mobile width a long name already wraps the row
+   to 2 lines, which puts the header's column positions out of sync with the
+   values under it. Instead each row self-labels on its own second line —
+   "+255,027 total extra fans (+498/g · 512 g)" — the same inline pattern the
+   arena stat-card sub-line already uses ("62.5% · 16 g · Regular Season"), so
+   no column-to-value correspondence needs to survive a wrap. */
+function rankedRowsHtml(titleCol, restCols, rows, opts) {
+  const gCol = restCols.find(c => c.key === "games");
+  const meanCol = restCols.find(c => c.key === "mean_delta");
+  const totalCol = restCols.find(c => c.key === "total_delta");
+  if (meanCol && totalCol && restCols.length <= 3) return selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts);
+
+  const headVals = restCols.map(c => '<span class="rval">' + esc(c.label) + "</span>").join("");
+  const head = '<div class="rrow rrow-head"><span class="rrank"></span><span class="rname"></span>' +
+    '<span class="rvals">' + headVals + "</span></div>";
+  const items = rows.map((row, i) => {
+    const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
+    const rc = opts.rowClass ? opts.rowClass(row) : "";
+    const rowCls = rc ? " " + esc(rc) : "";
+    const vals = restCols.map(c => '<span class="rval">' + c.cell(row) + "</span>").join("");
+    return '<div class="rrow' + rowCls + '"' + href + '>' +
+      '<span class="rrank">' + (i + 1) + '</span>' +
+      '<span class="rname">' + titleCol.cell(row) + "</span>" +
+      '<span class="rvals">' + vals + "</span></div>";
+  }).join("");
+  return '<div class="cards rlist">' + head + items + "</div>";
+}
+
+function selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts) {
+  const totalLabel = esc((totalCol.label || "total").toLowerCase());
+  const items = rows.map((row, i) => {
+    const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
+    const rc = opts.rowClass ? opts.rowClass(row) : "";
+    const rowCls = rc ? " " + esc(rc) : "";
+    const secondary = [meanCol.cell(row) + "/g", gCol ? gCol.cell(row) + " g" : ""].filter(Boolean).join(" · ");
+    return '<div class="rrow rrow-self' + rowCls + '"' + href + '>' +
+      '<div class="rrow-top"><span class="rrank">' + (i + 1) + '</span>' +
+      '<span class="rname">' + titleCol.cell(row) + "</span></div>" +
+      '<div class="rrow-meta">' + totalCol.cell(row) + " " + totalLabel +
+      ' <span class="rsecondary">(' + secondary + ")</span></div></div>";
+  }).join("");
+  return '<div class="cards rlist">' + items + "</div>";
 }
 
 /* ---------- "you might also like" related-entity footer ----------
@@ -143,12 +197,13 @@ function renderRelated(mount, heading, cols, rows) {
   wireRowNav(mount);
 }
 
-/* whole-row navigation (ignore clicks that landed on a real link). Covers both
-   the desktop table row and its mobile .card counterpart. */
+/* whole-row navigation (ignore clicks that landed on a real link). Covers the
+   desktop table row and both mobile card formats (.card block, .rrow compact
+   ranked row). */
 function wireRowNav(root) {
   root.addEventListener("click", e => {
     if (e.target.closest("a")) return;
-    const el = e.target.closest("tr[data-href], .card[data-href]");
+    const el = e.target.closest("tr[data-href], .card[data-href], .rrow[data-href]");
     if (el) window.location.href = el.dataset.href;
   });
 }

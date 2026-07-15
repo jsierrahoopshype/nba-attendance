@@ -87,7 +87,7 @@ table.lb td.sub{color:var(--text-secondary)}
    in for .table-wrap under the 860px breakpoint (nba-polymarket's pattern). */
 .cards{display:none}
 .card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:.7rem .85rem;margin-bottom:.55rem;transition:border-color .12s}
+  padding:.7rem .85rem;margin-bottom:.55rem;min-width:0;transition:border-color .12s}
 .card[data-href]{cursor:pointer}
 .card:hover{border-color:var(--accent)}
 .card:last-child{margin-bottom:0}
@@ -97,23 +97,17 @@ table.lb td.sub{color:var(--text-secondary)}
 .card-title a{color:var(--text)}
 /* Names/values wrap to a second line instead of ellipsis-truncating — a
    truncated "Little Caesar…" loses information a static card can't recover
-   (no hover tooltip on touch); tighter padding/gaps above and below compensate
-   for the occasional extra line. */
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(6.5rem,1fr));gap:.45rem .7rem}
+   (no hover tooltip on touch). A 2-column (or wider) grid needs a minimum
+   column width generous enough that even a single long word ("Philadelphia",
+   12 characters) wraps at a space, not mid-word — auto-fit drops to a single
+   column by itself once the container can't fit two columns at that minimum,
+   rather than cramming two columns too narrow to hold one word. */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.45rem .7rem}
 .card-stat{display:flex;flex-direction:column;gap:.15rem;min-width:0}
 .card-stat .card-lbl{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--text-secondary);
   text-transform:uppercase;letter-spacing:.05em}
 .card-stat .card-val{font-family:'JetBrains Mono',monospace;font-size:.86rem;font-weight:600;
   overflow-wrap:break-word}
-
-/* ranked lists (frontpage boxes, "Most Points"-style mini leaderboards):
-   an explicit rank number, and a tighter footprint since these only ever show
-   a name + one or two short stats. */
-.card-rank{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;
-  color:var(--text-secondary);flex-shrink:0}
-.cards.ranked .card{padding:.55rem .75rem;margin-bottom:.4rem}
-.cards.ranked .card-title{margin-bottom:.3rem;display:flex;align-items:baseline;gap:.4rem}
-.cards.ranked .card-grid{gap:.3rem .6rem;grid-template-columns:repeat(auto-fill,minmax(5rem,1fr))}
 table.lb thead th.rank{width:2.2rem}
 
 /* "you might also like" related-entity footer: always-visible responsive
@@ -122,21 +116,80 @@ table.lb thead th.rank{width:2.2rem}
 .cards.always{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.7rem}
 .cards.always .card{margin-bottom:0}
 
-/* stat cards (detail pages) */
+/* ---------- compact ranked-list rows (opts.ranked) ----------
+   Simple ranked lists (frontpage boxes, all-time draw kings, "Most Points"-
+   style mini leaderboards) were the worst offender for label-heavy bloat: a
+   bordered block per row with the field label repeated every time. This is a
+   single bordered list — one thin divider per row, a slim uppercase header
+   row establishes what each value column means ONCE, then every row is just
+   rank + name + right-aligned values. Sizing matches nba-polymarket's
+   .card-foot pattern (measured at 390px: label .58rem, value/row text .74rem,
+   name/title .92rem) rather than inventing new numbers. */
+.rlist{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:.1rem .8rem;margin-bottom:.6rem;min-width:0}
+/* flex-wrap here is the actual fix for mid-word breaks: .rname gets a min-width
+   generous enough for one long name/word, so when a long name AND several
+   value columns can't all fit on one line, .rvals (flex:0 0 auto, no shrink)
+   drops to a line of its own — pushed flush right by margin-left:auto — a
+   two-line row, rather than .rname being squeezed until a word inside it
+   breaks. This is the "drop to single-column before mid-word wrap" rule. */
+.rrow{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.6rem;row-gap:.1rem;
+  padding:.5rem 0;border-bottom:1px solid var(--border);min-width:0}
+.rrow:last-child{border-bottom:none}
+.rrow[data-href]{cursor:pointer}
+.rrow:hover{background:var(--surface-hover)}
+.rrank{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-secondary);
+  flex-shrink:0;width:1.3rem;text-align:right}
+.rname{flex:1 1 auto;min-width:9rem;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.86rem;
+  color:var(--text);line-height:1.25}
+.rname a{color:var(--text)}
+/* value cells can hold text (a city name), not just numbers. flex:0 0 auto (no
+   shrink, no grow) plus the parent row's flex-wrap is what lets the whole
+   value group move to its own line instead of being crushed into one that's
+   too narrow for either the name or the values to wrap safely. */
+.rvals{display:flex;gap:.7rem;flex:0 0 auto;margin-left:auto;justify-content:flex-end}
+.rval{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;text-align:right}
+.rrow-head{padding:.4rem 0 .35rem;border-bottom:1px solid var(--border)}
+.rrow-head .rval{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;
+  letter-spacing:.05em;font-weight:600}
+
+/* self-labeling rows (games/mean_delta/total_delta lists, e.g. all-time draw
+   kings): no header row, so each row is a genuine 2-line stack instead of a
+   single flex line — rank+name on top, then a plain-language second line
+   ("+255,027 total extra fans (+498/g · 512 g)") that carries its own label,
+   the same inline pattern the arena stat-card sub-line already uses. */
+.rrow-self{display:block}
+.rrow-top{display:flex;align-items:baseline;gap:.6rem}
+.rrow-top .rname{min-width:0}
+.rrow-meta{margin-top:.2rem;padding-left:1.9rem;font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;color:var(--text);overflow-wrap:break-word}
+.rsecondary{color:var(--text-secondary);font-size:.72rem;font-weight:500}
+
+/* stat cards (detail pages) — each is a genuinely distinct stat type, so these
+   keep their own labeled card, but sized to read as a compact stat card, not
+   a page heading: value size, label size and padding match nba-polymarket's
+   own .stat-card, measured directly off their site at 390px (label .6rem,
+   value 1.25rem, padding .7rem .6rem — see the mobile override below). */
 .stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin-bottom:1.3rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;min-width:0}
-.stat-card .lbl{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.3rem}
-/* a scope suffix ("Regular Season", "all-time", a season) gets its own line
-   instead of being concatenated onto .lbl — on a 2-column mobile card the
-   combined string ("TOP SCORER · REGULAR SEASON") has nowhere to break
-   cleanly and wraps mid-word; split, each line fits on its own. */
-.stat-card .lbl-scope{display:block;margin-top:.1rem;font-weight:500;opacity:.72}
+.stat-card .lbl{font-size:.6rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.25rem}
 .stat-card .num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;letter-spacing:-.02em;
   overflow-wrap:break-word}
 .stat-card .num.pos{color:var(--green)}.stat-card .num.neg{color:var(--red)}
-.stat-card .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);margin-top:.25rem;
+/* the scope ("Regular Season", "all-time", a season) folds into .sub instead
+   of a separate label line — one fewer line per card, and .sub already wraps
+   at word boundaries so there's no mid-word-wrap risk to design around. */
+.stat-card .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);margin-top:.2rem;
   overflow-wrap:break-word}
 .stat-card a{color:var(--text)}.stat-card a:hover{color:var(--accent)}
+
+/* compact info panel (city page): one line per stat instead of a labeled
+   block per stat — "2 arenas · 2,859 games hosted", "Top scorer: X — Y pts" —
+   for a handful of facts that don't each need their own card. */
+.info-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:.8rem 1rem;margin-bottom:1.3rem;display:flex;flex-direction:column;gap:.4rem}
+.info-line{font-size:.86rem;color:var(--text);overflow-wrap:break-word}
+.info-line a{font-weight:600}
 
 /* detail-page header */
 .back{font-size:.76rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);display:inline-block;margin-bottom:1rem}
@@ -149,6 +202,7 @@ table.lb thead th.rank{width:2.2rem}
 
 /* leaderboard grid on arena page */
 .lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:1.2rem}
+.lb-card{min-width:0}
 .lb-card h3{font-size:.8rem;font-weight:700;margin:0 0 .5rem}
 .lb-card h3 .cap{color:var(--text-secondary);font-weight:400;font-size:.7rem;text-transform:none;letter-spacing:0}
 .section-title{font-size:1.02rem;font-weight:700;margin:1.4rem 0 .7rem}
@@ -236,7 +290,11 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
 
 /* frontpage: responsive grid of ranking boxes */
 .fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:.4rem}
-.fp-box{margin-bottom:0;border:1px solid var(--border);border-radius:12px;
+/* min-width:0 on a grid/flex item is load-bearing: without it, a grid item
+   refuses to shrink below its content's natural (unwrapped) width, so one
+   long unwrapped value ("Mexico City") in a nested flex row pushes the whole
+   box — and the page — wider than the viewport instead of wrapping. */
+.fp-box{min-width:0;margin-bottom:0;border:1px solid var(--border);border-radius:12px;
   background:var(--surface);padding:1rem 1.1rem;display:flex;flex-direction:column}
 .fp-box .block-head{margin-bottom:.5rem}
 .fp-box table{margin-top:.1rem}
@@ -254,8 +312,14 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
   .container{padding:1rem 1rem 3rem}
   .site-search{padding:0 1rem}
   .hdr h1{font-size:1.2rem}
-  .stat-cards{grid-template-columns:1fr 1fr;gap:.6rem}
-  .stat-card .num{font-size:1.15rem}
+  /* Matches nba-polymarket's own .stat-card at 390px exactly (padding, value
+     size) rather than an invented mobile size — measured off their live site:
+     padding .7rem .6rem, value 1.25rem. auto-fit/minmax picks 2 or 3 columns
+     by actual available width and drops to 1 before a column gets too narrow
+     for its content, instead of a fixed column count that can't adapt. */
+  .stat-cards{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.5rem}
+  .stat-card{padding:.7rem .6rem}
+  .stat-card .num{font-size:1.25rem}
   .ehead h1{font-size:1.3rem}
   table.lb thead th{position:static}
   .fp-grid{grid-template-columns:1fr}
@@ -271,8 +335,4 @@ table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
   .controls .field .toggle{width:100%}
   .controls .field .toggle button{flex:1}
   .season-field .season-select{width:100%;min-width:0}
-}
-@media(max-width:520px){
-  .stat-cards{grid-template-columns:1fr 1fr}
-  .card-grid{grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))}
 }

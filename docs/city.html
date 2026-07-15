@@ -103,23 +103,28 @@ function currentView(gtLabel) {
   return { lbs: computeLeaderboards(srecs), recs };
 }
 
+/* A compact one-line-per-stat info panel instead of four separate
+   label/value/sub stat-cards — "2 arenas · 2,859 games hosted" and
+   "Top scorer: Kobe Bryant — 16,216 pts" read in one line each, rather than
+   spreading the same handful of facts across three-line blocks. */
 function renderCards() {
   const o = (over || []).find(x => x.slug === city.slug);
-  const card = (lbl, num, sub) =>
-    '<div class="stat-card"><div class="lbl">' + lbl + '</div><div class="num">' + num + "</div>" +
-    (sub ? '<div class="sub">' + sub + "</div>" : "") + "</div>";
-  let html = "";
+  const arenaCount = (city.buildings || []).length;
+  const lines = [
+    arenaCount + " arena" + (arenaCount === 1 ? "" : "s") + " · " +
+      fmtInt(city.total_games) + " games hosted · " + esc(seasons(city.first_season, city.last_season)),
+  ];
   if (o) {
-    html += card("Top Scorer",
-      o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
-      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
-    html += card("Winningest Player",
-      o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
-      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
-    html += card("Games Hosted", fmtInt(city.total_games), esc(seasons(city.first_season, city.last_season)));
-    html += card("Arenas", (city.buildings || []).length, "combined into this city");
+    lines.push("Top scorer: " + (o.top_scorer
+      ? playerLink(o.top_scorer.personId, o.top_scorer.name) + " — " + fmtInt(o.top_scorer.points) + " pts"
+      : "—"));
+    lines.push("Winningest player: " + (o.winningest_player
+      ? playerLink(o.winningest_player.personId, o.winningest_player.name) + " — " +
+        pct(o.winningest_player.win_pct) + " (" + o.winningest_player.games + " g, min 15)"
+      : "—"));
   }
-  document.getElementById("cards").innerHTML = html ? '<div class="stat-cards">' + html + "</div>" : "";
+  document.getElementById("cards").innerHTML =
+    '<div class="info-panel">' + lines.map(l => '<div class="info-line">' + l + "</div>").join("") + "</div>";
 }
 
 /* "You might also like" — other cities ranked by games hosted, from the
