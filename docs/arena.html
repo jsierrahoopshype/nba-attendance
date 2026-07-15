@@ -114,14 +114,15 @@ function currentView(gtLabel) {
 
 function renderCards() {
   const o = (over || []).find(x => x.slug === building.slug);
-  // The scope ("Regular Season", "all-time", a season) renders on its own
-  // line (.lbl-scope) instead of being concatenated onto the label — on a
-  // narrow 2-column card "TOP SCORER · REGULAR SEASON" has no clean break
-  // point and wraps mid-word; split, each line is short enough to fit alone.
-  const card = (lbl, num, sub, scope) =>
-    '<div class="stat-card"><div class="lbl">' + lbl +
-    (scope ? '<span class="lbl-scope">' + scope + "</span>" : "") + '</div><div class="num">' + num + "</div>" +
-    (sub ? '<div class="sub">' + sub + "</div>" : "") + "</div>";
+  // The scope ("Regular Season", "all-time", a season) folds into the .sub
+  // line instead of being concatenated onto the label — "TOP SCORER ·
+  // REGULAR SEASON" has no clean break point on a narrow card and wraps
+  // mid-word; .sub is plain text that already wraps at word boundaries.
+  const card = (lbl, num, sub, scope) => {
+    const subText = scope ? (sub ? sub + " · " + scope : scope) : sub;
+    return '<div class="stat-card"><div class="lbl">' + lbl + '</div><div class="num">' + num + "</div>" +
+      (subText ? '<div class="sub">' + subText + "</div>" : "") + "</div>";
+  };
   let html = "";
   if (o) {
     const scope = esc(o.card_scope || "Regular Season");
