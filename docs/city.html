@@ -265,7 +265,7 @@ function renderDrawTables(mount) {
       { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
       ...drawDeltaCols(),
-    ], prows, { key: "total_delta", dir: "desc" });
+    ], prows, { key: "total_delta", dir: "desc" }, { ranked: true });
     wireRowNav(pm);
   } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
 
@@ -280,7 +280,7 @@ function renderDrawTables(mount) {
       { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team || "", cell: teamNameCell },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
       ...drawDeltaCols(),
-    ], teams.slice(), { key: "total_delta", dir: "desc" });
+    ], teams.slice(), { key: "total_delta", dir: "desc" }, { ranked: true });
   } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
 }
 

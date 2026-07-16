@@ -318,6 +318,7 @@ async function initHome() {
   const gCol = { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) };
   const meanCol = { key: "mean_delta", label: DRAW_DELTA_LABEL, defaultDir: "desc", get: r => r.mean_delta, cell: draw };
   const totalCol = { key: "total_delta", label: "Total extra fans", defaultDir: "desc", get: r => r.total_delta, cell: totalDraw };
+  const hiCol = { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) };
 
   const boxes = [
     { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top All-Star visiting players, min 15 road games",
@@ -332,8 +333,8 @@ async function initHome() {
       rows: b.sellout, tab: "records", cols: [arenaCol, cityCol,
         { key: "pct", label: "Sellout%", defaultDir: "desc", get: r => r.pct, cell: r => pct(r.pct) }] },
     { title: "Road legends", sub: "highest visiting single game, by arena",
-      rows: b.road_legends, tab: "records", cols: [arenaCol, cityCol, playerCol,
-        { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) }] },
+      rows: b.road_legends, tab: "records", cols: [arenaCol, cityCol, playerCol, hiCol],
+      selfLabel: { sub: cityCol, headline: hiCol, headlineLabel: "pts", attribution: playerCol } },
     { title: "Enemy territory", sub: "top scorers who never played home there",
       rows: b.enemy_territory, tab: "players", cols: [playerCol, arenaCol, cityCol,
         { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) }] },
@@ -366,7 +367,7 @@ function fillBox(box, tm) {
   tm.innerHTML = "";
   if (rows.length) {
     sortableTable(tm, box.cols, rows, box.initial || { key: box.cols[box.cols.length - 1].key, dir: "desc" },
-      { ranked: true });
+      { ranked: true, selfLabel: box.selfLabel });
     wireRowNav(tm);
   } else {
     tm.innerHTML = '<div class="empty">No data yet.</div>';

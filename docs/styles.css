@@ -172,6 +172,11 @@ table.lb thead th.rank{width:2.2rem}
 .rrow-meta{margin-top:.2rem;padding-left:1.9rem;font-family:'JetBrains Mono',monospace;
   font-size:.78rem;color:var(--text);overflow-wrap:break-word}
 .rsecondary{color:var(--text-secondary);font-size:.72rem;font-weight:500}
+/* line-1 context for entity-keyed self-label rows (e.g. Road legends: arena
+   name is the row's identity, city disambiguates it) — same treatment as
+   the .rrow-meta secondary text, just inline after the name instead of on
+   its own line. */
+.rsub{color:var(--text-secondary);font-weight:500;font-size:.78rem}
 
 /* stat cards (detail pages) — each is a genuinely distinct stat type, so these
    keep their own labeled card, but sized to read as a compact stat card, not
