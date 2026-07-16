@@ -54,6 +54,14 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .toggle button:hover{border-color:var(--accent);color:var(--accent)}
 .toggle button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
+/* "Show all N →" — appears once a list's qualifying rows exceed the default
+   50-row cap (sortableTable's LIST_PAGE_SIZE), below both the desktop table
+   and the mobile card fallback since they always render the same subset. */
+.show-all-btn{display:block;width:100%;margin-top:.7rem;font-family:'JetBrains Mono',monospace;
+  font-size:.74rem;font-weight:600;color:var(--accent);background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;cursor:pointer;text-align:center}
+.show-all-btn:hover{border-color:var(--accent);background:var(--surface-hover)}
+
 /* table */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow-x:auto}
 table.lb{width:100%;border-collapse:collapse;font-size:.86rem}

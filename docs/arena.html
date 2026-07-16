@@ -191,9 +191,16 @@ function render() {
   const scope = allstarMode ? "All-Stars" : "all players";
   const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
   const mount = document.getElementById("result");
-  mount.innerHTML = "<div class='section-title'>" + esc(building.name) +
+  mount.innerHTML = "";
+
+  // visiting-player + visiting-team attendance draw leads the detailed
+  // section now, ahead of the leaderboards below. Its own All-Stars-only
+  // default, and a note off-2026 instead of stale numbers.
+  renderDrawTables(mount);
+
+  mount.insertAdjacentHTML("beforeend", "<div class='section-title'>" + esc(building.name) +
     " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
-    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>";
+    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>");
 
   const grid = document.createElement("div");
   grid.className = "lb-grid";
@@ -220,10 +227,6 @@ function render() {
   });
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
     (allstarMode ? " All-Star" : "") + " records at this building.</div>");
-
-  // visiting-player + visiting-team attendance draw (2026 only) — its own
-  // All-Stars-only default, and a note off-2026 instead of stale numbers.
-  renderDrawTables(mount);
 
   // full records table for this game type (season-aware). The home/away split is
   // merged in — home + road game counts per player, and rows for players who

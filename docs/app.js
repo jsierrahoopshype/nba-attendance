@@ -28,6 +28,16 @@ const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(nam
 const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
 const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
+/* Any list capable of rendering more than this many rows shows only the top
+   LIST_PAGE_SIZE by default, with a single "Show all" click revealing the
+   rest — implemented once here so every sortableTable()-based list gets it
+   for free, rather than each page inventing its own cap (or none at all).
+   Independent of and stacks with row-level filters like the All-Star toggle:
+   a filter changes which rows qualify; this only bounds how many of the
+   qualifying set render at once. Lists that never exceed the cap (frontpage
+   boxes, mini leaderboards already capped upstream) are unaffected. */
+const LIST_PAGE_SIZE = 50;
+
 /* ---------- sortable table ----------
    cols: [{key, label, align:'left'|'right', sortable:bool, defaultDir:'asc'|'desc',
            get(row) -> sort value (number or string), cell(row) -> html, tdcls(row)}]
@@ -39,6 +49,7 @@ const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").r
 function sortableTable(mount, cols, rows, initial, opts) {
   opts = opts || {};
   let sort = initial || firstSortable(cols);
+  let showAll = false;
 
   function firstSortable(cs) {
     const c = cs.find(x => x.sortable !== false);
@@ -58,6 +69,9 @@ function sortableTable(mount, cols, rows, initial, opts) {
         return sort.dir === "desc" ? (y - x) : (x - y);
       });
     }
+    const capped = !showAll && arr.length > LIST_PAGE_SIZE;
+    const visible = capped ? arr.slice(0, LIST_PAGE_SIZE) : arr;
+
     const rankHead = opts.ranked ? '<th class="rank"></th>' : "";
     const head = rankHead + cols.map(c => {
       const left = c.align === "left" ? " left" : "";
@@ -66,7 +80,7 @@ function sortableTable(mount, cols, rows, initial, opts) {
       const arrow = sort.key === c.key ? '<span class="arr">' + (sort.dir === "desc" ? "▼" : "▲") + "</span>" : "";
       return '<th class="sortable' + left + sb + '" data-k="' + esc(c.key) + '">' + esc(c.label) + arrow + "</th>";
     }).join("");
-    const body = arr.map((row, i) => {
+    const body = visible.map((row, i) => {
       const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
       const rc = opts.rowClass ? opts.rowClass(row) : "";
       const rowCls = rc ? ' class="' + esc(rc) + '"' : "";
@@ -83,7 +97,11 @@ function sortableTable(mount, cols, rows, initial, opts) {
     mount.innerHTML =
       '<div class="table-wrap"><table class="lb"><thead><tr>' + head +
       "</tr></thead><tbody>" + (body || '<tr><td class="dash">No data</td></tr>') + "</tbody></table></div>" +
-      cardsHtml(cols, arr, opts);
+      cardsHtml(cols, visible, opts) +
+      (capped ? '<button type="button" class="show-all-btn">Show all ' + arr.length.toLocaleString() + " →</button>" : "");
+    if (capped) {
+      mount.querySelector(".show-all-btn").addEventListener("click", () => { showAll = true; draw(); });
+    }
   }
   draw();
   mount.addEventListener("click", e => {
@@ -95,7 +113,7 @@ function sortableTable(mount, cols, rows, initial, opts) {
     else sort = { key, dir: (col && col.defaultDir) || "desc" };
     draw();
   });
-  return { setRows(r) { rows = r; draw(); } };
+  return { setRows(r) { rows = r; showAll = false; draw(); } };
 }
 
 /* Mobile card fallback for a sortable table — same cols/cell renderers, no

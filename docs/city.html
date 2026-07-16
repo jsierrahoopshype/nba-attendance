@@ -159,9 +159,16 @@ function render() {
   const scope = allstarMode ? "All-Stars" : "all players";
   const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
   const mount = document.getElementById("result");
-  mount.innerHTML = "<div class='section-title'>" + esc(city.name) +
+  mount.innerHTML = "";
+
+  // visiting-player + visiting-team draw for the whole city (aggregated across
+  // its arenas) leads the detailed section now, ahead of the leaderboards
+  // below. All-Stars-only default, 2026-only note off-season.
+  renderDrawTables(mount);
+
+  mount.insertAdjacentHTML("beforeend", "<div class='section-title'>" + esc(city.name) +
     " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
-    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>";
+    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>");
 
   const grid = document.createElement("div");
   grid.className = "lb-grid";
@@ -186,10 +193,6 @@ function render() {
   });
   if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
     (allstarMode ? " All-Star" : "") + " records in this city.</div>");
-
-  // visiting-player + visiting-team draw for the whole city (aggregated across
-  // its arenas). All-Stars-only default, 2026-only note off-season.
-  renderDrawTables(mount);
 
   // full records table for this game type (season-aware)
   const recs = fullRecs;

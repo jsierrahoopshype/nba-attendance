@@ -320,14 +320,14 @@ async function initHome() {
   const totalCol = { key: "total_delta", label: "Total extra fans", defaultDir: "desc", get: r => r.total_delta, cell: totalDraw };
 
   const boxes = [
-    { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
-      rows: b.arena_attendance, tab: "records", cols: [arenaCol, cityCol,
-        { key: "avg", label: "Avg Att", defaultDir: "desc", get: r => r.avg, cell: r => fmtInt(r.avg) }] },
     { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top All-Star visiting players, min 15 road games",
       rows: b.biggest_draws_season, tab: "draw", allstar: true, cols: [playerCol, gCol, meanCol] },
     { title: "All-time draw kings", sub: "career total & avg draw, min 100 road games",
       rows: b.draw_kings_alltime, tab: "draw", initial: { key: "total_delta", dir: "desc" },
       cols: [playerCol, gCol, meanCol, totalCol] },
+    { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
+      rows: b.arena_attendance, tab: "records", cols: [arenaCol, cityCol,
+        { key: "avg", label: "Avg Att", defaultDir: "desc", get: r => r.avg, cell: r => fmtInt(r.avg) }] },
     { title: "Sellout meter" + (sl ? " · " + sl : ""), sub: "share of games within 0.5% of capacity",
       rows: b.sellout, tab: "records", cols: [arenaCol, cityCol,
         { key: "pct", label: "Sellout%", defaultDir: "desc", get: r => r.pct, cell: r => pct(r.pct) }] },
