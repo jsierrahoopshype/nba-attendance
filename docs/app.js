@@ -123,10 +123,12 @@ function sortableTable(mount, cols, rows, initial, opts) {
    multi-column grid shown at every width, not just under the mobile
    breakpoint (used for the "you might also like" related-entity footers,
    which are cards-only, with no companion desktop table).
-   opts.ranked switches to the compact row-list format below, for simple
-   ranked lists (frontpage boxes, "Most Points"-style mini leaderboards) —
-   everything else (detailed multi-column tables, draw tables) keeps the
-   block-card format, since those rows carry more than a name + 1-2 numbers. */
+   opts.ranked switches to the compact row-list format below, for ranked
+   lists (frontpage boxes, "Most Points"-style mini leaderboards, draw
+   tables) — everything else (detailed multi-column tables with no single
+   "the" ranking, e.g. the per-building records table) keeps the block-card
+   format, since those rows carry several parallel stats rather than one
+   headline value. */
 function cardsHtml(cols, rows, opts) {
   opts = opts || {};
   if (!rows.length) return "";
@@ -156,19 +158,29 @@ function cardsHtml(cols, rows, opts) {
    meaning is established ONCE via a slim uppercase header row, matching
    nba-polymarket's own micro-label sizing (.6rem) measured at 390px.
 
-   Lists shaped like games/mean_delta/total_delta (all-time draw kings, and
-   any other ranked list built from the same per-game+total metric pair) skip
-   the header row entirely: at mobile width a long name already wraps the row
-   to 2 lines, which puts the header's column positions out of sync with the
-   values under it. Instead each row self-labels on its own second line —
-   "+255,027 total extra fans (+498/g · 512 g)" — the same inline pattern the
-   arena stat-card sub-line already uses ("62.5% · 16 g · Regular Season"), so
-   no column-to-value correspondence needs to survive a wrap. */
+   Any list with a genuine "headline" stat instead skips the header row
+   entirely: at mobile width a long name (or a long text value like a city or
+   player name in another column) already wraps the row, which puts the
+   header's column positions out of sync with the values under it. Instead
+   each row self-labels on its own second line — "+255,027 total extra fans
+   (+498/g · 512 g)" for a draw list, "84 pts — LeBron James" for a
+   single-stat-plus-attribution list like Road legends — the same inline
+   pattern the arena stat-card sub-line already uses ("62.5% · 16 g ·
+   Regular Season"), so no column-to-value correspondence needs to survive a
+   wrap. Two ways in: opts.selfLabel gives an explicit field mapping for
+   whatever shape the list has (see selfLabelRowsHtml below); lacking that,
+   lists shaped like games/mean_delta/total_delta (all-time draw kings,
+   arena/city draw tables) are auto-detected into the same renderer so
+   existing callers don't need to opt in by hand. */
 function rankedRowsHtml(titleCol, restCols, rows, opts) {
+  if (opts.selfLabel) return selfLabelRowsHtml(titleCol, rows, opts, opts.selfLabel);
   const gCol = restCols.find(c => c.key === "games");
   const meanCol = restCols.find(c => c.key === "mean_delta");
   const totalCol = restCols.find(c => c.key === "total_delta");
-  if (meanCol && totalCol && restCols.length <= 3) return selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts);
+  if (meanCol && totalCol && restCols.length <= 3) return selfLabelRowsHtml(titleCol, rows, opts, {
+    headline: totalCol, headlineLabel: (totalCol.label || "total").toLowerCase(),
+    secondary: [{ col: meanCol, suffix: "/g" }, gCol ? { col: gCol, suffix: " g" } : null].filter(Boolean),
+  });
 
   const headVals = restCols.map(c => '<span class="rval">' + esc(c.label) + "</span>").join("");
   const head = '<div class="rrow rrow-head"><span class="rrank"></span><span class="rname"></span>' +
@@ -186,18 +198,34 @@ function rankedRowsHtml(titleCol, restCols, rows, opts) {
   return '<div class="cards rlist">' + head + items + "</div>";
 }
 
-function selfLabelRowsHtml(titleCol, gCol, meanCol, totalCol, rows, opts) {
-  const totalLabel = esc((totalCol.label || "total").toLowerCase());
+/* desc: { sub, headline, headlineLabel, secondary: [{col,suffix}], attribution }
+   sub          — optional column merged onto line 1 after the name ("· City"),
+                  for rows keyed by an entity that needs extra context (an
+                  arena, which can share a name pattern across cities).
+   headline     — required column whose cell() leads line 2 (the one stat this
+                  list is ranked by — total extra fans, career-high points…).
+   headlineLabel — plain-language text following the headline value.
+   secondary    — optional columns folded into a "(...)" parenthetical, each
+                  with its own unit suffix (games, per-game rate…).
+   attribution  — optional column appended as "— {cell}" — who's responsible
+                  for the headline value, when that's a different entity than
+                  the row's own name (e.g. Road legends: the row is an arena,
+                  the headline is a scoring record, the attribution is the
+                  visiting player who set it). */
+function selfLabelRowsHtml(titleCol, rows, opts, desc) {
   const items = rows.map((row, i) => {
     const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
     const rc = opts.rowClass ? opts.rowClass(row) : "";
     const rowCls = rc ? " " + esc(rc) : "";
-    const secondary = [meanCol.cell(row) + "/g", gCol ? gCol.cell(row) + " g" : ""].filter(Boolean).join(" · ");
+    const name = titleCol.cell(row) + (desc.sub ? '<span class="rsub"> · ' + desc.sub.cell(row) + "</span>" : "");
+    const secondary = (desc.secondary || []).map(s => s.col.cell(row) + (s.suffix || "")).join(" · ");
+    const meta = desc.headline.cell(row) + " " + esc(desc.headlineLabel || "") +
+      (secondary ? ' <span class="rsecondary">(' + secondary + ")</span>" : "") +
+      (desc.attribution ? " — " + desc.attribution.cell(row) : "");
     return '<div class="rrow rrow-self' + rowCls + '"' + href + '>' +
       '<div class="rrow-top"><span class="rrank">' + (i + 1) + '</span>' +
-      '<span class="rname">' + titleCol.cell(row) + "</span></div>" +
-      '<div class="rrow-meta">' + totalCol.cell(row) + " " + totalLabel +
-      ' <span class="rsecondary">(' + secondary + ")</span></div></div>";
+      '<span class="rname">' + name + "</span></div>" +
+      '<div class="rrow-meta">' + meta + "</div></div>";
   }).join("");
   return '<div class="cards rlist">' + items + "</div>";
 }
