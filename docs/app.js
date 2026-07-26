@@ -2,7 +2,17 @@
 /* Shared helpers for the dashboard + detail pages.
    Relative paths throughout so the site works from any GitHub Pages subpath. */
 
-const DATA = "./data";
+/* Entity pages are physical files one directory below docs/ — docs/arenas/{slug}.html,
+   docs/cities/{slug}.html, docs/players/{personId}.html — generated at build time
+   (see generate_entity_pages.py) so each ships a real baked <title>/<meta
+   description>/<h1>, unlike the old docs/{arena,city,player}.html?slug=/?id= pages
+   (which still exist and now just redirect here, see their boot()). Every other
+   page (index.html and those legacy redirectors) lives at docs/ root. ROOT lets
+   this one shared script compute correct relative paths — to data/, to itself,
+   and to other entities' pages — from either depth, so nothing here needs to
+   know in advance which kind of page loaded it. */
+const ROOT = /\/(arenas|cities|players)\/[^/]+\.html$/.test(location.pathname) ? "../" : "./";
+const DATA = ROOT + "data";
 
 /* ---------- fetch / format ---------- */
 async function getJSON(path) {
@@ -19,10 +29,14 @@ const signed = n => (n > 0 ? "+" : "") + Math.round(Number(n)).toLocaleString();
 const deltaCls = n => n > 0 ? "pos" : (n < 0 ? "neg" : "flat");
 const seasons = (a, b) => a === b ? String(a) : a + "–" + b;
 
-/* ---------- entity links (relative, work from index or detail pages) ---------- */
-const playerHref = id => "player.html?id=" + encodeURIComponent(id);
-const arenaHref = slug => "arena.html?slug=" + encodeURIComponent(slug);
-const cityHref = slug => "city.html?slug=" + encodeURIComponent(slug);
+/* ---------- entity links (relative, work from index or detail pages) ----------
+   Point at the generated static pages, not the old ?slug=/?id= query-string
+   routes — those still work (docs/{arena,city,player}.html now just redirect
+   here), but every link the site itself renders should go straight to the
+   canonical path. */
+const playerHref = id => ROOT + "players/" + encodeURIComponent(id) + ".html";
+const arenaHref = slug => ROOT + "arenas/" + encodeURIComponent(slug) + ".html";
+const cityHref = slug => ROOT + "cities/" + encodeURIComponent(slug) + ".html";
 const playerLink = (id, name) => '<a href="' + playerHref(id) + '">' + esc(name) + "</a>";
 const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(name) + "</a>";
 const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
@@ -444,7 +458,7 @@ const searchHref = it =>
   it.type === "player" ? playerHref(it.id) :
   it.type === "arena" ? arenaHref(it.slug) :
   it.type === "city" ? cityHref(it.slug) :
-  "index.html?tab=draw";               // teams live on the Attendance Draw tab
+  ROOT + "index.html?tab=draw";         // teams live on the Attendance Draw tab
 
 function siteSearchBar(pos, items) {
   const bar = document.createElement("div");

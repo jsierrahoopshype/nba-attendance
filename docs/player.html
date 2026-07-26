@@ -59,7 +59,14 @@ async function renderRelatedPlayers() {
 }
 
 async function boot() {
-  const id = qp("id");
+  // Generated pages (docs/players/{id}.html) bake window.ENTITY_ID inline so
+  // this exact shell/script renders them directly, with no query string.
+  // This file (docs/player.html) has no such global, so an ?id= visit here
+  // just redirects to the canonical page instead of rendering inline — the
+  // canonical page has a real baked title/meta/H1, this one doesn't.
+  const qid = qp("id");
+  const id = window.ENTITY_ID || qid;
+  if (!window.ENTITY_ID && qid) { location.replace(playerHref(qid)); return; }
   if (!id) { document.getElementById("result").innerHTML = '<div class="err">No player id given.</div>'; return; }
   try { player = await getJSON(DATA + "/players/" + encodeURIComponent(id) + ".json"); }
   catch (err) { document.getElementById("result").innerHTML = '<div class="err">Could not load player: ' + esc(err.message) + "</div>"; return; }

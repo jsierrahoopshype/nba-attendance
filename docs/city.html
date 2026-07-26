@@ -49,7 +49,14 @@ function currentDraw() {
 }
 
 async function boot() {
-  const slug = qp("slug");
+  // Generated pages (docs/cities/{slug}.html) bake window.ENTITY_SLUG inline
+  // so this exact shell/script renders them directly, with no query string.
+  // This file (docs/city.html) has no such global, so a ?slug= visit here
+  // just redirects to the canonical page instead of rendering inline —
+  // the canonical page has a real baked title/meta/H1, this one doesn't.
+  const qslug = qp("slug");
+  const slug = window.ENTITY_SLUG || qslug;
+  if (!window.ENTITY_SLUG && qslug) { location.replace(cityHref(qslug)); return; }
   if (!slug) { document.getElementById("result").innerHTML = '<div class="err">No city given.</div>'; return; }
   try {
     [city, over] = await Promise.all([
