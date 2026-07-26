@@ -48,7 +48,7 @@ async function renderRelatedPlayers() {
   const allStars = others.filter(p => isAllstar(p.personId)).sort((a, b) => b.games - a.games);
   const rest = others.filter(p => !isAllstar(p.personId)).sort((a, b) => b.games - a.games);
   const picks = [...allStars, ...rest].slice(0, 6)
-    .map(p => ({ ...p, _href: playerHref(p.personId) }));
+    .map(p => ({ ...p, _href: playerHref(p.personId, p.name) }));
   const cols = [
     { key: "name", label: "Player", align: "left", get: r => r.name,
       cell: r => (isAllstar(r.personId) ? '<span title="All-Star">★</span> ' : "") + playerLink(r.personId, r.name) },
@@ -66,10 +66,12 @@ async function boot() {
   // canonical page has a real baked title/meta/H1, this one doesn't.
   const qid = qp("id");
   const id = window.ENTITY_ID || qid;
-  if (!window.ENTITY_ID && qid) { location.replace(playerHref(qid)); return; }
   if (!id) { document.getElementById("result").innerHTML = '<div class="err">No player id given.</div>'; return; }
   try { player = await getJSON(DATA + "/players/" + encodeURIComponent(id) + ".json"); }
   catch (err) { document.getElementById("result").innerHTML = '<div class="err">Could not load player: ' + esc(err.message) + "</div>"; return; }
+  // The name-slugged canonical URL needs the player's name, which we only
+  // have after this fetch — so the redirect happens here, not before it.
+  if (!window.ENTITY_ID && qid) { location.replace(playerHref(qid, player.name)); return; }
 
   document.title = player.name + " Arena Records & Road Draw | NBA Attendance Tracker";
   const buildings = new Set(player.records.map(r => r.building)).size;

@@ -36,9 +36,35 @@ import json
 import os
 import re
 import shutil
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(HERE, "docs")
+
+
+def player_slug(name, person_id):
+    """Canonical player page filename stem — "{name-slug}-{personId}", e.g.
+    "lebron-james-2544". The numeric id is load-bearing, not decoration: this
+    dataset has confirmed real duplicate player names, so the name alone
+    can't be the whole slug.
+
+    Mirrors the accent/apostrophe normalization build_allstar_flags.norm_name()
+    already established for All-Star name matching (NFKD-decompose, drop
+    combining marks, lowercase, drop apostrophes/periods) rather than
+    inventing new rules — just hyphen-joined instead of space-joined.
+
+    docs/app.js's playerSlug() is the client-side twin of this exact
+    algorithm. The two must produce byte-identical output for the same
+    inputs — this is the one Python-side implementation, used here and
+    nowhere else, precisely so it can't drift from that JS twin.
+    """
+    s = unicodedata.normalize("NFKD", name or "")
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.lower()
+    s = s.replace("'", "").replace("’", "").replace(".", "")
+    s = "".join(c if c.isalnum() or c.isspace() else " " for c in s)
+    words = "-".join(s.split())
+    return (words + "-" if words else "") + str(person_id)
 
 
 def _esc(s):
@@ -142,24 +168,49 @@ def generate_city_pages(docs_dir=DOCS_DIR):
     return len(index)
 
 
+def _redirect_stub(target):
+    """Minimal static redirect to `target` (a sibling file in the same directory).
+    Cheap alongside the real canonical page — meta-refresh as the no-JS
+    fallback, an immediate replace() for everyone else."""
+    return (
+        "<!doctype html>\n<html><head><meta charset=\"utf-8\">\n"
+        '<meta http-equiv="refresh" content="0; url=' + target + '">\n'
+        '<link rel="canonical" href="' + target + '">\n'
+        "<script>location.replace(" + json.dumps(target) + ");</script>\n"
+        "</head><body></body></html>\n"
+    )
+
+
 def generate_player_pages(docs_dir=DOCS_DIR):
     template = _read(os.path.join(docs_dir, "player.html"))
     index = json.load(open(os.path.join(docs_dir, "data", "players", "index.json"), encoding="utf-8"))
     out_dir = os.path.join(docs_dir, "players")
+    # Standing behavior, not a one-off cleanup: every regen clears the whole
+    # directory first, so a filename-format change (like this one, bare
+    # personId -> name-slug-personId) can never leave old and new files
+    # both lingering.
     if os.path.isdir(out_dir):
         shutil.rmtree(out_dir)
     os.makedirs(out_dir, exist_ok=True)
     for p in index:
         pid, name = str(p["personId"]), p["name"]
+        slug = player_slug(name, pid)
         title = _esc(name + " Arena Records & Road Draw | NBA Attendance Tracker")
         description = _esc(
             "Career arena attendance draw and building-by-building records for " + name + "."
         )
         entity_global = '<script>window.ENTITY_ID = "' + _js_str(pid) + '";</script>'
         html = _bake(template, title=title, description=description,
-                     canonical=pid + ".html", name_html=_esc(name),
+                     canonical=slug + ".html", name_html=_esc(name),
                      entity_global=entity_global)
-        _write(os.path.join(out_dir, pid + ".html"), html)
+        _write(os.path.join(out_dir, slug + ".html"), html)
+        # Cheap legacy redirect: the bare-id filename from the last regen (and
+        # anyone who bookmarked/shared it in the meantime) still resolves,
+        # same spirit as docs/player.html?id= redirecting via boot(). Not
+        # required per se — these URLs are under a day old — but harmless to
+        # keep alongside that existing redirect logic.
+        if slug != pid:
+            _write(os.path.join(out_dir, pid + ".html"), _redirect_stub(slug + ".html"))
     return len(index)
 
 
