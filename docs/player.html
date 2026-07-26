@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Player — NBA Arena Records</title>
+<title>Player Arena Records &amp; Road Draw | NBA Attendance Tracker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,7 +64,7 @@ async function boot() {
   try { player = await getJSON(DATA + "/players/" + encodeURIComponent(id) + ".json"); }
   catch (err) { document.getElementById("result").innerHTML = '<div class="err">Could not load player: ' + esc(err.message) + "</div>"; return; }
 
-  document.title = player.name + " — NBA Arena Records";
+  document.title = player.name + " Arena Records & Road Draw | NBA Attendance Tracker";
   const buildings = new Set(player.records.map(r => r.building)).size;
   const fs = Math.min(...player.records.map(r => r.first_season));
   const ls = Math.max(...player.records.map(r => r.last_season));

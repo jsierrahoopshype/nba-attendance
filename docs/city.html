@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>City — NBA Arena Records</title>
+<title>City NBA Arena Records | NBA Attendance Tracker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,7 @@ async function boot() {
     document.getElementById("result").innerHTML = '<div class="err">Could not load city: ' + esc(err.message) + "</div>"; return;
   }
 
-  document.title = city.name + " — NBA Arena Records";
+  document.title = city.name + " NBA Arena Records | NBA Attendance Tracker";
   document.getElementById("head").innerHTML =
     '<div class="ehead"><h1>' + esc(city.name) + "</h1>" +
     '<div class="esub"><span class="pill" style="margin-left:0">City</span>' +
