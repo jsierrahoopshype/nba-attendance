@@ -226,7 +226,7 @@ function renderDraw() {
   if (teamRows.length)
     sortableTable(tmount,
       attCols({ key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team, cell: teamNameCell }),
-      teamRows, { key: "total_delta", dir: "desc" });
+      teamRows, { key: "total_delta", dir: "desc" }, { ranked: true });
 
   // Players — All-Stars only by default, toggleable.
   const allPlayers = drawScope(DRAW.players);
@@ -239,7 +239,7 @@ function renderDraw() {
   if (playerRows.length) {
     sortableTable(pmount,
       attCols({ key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) }),
-      playerRows, { key: "total_delta", dir: "desc" });
+      playerRows, { key: "total_delta", dir: "desc" }, { ranked: true });
     wireRowNav(pmount);
   }
 }

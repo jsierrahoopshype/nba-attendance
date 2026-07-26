@@ -1604,6 +1604,10 @@ def main():
     fp = build_frontpage(records, home_away_by_slug, sellout_by_building)
     print(f"frontpage.json: {fp}")
 
+    from generate_entity_pages import generate_entity_pages
+    page_counts = generate_entity_pages(os.path.join(HERE, "docs"))
+    print("entity pages: " + ", ".join(f"{v} {k}" for k, v in page_counts.items()))
+
     print("Done.")
 
 
