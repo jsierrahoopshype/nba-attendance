@@ -217,7 +217,7 @@ function render() {
   mount.appendChild(grid);
   let any = false;
   LB_DEFS.forEach(def => {
-    const rows = (lbs[def.key] || []).map(r => ({ ...r, _href: playerHref(r.personId) }));
+    const rows = (lbs[def.key] || []).map(r => ({ ...r, _href: playerHref(r.personId, r.playerName) }));
     if (rows.length) any = true;
     const card = document.createElement("div");
     card.className = "block lb-card";
@@ -248,7 +248,7 @@ function render() {
       ") · shaded = never played here for the home team</span></div>");
     const am = document.createElement("div");
     mount.appendChild(am);
-    const rows = recs.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    const rows = recs.map(r => ({ ...r, _href: playerHref(r.personId, r.playerName) }));
     const homeG = r => { const ha = homeAwayOf(r.personId); return ha ? ha.home_games : null; };
     const awayG = r => { const ha = homeAwayOf(r.personId); return ha ? ha.away_games : null; };
     const cols = [
@@ -314,7 +314,7 @@ function renderDrawTables(mount) {
   const pm = document.createElement("div");
   pcard.appendChild(pm); grid.appendChild(pcard);
   if (pfil.length) {
-    const prows = pfil.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    const prows = pfil.map(r => ({ ...r, _href: playerHref(r.personId, r.playerName) }));
     sortableTable(pm, [
       { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
       { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
