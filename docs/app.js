@@ -29,15 +29,34 @@ const signed = n => (n > 0 ? "+" : "") + Math.round(Number(n)).toLocaleString();
 const deltaCls = n => n > 0 ? "pos" : (n < 0 ? "neg" : "flat");
 const seasons = (a, b) => a === b ? String(a) : a + "–" + b;
 
+/* Canonical player page filename — {name-slug}-{personId}, e.g.
+   "lebron-james-2544.html". The numeric id is load-bearing, not decoration:
+   this dataset has confirmed real duplicate player names, so the name alone
+   can't be the whole slug. Mirrors the accent/apostrophe normalization
+   build_allstar_flags.norm_name() already established for All-Star name
+   matching (NFKD-decompose, drop combining marks, lowercase, drop
+   apostrophes/periods) rather than inventing new rules. This is the one
+   place the site computes it client-side; generate_entity_pages.py's
+   player_slug() must produce byte-identical output for the same inputs —
+   see that file for the Python side of this same algorithm — or generated
+   links 404 against the files it actually wrote. */
+function playerSlug(name, id) {
+  let s = String(name || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+  s = s.toLowerCase().replace(/['’.]/g, "").replace(/[^a-z0-9\s]/g, " ");
+  const words = s.trim().split(/\s+/).filter(Boolean).join("-");
+  return (words ? words + "-" : "") + id;
+}
+
 /* ---------- entity links (relative, work from index or detail pages) ----------
    Point at the generated static pages, not the old ?slug=/?id= query-string
    routes — those still work (docs/{arena,city,player}.html now just redirect
    here), but every link the site itself renders should go straight to the
-   canonical path. */
-const playerHref = id => ROOT + "players/" + encodeURIComponent(id) + ".html";
+   canonical path. playerHref needs the player's name (not just the id) to
+   compute the slug — every call site already has it at hand. */
+const playerHref = (id, name) => ROOT + "players/" + playerSlug(name, id) + ".html";
 const arenaHref = slug => ROOT + "arenas/" + encodeURIComponent(slug) + ".html";
 const cityHref = slug => ROOT + "cities/" + encodeURIComponent(slug) + ".html";
-const playerLink = (id, name) => '<a href="' + playerHref(id) + '">' + esc(name) + "</a>";
+const playerLink = (id, name) => '<a href="' + playerHref(id, name) + '">' + esc(name) + "</a>";
 const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(name) + "</a>";
 const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
 const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -455,7 +474,7 @@ function makeAllstarToggle(mount, onChange, opts) {
 /* ---------- persistent site search (players, teams, arenas, cities) ----------
    Injected at the top and bottom of every page from search.json. */
 const searchHref = it =>
-  it.type === "player" ? playerHref(it.id) :
+  it.type === "player" ? playerHref(it.id, it.name) :
   it.type === "arena" ? arenaHref(it.slug) :
   it.type === "city" ? cityHref(it.slug) :
   ROOT + "index.html?tab=draw";         // teams live on the Attendance Draw tab

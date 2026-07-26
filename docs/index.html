@@ -134,7 +134,7 @@ async function initPlayers() {
   catch (err) { document.getElementById("playerDir").innerHTML = '<div class="err">Failed to load players: ' + esc(err.message) + "</div>"; return; }
   await loadAllstar();
 
-  const rows = players.map(p => ({ ...p, _href: playerHref(p.personId) }));
+  const rows = players.map(p => ({ ...p, _href: playerHref(p.personId, p.name) }));
   const cols = [
     { key: "name", label: "Player", align: "left", defaultDir: "asc",
       get: r => r.name, cell: r => playerLink(r.personId, r.name) },
@@ -159,7 +159,7 @@ async function initPlayers() {
   apply();
 
   autocomplete(input, document.getElementById("playerAC"), players, {
-    href: p => playerHref(p.personId),
+    href: p => playerHref(p.personId, p.name),
     sub: p => fmtInt(p.games) + " g",
     onInput: apply,
   });
@@ -231,7 +231,7 @@ function renderDraw() {
   // Players — All-Stars only by default, toggleable.
   const allPlayers = drawScope(DRAW.players);
   const playerRows = filterAllstar(allPlayers, p => p.personId, drawAllstarMode)
-    .map(p => ({ ...p, _href: playerHref(p.personId) }));
+    .map(p => ({ ...p, _href: playerHref(p.personId, p.playerName) }));
   document.getElementById("playerDrawSub").textContent =
     playerRows.length + (drawAllstarMode ? " All-Star" : "") + " visiting players · 20+ road games · " + scopeLabel;
   const pmount = document.getElementById("playerDrawTable");
@@ -363,7 +363,7 @@ function fillBox(box, tm) {
   let rows = (box.rows || []).slice();
   if (box.allstar) rows = filterAllstar(rows, r => r.personId, true);
   rows = rows.slice(0, FP_ROWS).map(r => ({ ...r,
-    _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId) : null) }));
+    _href: r.slug && !r.personId ? arenaHref(r.slug) : (r.personId ? playerHref(r.personId, r.playerName) : null) }));
   tm.innerHTML = "";
   if (rows.length) {
     sortableTable(tm, box.cols, rows, box.initial || { key: box.cols[box.cols.length - 1].key, dir: "desc" },
