@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FedExForum Attendance &amp; Records | NBA Attendance Tracker</title>
+<meta name="description" content="Attendance records, win/loss splits, and road-team draw history for FedExForum in Memphis.">
+<link rel="canonical" href="fedexforum.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="container">
+  <a class="back" href="../index.html">← All players &amp; arenas</a>
+  <div id="head"><div class="ehead"><h1>FedExForum</h1></div></div>
+  <div id="cards"></div>
+  <div class="controls" id="controls" style="display:none">
+    <div class="field">
+      <span class="lbl">Game type</span>
+      <div class="toggle" id="gtToggle">
+        <button data-gt="regular" class="active">Regular Season</button>
+        <button data-gt="playoffs">Playoffs</button>
+      </div>
+    </div>
+  </div>
+  <div id="result"><div class="loading">Loading…</div></div>
+  <div class="block" id="related"></div>
+  <div class="foot" id="foot">Leaderboards · minimum 15 games for the win% board.</div>
+</div>
+
+<script>window.ENTITY_SLUG = "fedexforum";</script>
+<script src="../app.js"></script>
+<script>
+"use strict";
+let building = null, over = null, gt = "regular", season = null;
+
+/* home/away split (merged into the leaderboard); home_games === 0 => shaded row */
+const homeAwayOf = pid => (building.home_away || {})[pid] || null;
+const noHomeClass = r => {
+  const ha = homeAwayOf(r.personId);
+  return (ha && ha.home_games === 0 && ha.away_games > 0) ? "no-home" : "";
+};
+/* Draw rows for the current season selection. Prefers the season-keyed data
+   (2007-2026) when present; otherwise falls back to the single-season fields
+   with the old 2026-only gate. `absent` => the picked season genuinely has no
+   attendance data, so a note replaces the table. */
+function currentDraw() {
+  const vs = building.visiting_draw_by_season, ts = building.team_draw_by_season;
+  if (vs || ts) {
+    if (seasonAbsentFromDraw(building.draw_seasons, season)) return { absent: true, players: [], teams: [] };
+    const k = drawKey(season);
+    return { absent: false, players: (vs && vs[k]) || [], teams: (ts && ts[k]) || [] };
+  }
+  const ok = season == null || season === 2026;   // legacy single-season data
+  return { absent: !ok, players: building.visiting_draw || [], teams: building.team_draw || [] };
+}
+
+async function boot() {
+  // Generated pages (docs/arenas/{slug}.html) bake window.ENTITY_SLUG inline
+  // so this exact shell/script renders them directly, with no query string.
+  // This file (docs/arena.html) has no such global, so a ?slug= visit here
+  // just redirects to the canonical page instead of rendering inline —
+  // the canonical page has a real baked title/meta/H1, this one doesn't.
+  const qslug = qp("slug");
+  const slug = window.ENTITY_SLUG || qslug;
+  if (!window.ENTITY_SLUG && qslug) { location.replace(arenaHref(qslug)); return; }
+  if (!slug) { document.getElementById("result").innerHTML = '<div class="err">No arena given.</div>'; return; }
+  try {
+    [building, over] = await Promise.all([
+      getJSON(DATA + "/buildings/" + encodeURIComponent(slug) + ".json"),
+      getJSON(DATA + "/buildings/overview.json").catch(() => []),
+    ]);
+  } catch (err) {
+    document.getElementById("result").innerHTML = '<div class="err">Could not load arena: ' + esc(err.message) + "</div>"; return;
+  }
+
+  document.title = building.name + " Attendance & Records | NBA Attendance Tracker";
+  const cityCell = building.city_slug
+    ? cityLink(building.city_slug, building.city) : esc(building.city);
+  document.getElementById("head").innerHTML =
+    '<div class="ehead"><h1>' + esc(building.name) + "</h1>" +
+    '<div class="esub"><span class="pill" style="margin-left:0">' + esc(building.buildingType) + "</span>" +
+    "<span>" + cityCell + '</span><span class="sep">·</span>' +
+    "<span>" + seasons(building.first_season, building.last_season) + '</span><span class="sep">·</span>' +
+    "<span>" + fmtInt(building.total_games) + " games hosted</span><span class=\"sep\">·</span>" +
+    "<span>" + fmtInt(building.player_game_rows) + " player-game records</span></div></div>";
+
+  document.getElementById("foot").textContent =
+    "Leaderboards cover the " + seasons(building.first_season, building.last_season) +
+    " seasons · minimum 15 games for the win% board.";
+  await loadAllstar();
+  renderCards();
+  renderRelatedArenas();
+  document.getElementById("controls").style.display = "";
+  makeSeasonPicker(document.getElementById("controls"), building.records_by_season, s => { season = s; render(); }, building.draw_seasons);
+  makeAllstarToggle(document.getElementById("controls"), render);
+  document.querySelectorAll("#gtToggle button").forEach(b =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#gtToggle button").forEach(x => x.classList.toggle("active", x === b));
+      gt = b.dataset.gt; render();
+    }));
+  render();
+}
+
+/* Leaderboards + full-records rows for the current gameType, honoring the season
+   filter. season === null keeps the untouched all-time path (precomputed
+   leaderboards + all-time records). */
+function currentView(gtLabel) {
+  if (season == null) {
+    const lbSet = (allstarMode && building.leaderboards_allstar)
+      ? building.leaderboards_allstar : building.leaderboards;
+    const recs = filterAllstar(building.records.filter(r => r.gameType === gtLabel), r => r.personId);
+    return { lbs: lbSet[gt], recs };
+  }
+  let srecs = (building.records_by_season || [])
+    .filter(r => r.gameType === gtLabel && r.season === season);
+  srecs = filterAllstar(srecs, r => r.personId);
+  const recs = srecs.map(r => ({ ...r, first_season: r.season, last_season: r.season }));
+  return { lbs: computeLeaderboards(srecs), recs };
+}
+
+function renderCards() {
+  const o = (over || []).find(x => x.slug === building.slug);
+  // The scope ("Regular Season", "all-time", a season) folds into the .sub
+  // line instead of being concatenated onto the label — "TOP SCORER ·
+  // REGULAR SEASON" has no clean break point on a narrow card and wraps
+  // mid-word; .sub is plain text that already wraps at word boundaries.
+  const card = (lbl, num, sub, scope) => {
+    const subText = scope ? (sub ? sub + " · " + scope : scope) : sub;
+    return '<div class="stat-card"><div class="lbl">' + lbl + '</div><div class="num">' + num + "</div>" +
+      (subText ? '<div class="sub">' + subText + "</div>" : "") + "</div>";
+  };
+  let html = "";
+  if (o) {
+    // The "Regular Season"/"Playoffs" scope is NOT folded into these three
+    // cards' sub-lines — the Game Type toggle directly below the grid already
+    // states it, so repeating it on every card is pure redundancy.
+    html += card("Top Scorer",
+      o.top_scorer ? playerLink(o.top_scorer.personId, o.top_scorer.name) : "—",
+      o.top_scorer ? fmtInt(o.top_scorer.points) + " total points" : "");
+    html += card("Winningest Player",
+      o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
+      o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
+    html += card("Winningest Team",
+      o.winningest_team ? esc(o.winningest_team.team) : "—",
+      o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
+    html += card("Avg Attendance",
+      o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
+      esc(o.avg_attendance_label || ""));
+    if (o.biggest_draw) {
+      html += card("Biggest Draw",
+        esc(o.biggest_draw.team),
+        signed(o.biggest_draw.mean_delta) + " extra fans/game · " + o.biggest_draw.games + " g (min 15)", "all-time");
+    }
+    if (o.sellout) {
+      html += card("Sellout Rate",
+        pct(o.sellout.pct), "within 0.5% of capacity · " + o.sellout.games + " g", seasonLabel(o.sellout.season));
+    }
+  }
+  document.getElementById("cards").innerHTML = html ? '<div class="stat-cards">' + html + "</div>" : "";
+}
+
+/* "You might also like" — other arenas, same city first, then by games hosted.
+   Sourced client-side from buildings/index.json (already fetched sitewide for
+   the overview table); city_slug isn't on that index, so it's derived with
+   the same slugify() the generator uses — no new field needed. */
+async function renderRelatedArenas() {
+  const mount = document.getElementById("related");
+  let idx;
+  try { idx = await getJSON(DATA + "/buildings/index.json"); }
+  catch (e) { return; }
+  const others = idx.filter(b => b.slug !== building.slug);
+  const sameCity = others.filter(b => b.city === building.city)
+    .sort((a, b) => b.total_games - a.total_games);
+  const rest = others.filter(b => b.city !== building.city)
+    .sort((a, b) => b.total_games - a.total_games);
+  const picks = [...sameCity, ...rest].slice(0, 6)
+    .map(b => ({ ...b, _href: arenaHref(b.slug) }));
+  const cols = [
+    { key: "name", label: "Arena", align: "left", get: r => r.name, cell: r => arenaLink(r.slug, r.name) },
+    { key: "city", label: "City", align: "left", get: r => r.city,
+      cell: r => cityLink(slugify(r.city), r.city) },
+    { key: "total_games", label: "Games", get: r => r.total_games, cell: r => fmtInt(r.total_games) + " hosted" },
+  ];
+  renderRelated(mount, "You might also like", cols, picks);
+}
+
+const LB_DEFS = [
+  { key: "total_points", title: "Most Points", cap: "total points here", col: "Pts", val: r => fmtInt(r.total_points), sort: r => r.total_points },
+  { key: "wins", title: "Most Wins", cap: "games won", col: "W", val: r => fmtInt(r.wins), sort: r => r.wins },
+  { key: "win_pct", title: "Best Win %", cap: "min 15 games", col: "Win%", val: r => pct(r.win_pct), sort: r => r.win_pct },
+  { key: "career_high", title: "Highest Single Game", cap: "career high here", col: "Hi", val: r => fmtInt(r.career_high), sort: r => r.career_high },
+];
+
+function render() {
+  const gtLabel = gt === "regular" ? "Regular Season" : "Playoffs";
+  const { lbs, recs: fullRecs } = currentView(gtLabel);
+  const scope = allstarMode ? "All-Stars" : "all players";
+  const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
+  const mount = document.getElementById("result");
+  mount.innerHTML = "";
+
+  // visiting-player + visiting-team attendance draw leads the detailed
+  // section now, ahead of the leaderboards below. Its own All-Stars-only
+  // default, and a note off-2026 instead of stale numbers.
+  renderDrawTables(mount);
+
+  mount.insertAdjacentHTML("beforeend", "<div class='section-title'>" + esc(building.name) +
+    " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
+    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>");
+
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+  let any = false;
+  LB_DEFS.forEach(def => {
+    const rows = (lbs[def.key] || []).map(r => ({ ...r, _href: playerHref(r.personId) }));
+    if (rows.length) any = true;
+    const card = document.createElement("div");
+    card.className = "block lb-card";
+    card.innerHTML = "<h3>" + def.title + ' <span class="cap">(' + def.cap + ")</span></h3>";
+    const tm = document.createElement("div");
+    card.appendChild(tm);
+    grid.appendChild(card);
+    const cols = [
+      { key: "rank", label: "#", sortable: false, cell: (r, i) => "" },
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: def.key, label: def.col, defaultDir: "desc", get: def.sort, cell: def.val },
+    ];
+    // drop the placeholder rank col (kept simple: index handled by sort order)
+    sortableTable(tm, cols.slice(1), rows, { key: def.key, dir: "desc" }, { rowClass: noHomeClass, ranked: true });
+    wireRowNav(tm);
+  });
+  if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
+    (allstarMode ? " All-Star" : "") + " records at this building.</div>");
+
+  // full records table for this game type (season-aware). The home/away split is
+  // merged in — home + road game counts per player, and rows for players who
+  // never played here for the home team (home games === 0) are shaded.
+  const recs = fullRecs;
+  if (recs.length) {
+    mount.insertAdjacentHTML("beforeend", "<div class='section-title'>All " + gtLabel + " records " +
+      "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>(" + recs.length + " · " + seasonScope +
+      ") · shaded = never played here for the home team</span></div>");
+    const am = document.createElement("div");
+    mount.appendChild(am);
+    const rows = recs.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    const homeG = r => { const ha = homeAwayOf(r.personId); return ha ? ha.home_games : null; };
+    const awayG = r => { const ha = homeAwayOf(r.personId); return ha ? ha.away_games : null; };
+    const cols = [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "home_games", label: "Home", defaultDir: "desc", get: homeG, cell: r => { const v = homeG(r); return v == null ? '<span class="dash">—</span>' : fmtInt(v); } },
+      { key: "away_games", label: "Road", defaultDir: "desc", get: awayG, cell: r => { const v = awayG(r); return v == null ? '<span class="dash">—</span>' : fmtInt(v); } },
+      { key: "wins", label: "W", defaultDir: "desc", get: r => r.wins, cell: r => fmtInt(r.wins) },
+      { key: "losses", label: "L", defaultDir: "desc", get: r => r.losses, cell: r => fmtInt(r.losses) },
+      { key: "win_pct", label: "Win%", defaultDir: "desc", get: r => r.win_pct, cell: r => pct(r.win_pct) },
+      { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) },
+      { key: "ppg", label: "PPG", defaultDir: "desc", get: r => r.ppg, cell: r => fmt1(r.ppg) },
+      { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) },
+      { key: "seasons", label: "Seasons", align: "left", defaultDir: "asc", get: r => r.first_season, cell: r => '<span class="sub">' + seasons(r.first_season, r.last_season) + "</span>" },
+    ];
+    sortableTable(am, cols, rows, { key: "total_points", dir: "desc" }, { rowClass: noHomeClass });
+    wireRowNav(am);
+  }
+}
+
+/* Visiting-player draw and visiting-team draw, side by side. These default to
+   All-Stars only (drawAllstarMode) — the opposite default from the career
+   tables — and are toggleable to show everyone. The section follows the season
+   selector: All Seasons is an all-years aggregate, a season shows that season,
+   and a season with no attendance data shows a note. */
+function renderDrawTables(mount) {
+  const hasAny = (building.visiting_draw_by_season || building.team_draw_by_season
+    || (building.visiting_draw || []).length || (building.team_draw || []).length);
+  if (!hasAny) return;
+  const { absent, players, teams } = currentDraw();
+  const scopeLabel = season == null
+    ? "all seasons · " + esc(building.draw_label || "")
+    : esc(seasonLabel(season));
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Who drew the most here " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
+
+  if (absent) {
+    mount.insertAdjacentHTML("beforeend",
+      '<div class="draw-note">No attendance data exists for the <strong>' + esc(seasonLabel(season)) +
+      "</strong> season, so there's no draw to show. Attendance is available for " +
+      esc(building.draw_label || "2026") + " — pick a covered season or <strong>All Seasons</strong>.</div>");
+    return;
+  }
+
+  const dc = document.createElement("div");
+  dc.className = "controls";
+  mount.appendChild(dc);
+  makeAllstarToggle(dc, render, {
+    label: "Draw players", get: () => drawAllstarMode, set: v => { drawAllstarMode = v; },
+  });
+
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+
+  // players (All-Star filterable)
+  const pfil = filterAllstar(players, r => r.personId, drawAllstarMode);
+  const pcard = document.createElement("div");
+  pcard.className = "block lb-card";
+  pcard.innerHTML = '<h3>Visiting players <span class="cap">(avg draw vs baseline)</span></h3>';
+  const pm = document.createElement("div");
+  pcard.appendChild(pm); grid.appendChild(pcard);
+  if (pfil.length) {
+    const prows = pfil.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    sortableTable(pm, [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      ...drawDeltaCols(),
+    ], prows, { key: "total_delta", dir: "desc" }, { ranked: true });
+    wireRowNav(pm);
+  } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
+
+  // teams have no All-Star attribute, so the toggle governs the player table
+  // only; the team draw always shows every visiting team.
+  const tcard = document.createElement("div");
+  tcard.className = "block lb-card";
+  const teamCap = drawAllstarMode ? "all teams — no All-Star filter applies" : "avg draw vs baseline";
+  tcard.innerHTML = '<h3>Visiting teams <span class="cap">(' + teamCap + ")</span></h3>";
+  const tm = document.createElement("div");
+  tcard.appendChild(tm); grid.appendChild(tcard);
+  if (teams.length) {
+    sortableTable(tm, [
+      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team || "", cell: teamNameCell },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      ...drawDeltaCols(),
+    ], teams.slice(), { key: "total_delta", dir: "desc" }, { ranked: true });
+  } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
+}
+
+boot();
+</script>
+</body>
+</html>

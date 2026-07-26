@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Las Vegas NBA Arena Records | NBA Attendance Tracker</title>
+<meta name="description" content="NBA arena attendance and records for every building in Las Vegas.">
+<link rel="canonical" href="las-vegas.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="container">
+  <a class="back" href="../index.html">← All players &amp; arenas</a>
+  <div id="head"><div class="ehead"><h1>Las Vegas</h1></div></div>
+  <div id="buildings"></div>
+  <div id="cards"></div>
+  <div class="controls" id="controls" style="display:none">
+    <div class="field">
+      <span class="lbl">Game type</span>
+      <div class="toggle" id="gtToggle">
+        <button data-gt="regular" class="active">Regular Season</button>
+        <button data-gt="playoffs">Playoffs</button>
+      </div>
+    </div>
+  </div>
+  <div id="result"><div class="loading">Loading…</div></div>
+  <div class="block" id="related"></div>
+  <div class="foot" id="foot">Every arena in the city is combined · minimum 15 games for the win% board.</div>
+</div>
+
+<script>window.ENTITY_SLUG = "las-vegas";</script>
+<script src="../app.js"></script>
+<script>
+"use strict";
+let city = null, over = null, gt = "regular", season = null;
+
+/* Draw rows for the current season selection (season-keyed data preferred,
+   single-season fallback). `absent` => the picked season genuinely has no data. */
+function currentDraw() {
+  const vs = city.visiting_draw_by_season, ts = city.team_draw_by_season;
+  if (vs || ts) {
+    if (seasonAbsentFromDraw(city.draw_seasons, season)) return { absent: true, players: [], teams: [] };
+    const k = drawKey(season);
+    return { absent: false, players: (vs && vs[k]) || [], teams: (ts && ts[k]) || [] };
+  }
+  const ok = season == null || season === 2026;
+  return { absent: !ok, players: city.visiting_draw || [], teams: city.team_draw || [] };
+}
+
+async function boot() {
+  // Generated pages (docs/cities/{slug}.html) bake window.ENTITY_SLUG inline
+  // so this exact shell/script renders them directly, with no query string.
+  // This file (docs/city.html) has no such global, so a ?slug= visit here
+  // just redirects to the canonical page instead of rendering inline —
+  // the canonical page has a real baked title/meta/H1, this one doesn't.
+  const qslug = qp("slug");
+  const slug = window.ENTITY_SLUG || qslug;
+  if (!window.ENTITY_SLUG && qslug) { location.replace(cityHref(qslug)); return; }
+  if (!slug) { document.getElementById("result").innerHTML = '<div class="err">No city given.</div>'; return; }
+  try {
+    [city, over] = await Promise.all([
+      getJSON(DATA + "/cities/" + encodeURIComponent(slug) + ".json"),
+      getJSON(DATA + "/cities/overview.json").catch(() => []),
+    ]);
+  } catch (err) {
+    document.getElementById("result").innerHTML = '<div class="err">Could not load city: ' + esc(err.message) + "</div>"; return;
+  }
+
+  document.title = city.name + " NBA Arena Records | NBA Attendance Tracker";
+  document.getElementById("head").innerHTML =
+    '<div class="ehead"><h1>' + esc(city.name) + "</h1>" +
+    '<div class="esub"><span class="pill" style="margin-left:0">City</span>' +
+    "<span>" + (city.buildings || []).length + " arena" + ((city.buildings || []).length === 1 ? "" : "s") + '</span><span class="sep">·</span>' +
+    "<span>" + seasons(city.first_season, city.last_season) + '</span><span class="sep">·</span>' +
+    "<span>" + fmtInt(city.total_games) + " games hosted</span></div></div>";
+
+  const chips = (city.buildings || []).map(b => arenaLink(b.slug, b.name)).join("");
+  document.getElementById("buildings").innerHTML = chips ? '<div class="city-buildings">' + chips + "</div>" : "";
+
+  document.getElementById("foot").textContent =
+    "Every arena in the city is combined · leaderboards cover the " +
+    seasons(city.first_season, city.last_season) + " seasons · minimum 15 games for the win% board.";
+  await loadAllstar();
+  renderCards();
+  renderRelatedCities();
+  document.getElementById("controls").style.display = "";
+  makeSeasonPicker(document.getElementById("controls"), city.records_by_season, s => { season = s; render(); }, city.draw_seasons);
+  makeAllstarToggle(document.getElementById("controls"), render);
+  document.querySelectorAll("#gtToggle button").forEach(b =>
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#gtToggle button").forEach(x => x.classList.toggle("active", x === b));
+      gt = b.dataset.gt; render();
+    }));
+  render();
+}
+
+/* Leaderboards + records for the current gameType, honoring the season filter.
+   season === null keeps the untouched all-time path. */
+function currentView(gtLabel) {
+  if (season == null) {
+    const lbSet = (allstarMode && city.leaderboards_allstar) ? city.leaderboards_allstar : city.leaderboards;
+    const recs = filterAllstar(city.records.filter(r => r.gameType === gtLabel), r => r.personId);
+    return { lbs: lbSet[gt], recs };
+  }
+  let srecs = (city.records_by_season || [])
+    .filter(r => r.gameType === gtLabel && r.season === season);
+  srecs = filterAllstar(srecs, r => r.personId);
+  const recs = srecs.map(r => ({ ...r, first_season: r.season, last_season: r.season }));
+  return { lbs: computeLeaderboards(srecs), recs };
+}
+
+/* A compact one-line-per-stat info panel instead of four separate
+   label/value/sub stat-cards — "2 arenas · 2,859 games hosted" and
+   "Top scorer: Kobe Bryant — 16,216 pts" read in one line each, rather than
+   spreading the same handful of facts across three-line blocks. */
+function renderCards() {
+  const o = (over || []).find(x => x.slug === city.slug);
+  const arenaCount = (city.buildings || []).length;
+  const lines = [
+    arenaCount + " arena" + (arenaCount === 1 ? "" : "s") + " · " +
+      fmtInt(city.total_games) + " games hosted · " + esc(seasons(city.first_season, city.last_season)),
+  ];
+  if (o) {
+    lines.push("Top scorer: " + (o.top_scorer
+      ? playerLink(o.top_scorer.personId, o.top_scorer.name) + " — " + fmtInt(o.top_scorer.points) + " pts"
+      : "—"));
+    lines.push("Winningest player: " + (o.winningest_player
+      ? playerLink(o.winningest_player.personId, o.winningest_player.name) + " — " +
+        pct(o.winningest_player.win_pct) + " (" + o.winningest_player.games + " g, min 15)"
+      : "—"));
+  }
+  document.getElementById("cards").innerHTML =
+    '<div class="info-panel">' + lines.map(l => '<div class="info-line">' + l + "</div>").join("") + "</div>";
+}
+
+/* "You might also like" — other cities ranked by games hosted, from the
+   already-existing cities/index.json (fetched sitewide for the overview tab). */
+async function renderRelatedCities() {
+  const mount = document.getElementById("related");
+  let idx;
+  try { idx = await getJSON(DATA + "/cities/index.json"); }
+  catch (e) { return; }
+  const picks = idx.filter(c => c.slug !== city.slug)
+    .sort((a, b) => b.total_games - a.total_games)
+    .slice(0, 6)
+    .map(c => ({ ...c, _href: cityHref(c.slug) }));
+  const cols = [
+    { key: "name", label: "City", align: "left", get: r => r.name, cell: r => cityLink(r.slug, r.name) },
+    { key: "arenas", label: "Arenas", get: r => (r.buildings || []).length, cell: r => fmtInt((r.buildings || []).length) },
+    { key: "total_games", label: "Games", get: r => r.total_games, cell: r => fmtInt(r.total_games) + " hosted" },
+  ];
+  renderRelated(mount, "You might also like", cols, picks);
+}
+
+const LB_DEFS = [
+  { key: "total_points", title: "Most Points", cap: "total points here", col: "Pts", val: r => fmtInt(r.total_points), sort: r => r.total_points },
+  { key: "wins", title: "Most Wins", cap: "games won", col: "W", val: r => fmtInt(r.wins), sort: r => r.wins },
+  { key: "win_pct", title: "Best Win %", cap: "min 15 games", col: "Win%", val: r => pct(r.win_pct), sort: r => r.win_pct },
+  { key: "career_high", title: "Highest Single Game", cap: "career high here", col: "Hi", val: r => fmtInt(r.career_high), sort: r => r.career_high },
+];
+
+function render() {
+  const gtLabel = gt === "regular" ? "Regular Season" : "Playoffs";
+  const { lbs, recs: fullRecs } = currentView(gtLabel);
+  const scope = allstarMode ? "All-Stars" : "all players";
+  const seasonScope = season == null ? "All Seasons" : seasonLabel(season);
+  const mount = document.getElementById("result");
+  mount.innerHTML = "";
+
+  // visiting-player + visiting-team draw for the whole city (aggregated across
+  // its arenas) leads the detailed section now, ahead of the leaderboards
+  // below. All-Stars-only default, 2026-only note off-season.
+  renderDrawTables(mount);
+
+  mount.insertAdjacentHTML("beforeend", "<div class='section-title'>" + esc(city.name) +
+    " leaders <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " +
+    gtLabel + " · " + seasonScope + " · " + scope + "</span></div>");
+
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+  let any = false;
+  LB_DEFS.forEach(def => {
+    const rows = (lbs[def.key] || []).map(r => ({ ...r, _href: playerHref(r.personId) }));
+    if (rows.length) any = true;
+    const card = document.createElement("div");
+    card.className = "block lb-card";
+    card.innerHTML = "<h3>" + def.title + ' <span class="cap">(' + def.cap + ")</span></h3>";
+    const tm = document.createElement("div");
+    card.appendChild(tm);
+    grid.appendChild(card);
+    const cols = [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: def.key, label: def.col, defaultDir: "desc", get: def.sort, cell: def.val },
+    ];
+    sortableTable(tm, cols, rows, { key: def.key, dir: "desc" }, { ranked: true });
+    wireRowNav(tm);
+  });
+  if (!any) mount.insertAdjacentHTML("beforeend", '<div class="empty">No ' + gtLabel +
+    (allstarMode ? " All-Star" : "") + " records in this city.</div>");
+
+  // full records table for this game type (season-aware)
+  const recs = fullRecs;
+  if (recs.length) {
+    mount.insertAdjacentHTML("beforeend", "<div class='section-title'>All " + gtLabel + " records <span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>(" + recs.length + " · " + seasonScope + ")</span></div>");
+    const am = document.createElement("div");
+    mount.appendChild(am);
+    const rows = recs.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    const cols = [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "GP", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      { key: "wins", label: "W", defaultDir: "desc", get: r => r.wins, cell: r => fmtInt(r.wins) },
+      { key: "losses", label: "L", defaultDir: "desc", get: r => r.losses, cell: r => fmtInt(r.losses) },
+      { key: "win_pct", label: "Win%", defaultDir: "desc", get: r => r.win_pct, cell: r => pct(r.win_pct) },
+      { key: "total_points", label: "Pts", defaultDir: "desc", get: r => r.total_points, cell: r => fmtInt(r.total_points) },
+      { key: "ppg", label: "PPG", defaultDir: "desc", get: r => r.ppg, cell: r => fmt1(r.ppg) },
+      { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) },
+      { key: "seasons", label: "Seasons", align: "left", defaultDir: "asc", get: r => r.first_season, cell: r => '<span class="sub">' + seasons(r.first_season, r.last_season) + "</span>" },
+    ];
+    sortableTable(am, cols, rows, { key: "total_points", dir: "desc" });
+    wireRowNav(am);
+  }
+}
+
+/* City-level visiting-player / visiting-team draw (aggregated across the city's
+   arenas). All-Stars-only default (drawAllstarMode). Follows the season selector:
+   All Seasons = all-years aggregate, a season shows that season, a season with no
+   attendance data shows a note. */
+function renderDrawTables(mount) {
+  const hasAny = (city.visiting_draw_by_season || city.team_draw_by_season
+    || (city.visiting_draw || []).length || (city.team_draw || []).length);
+  if (!hasAny) return;
+  const { absent, players, teams } = currentDraw();
+  const scopeLabel = season == null
+    ? "all seasons · " + esc(city.draw_label || "")
+    : esc(seasonLabel(season));
+  mount.insertAdjacentHTML("beforeend",
+    "<div class='section-title'>Who drew the most in " + esc(city.name) + " " +
+    "<span style='color:var(--text-secondary);font-weight:400;font-size:.8rem'>— " + scopeLabel + "</span></div>");
+  mount.insertAdjacentHTML("beforeend", drawExplainerHTML());
+
+  if (absent) {
+    mount.insertAdjacentHTML("beforeend",
+      '<div class="draw-note">No attendance data exists for the <strong>' + esc(seasonLabel(season)) +
+      "</strong> season, so there's no draw to show. Attendance is available for " +
+      esc(city.draw_label || "2026") + " — pick a covered season or <strong>All Seasons</strong>.</div>");
+    return;
+  }
+
+  const dc = document.createElement("div");
+  dc.className = "controls";
+  mount.appendChild(dc);
+  makeAllstarToggle(dc, render, {
+    label: "Draw players", get: () => drawAllstarMode, set: v => { drawAllstarMode = v; },
+  });
+
+  const grid = document.createElement("div");
+  grid.className = "lb-grid";
+  mount.appendChild(grid);
+
+  const pfil = filterAllstar(players, r => r.personId, drawAllstarMode);
+  const pcard = document.createElement("div");
+  pcard.className = "block lb-card";
+  pcard.innerHTML = '<h3>Visiting players <span class="cap">(avg draw vs baseline)</span></h3>';
+  const pm = document.createElement("div");
+  pcard.appendChild(pm); grid.appendChild(pcard);
+  if (pfil.length) {
+    const prows = pfil.map(r => ({ ...r, _href: playerHref(r.personId) }));
+    sortableTable(pm, [
+      { key: "playerName", label: "Player", align: "left", defaultDir: "asc", get: r => r.playerName, cell: r => playerLink(r.personId, r.playerName) },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      ...drawDeltaCols(),
+    ], prows, { key: "total_delta", dir: "desc" }, { ranked: true });
+    wireRowNav(pm);
+  } else { pm.innerHTML = '<div class="empty">No visiting-player draw on record.</div>'; }
+
+  const tcard = document.createElement("div");
+  tcard.className = "block lb-card";
+  const teamCap = drawAllstarMode ? "all teams — no All-Star filter applies" : "avg draw vs baseline";
+  tcard.innerHTML = '<h3>Visiting teams <span class="cap">(' + teamCap + ")</span></h3>";
+  const tm = document.createElement("div");
+  tcard.appendChild(tm); grid.appendChild(tcard);
+  if (teams.length) {
+    sortableTable(tm, [
+      { key: "team", label: "Team", align: "left", defaultDir: "asc", get: r => r.team || "", cell: teamNameCell },
+      { key: "games", label: "G", defaultDir: "desc", get: r => r.games, cell: r => fmtInt(r.games) },
+      ...drawDeltaCols(),
+    ], teams.slice(), { key: "total_delta", dir: "desc" }, { ranked: true });
+  } else { tm.innerHTML = '<div class="empty">No visiting-team draw on record.</div>'; }
+}
+
+boot();
+</script>
+</body>
+</html>
