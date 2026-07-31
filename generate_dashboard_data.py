@@ -369,7 +369,7 @@ def load_game_counts(data_dir):
     dropped every 1980-2006 game.
     """
     import pandas as pd
-    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO
+    from arena_resolver import load_arena_resolver
 
     games_path = os.path.join(data_dir, "Games.csv")
     g = pd.read_csv(games_path, low_memory=False)
@@ -377,7 +377,9 @@ def load_game_counts(data_dir):
     g["season"] = g["gameDate"].dt.year + (g["gameDate"].dt.month >= 8).astype("int64")
 
     resolver = load_arena_resolver(data_dir)
-    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    # floor is the real minimum first_season in arena_mapping_pre2007.csv (see
+    # arena_resolver.load_arena_resolver), not a hardcoded season.
+    floor = resolver.pre2007_lo if resolver.has_pre2007 else 2007
     g = g[(g["season"] >= floor) & g["gameType"].isin(("Regular Season", "Playoffs"))].copy()
     g = resolver.attach(g)
     g = g[g["building"].notna()]

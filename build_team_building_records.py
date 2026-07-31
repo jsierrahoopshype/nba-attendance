@@ -42,7 +42,7 @@ def load_games(data_dir: str) -> pd.DataFrame:
     extends to 1980 (arenaId mapping first, then home team city+name+season via
     arena_resolver, with a coverage report and a >2% unresolved stop). Without
     that file, behavior is exactly as before (2007+ via arenaId only)."""
-    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO, UNMATCHED_GATE
+    from arena_resolver import load_arena_resolver, PRE2007_SEASON_HI, UNMATCHED_GATE
 
     games_path = os.path.join(data_dir, "Games.csv")
     if not os.path.exists(games_path):
@@ -55,11 +55,13 @@ def load_games(data_dir: str) -> pd.DataFrame:
     g["arenaId"] = pd.to_numeric(g["arenaId"], errors="coerce")
     g["winner"] = pd.to_numeric(g["winner"], errors="coerce")
 
-    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    # floor is the real minimum first_season in arena_mapping_pre2007.csv (see
+    # arena_resolver.load_arena_resolver), not a hardcoded season.
+    floor = resolver.pre2007_lo if resolver.has_pre2007 else 2007
     if resolver.has_pre2007:
         _, _, frac = resolver.coverage_report(g)
         if frac > UNMATCHED_GATE:
-            sys.exit(f"STOP: {frac:.2%} of 1980-2006 games are unresolved "
+            sys.exit(f"STOP: {frac:.2%} of {floor}-{PRE2007_SEASON_HI} games are unresolved "
                      f"(> {UNMATCHED_GATE:.0%}); fix arena_mapping_pre2007.csv and re-run.")
 
     g = g[(g["season"] >= floor) & g["gameType"].isin(GAME_TYPES) & g["winner"].notna()].copy()
