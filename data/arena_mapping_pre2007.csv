@@ -1,60 +1,60 @@
 teamCity,teamName,first_season,last_season,building,city,note
-Atlanta,Hawks,1980,1997,The Omni,Atlanta,demolished 1997
+Atlanta,Hawks,1972,1997,The Omni,Atlanta,demolished 1997
 Atlanta,Hawks,1998,1999,Georgia Dome,Atlanta,VERIFY: split with Alexander Memorial Coliseum during Philips construction
 Atlanta,Hawks,2000,2006,State Farm Arena,Atlanta,as Philips Arena
-Boston,Celtics,1980,1995,Boston Garden,Boston,demolished
+Boston,Celtics,1962,1995,Boston Garden,Boston,demolished
 Boston,Celtics,1996,2006,TD Garden,Boston,as FleetCenter
-New Jersey,Nets,1980,1981,Rutgers Athletic Center,Piscataway,
+New Jersey,Nets,1978,1981,Rutgers Athletic Center,Piscataway,
 New Jersey,Nets,1982,2006,Izod Center,East Rutherford,as Brendan Byrne / Continental Airlines Arena
 Charlotte,Hornets,1989,2002,Charlotte Coliseum,Charlotte,original Hornets; demolished 2007; NOT Spectrum Center
 Charlotte,Bobcats,2005,2005,Charlotte Coliseum,Charlotte,Bobcats debut season at old building
 Charlotte,Bobcats,2006,2006,Spectrum Center,Charlotte,as Charlotte Bobcats Arena
-Chicago,Bulls,1980,1994,Chicago Stadium,Chicago,demolished
+Chicago,Bulls,1966,1994,Chicago Stadium,Chicago,demolished
 Chicago,Bulls,1995,2006,United Center,Chicago,
-Cleveland,Cavaliers,1980,1994,Richfield Coliseum,Richfield,demolished
+Cleveland,Cavaliers,1974,1994,Richfield Coliseum,Richfield,demolished
 Cleveland,Cavaliers,1995,2006,Rocket Arena,Cleveland,as Gund Arena
 Dallas,Mavericks,1981,2001,Reunion Arena,Dallas,franchise founded 1980-81; demolished
 Dallas,Mavericks,2002,2006,American Airlines Center,Dallas,
-Denver,Nuggets,1980,1999,McNichols Sports Arena,Denver,demolished
+Denver,Nuggets,1977,1999,McNichols Sports Arena,Denver,demolished
 Denver,Nuggets,2000,2006,Ball Arena,Denver,as Pepsi Center
-Detroit,Pistons,1980,1988,Pontiac Silverdome,Pontiac,
+Detroit,Pistons,1979,1988,Pontiac Silverdome,Pontiac,
 Detroit,Pistons,1989,2006,The Palace of Auburn Hills,Auburn Hills,
-Golden State,Warriors,1980,1996,Oracle Arena,Oakland,as Oakland-Alameda County Coliseum Arena
+Golden State,Warriors,1972,1996,Oracle Arena,Oakland,as Oakland-Alameda County Coliseum Arena
 Golden State,Warriors,1997,1997,San Jose Arena,San Jose,VERIFY: one season in San Jose during Oakland renovation
 Golden State,Warriors,1998,2006,Oracle Arena,Oakland,post-renovation
-Houston,Rockets,1980,2003,The Summit,Houston,later Compaq Center
+Houston,Rockets,1976,2003,The Summit,Houston,later Compaq Center
 Houston,Rockets,2004,2006,Toyota Center,Houston,
-Indiana,Pacers,1980,1999,Market Square Arena,Indianapolis,demolished
+Indiana,Pacers,1977,1999,Market Square Arena,Indianapolis,demolished
 Indiana,Pacers,2000,2006,Gainbridge Fieldhouse,Indianapolis,as Conseco Fieldhouse
-San Diego,Clippers,1980,1984,San Diego Sports Arena,San Diego,
+San Diego,Clippers,1979,1984,San Diego Sports Arena,San Diego,
 Los Angeles,Clippers,1985,1999,LA Memorial Sports Arena,Los Angeles,VERIFY: occasional Anaheim Pond home games in the 90s will mismap here
 Los Angeles,Clippers,2000,2006,Crypto.com Arena,Los Angeles,as Staples Center
-Los Angeles,Lakers,1980,1999,The Forum,Inglewood,
+Los Angeles,Lakers,1968,1999,The Forum,Inglewood,
 Los Angeles,Lakers,2000,2006,Crypto.com Arena,Los Angeles,as Staples Center
 Vancouver,Grizzlies,1996,2001,Rogers Arena,Vancouver,as General Motors Place; home era not neutral
 Memphis,Grizzlies,2002,2004,Pyramid Arena,Memphis,
 Memphis,Grizzlies,2005,2006,FedExForum,Memphis,
 Miami,Heat,1989,1999,Miami Arena,Miami,demolished
 Miami,Heat,2000,2006,Kaseya Center,Miami,as AmericanAirlines Arena
-Milwaukee,Bucks,1980,1988,MECCA Arena,Milwaukee,
+Milwaukee,Bucks,1968,1988,MECCA Arena,Milwaukee,as Milwaukee Arena 1968-1974
 Milwaukee,Bucks,1989,2006,Bradley Center,Milwaukee,
 Minnesota,Timberwolves,1990,1990,Hubert H. Humphrey Metrodome,Minneapolis,debut season
 Minnesota,Timberwolves,1991,2006,Target Center,Minneapolis,
 New Orleans,Hornets,2003,2005,Smoothie King Center,New Orleans,as New Orleans Arena
 Oklahoma City,Hornets,2006,2006,Paycom Center,Oklahoma City,VERIFY exact team string in Games.csv; as Ford Center; some games in Baton Rouge/New Orleans
-New York,Knicks,1980,2006,Madison Square Garden,New York,
+New York,Knicks,1969,2006,Madison Square Garden,New York,
 Orlando,Magic,1990,2006,Amway Arena,Orlando,as Orlando Arena; old building
-Philadelphia,76ers,1980,1996,The Spectrum,Philadelphia,demolished
+Philadelphia,76ers,1968,1996,The Spectrum,Philadelphia,demolished
 Philadelphia,76ers,1997,2006,Xfinity Mobile Arena,Philadelphia,as CoreStates/First Union/Wachovia Center
-Phoenix,Suns,1980,1992,Arizona Veterans Memorial Coliseum,Phoenix,
+Phoenix,Suns,1968,1992,Arizona Veterans Memorial Coliseum,Phoenix,
 Phoenix,Suns,1993,2006,Mortgage Matchup Center,Phoenix,as America West Arena
-Portland,Trail Blazers,1980,1995,Memorial Coliseum,Portland,
+Portland,Trail Blazers,1970,1995,Memorial Coliseum,Portland,
 Portland,Trail Blazers,1996,2006,Moda Center,Portland,as Rose Garden
 Kansas City,Kings,1980,1980,Municipal Auditorium,Kansas City,roof collapse forced most of season here despite Kemper opening 1974
 Kansas City,Kings,1981,1985,Kemper Arena,Kansas City,
 Sacramento,Kings,1986,1988,ARCO Arena I,Sacramento,VERIFY: original small ARCO; separate building from Sleep Train
 Sacramento,Kings,1989,2006,Sleep Train Arena,Sacramento,as ARCO Arena II
-San Antonio,Spurs,1980,1993,HemisFair Arena,San Antonio,demolished
+San Antonio,Spurs,1977,1993,HemisFair Arena,San Antonio,demolished
 San Antonio,Spurs,1994,2002,Alamodome,San Antonio,
 San Antonio,Spurs,2003,2006,Frost Bank Center,San Antonio,as SBC Center
 Seattle,SuperSonics,1980,1985,Kingdome,Seattle,VERIFY exact Kingdome era boundaries; demolished
@@ -65,5 +65,27 @@ Toronto,Raptors,1996,1999,SkyDome,Toronto,VERIFY: 1999 season split; ACC opened 
 Toronto,Raptors,2000,2006,Scotiabank Arena,Toronto,as Air Canada Centre
 Utah,Jazz,1980,1991,Salt Palace,Salt Lake City,demolished
 Utah,Jazz,1992,2006,Delta Center,Salt Lake City,original Delta Center name
-Washington,Bullets,1980,1997,Capital Centre,Landover,later USAir Arena; demolished
+Washington,Bullets,1974,1997,Capital Centre,Landover,later USAir Arena; demolished
 Washington,Wizards,1998,2006,Capital One Arena,Washington,as MCI Center; name change from Bullets in 1997
+Capital,Bullets,1974,1974,Capital Centre,Landover,one-season 'Capital Bullets' branding before Washington Bullets
+Philadelphia,Warriors,1962,1962,Philadelphia Arena,Philadelphia,"VERIFY: final Philadelphia season before 1963 San Francisco move, building not independently confirmed for this specific era"
+Seattle,SuperSonics,1968,1975,Seattle Center Coliseum,Seattle,"verified via incidental confirmation (1969-70 and 1974-75 game logs); 1976-1979 NOT verified, left as a known gap alongside the existing Kingdome VERIFY flag"
+San Diego,Rockets,1968,1971,San Diego Sports Arena,San Diego,"pre-Houston era, earlier tenant of this building"
+Houston,Rockets,1972,1975,Hofheinz Pavilion,Houston,some Astrodome games in 1971-72 per some sources
+St. Louis,Hawks,1962,1968,Kiel Auditorium,St. Louis,pre-Atlanta move
+Atlanta,Hawks,1969,1971,Alexander Memorial Coliseum,Atlanta,"Georgia Tech's arena, now McCamish Pavilion; pre-Omni"
+Los Angeles,Lakers,1962,1967,LA Memorial Sports Arena,Los Angeles,"pre-Forum; distinct earlier tenant, not the later Clippers-era row"
+New York,Knicks,1962,1968,Madison Square Garden III,New York,demolished 1968; distinct building from current MSG; season 1968 verified majority by real game count (29 of 42)
+Cincinnati,Royals,1962,1972,Cincinnati Gardens,Cincinnati,pre-Kansas City-Omaha move
+Kansas City-Omaha,Kings,1973,1975,Municipal Auditorium,Kansas City,"VERIFY: genuinely split KC/Omaha this era; assigned Kansas City as best-documented primary, low confidence"
+Kansas City,Kings,1976,1979,Kemper Arena,Kansas City,"pre-roof-collapse Kemper years, distinct from the 1980 Municipal Auditorium interruption and the 1981-85 Kemper row already in this file"
+Buffalo,Braves,1971,1978,Buffalo Memorial Auditorium,Buffalo,minor Toronto/Maple Leaf Gardens games 1971-75 (~16 total) don't change any season's majority
+Cleveland,Cavaliers,1971,1973,Cleveland Arena,Cleveland,pre-Richfield; demolished
+Syracuse,Nationals,1962,1963,Onondaga County War Memorial,Syracuse,final Syracuse seasons before 1963 Philadelphia move
+Philadelphia,76ers,1964,1967,Philadelphia Arena,Philadelphia,"VERIFY: also used Convention Hall/Civic Center concurrently, low confidence best-documented-primary"
+San Francisco,Warriors,1963,1971,Cow Palace,San Francisco,"VERIFY: genuinely multi-venue era (also SF Civic Auditorium, later Oakland), low confidence best-documented-primary"
+Baltimore,Bullets,1963,1973,Baltimore Civic Center,Baltimore,"pre-Capital Centre; before that, Chicago Packers/Zephyrs 1961-63, arena not yet researched"
+Detroit,Pistons,1962,1978,Cobo Arena,Detroit,"VERIFY: assumed stable tenancy across this span, only incidentally confirmed mid-window via other teams' game logs"
+New Orleans,Jazz,1975,1975,Municipal Auditorium,New Orleans,"VERIFY: debut season also split with Loyola Field House, Municipal documented as primary"
+New Orleans,Jazz,1976,1979,Louisiana Superdome,New Orleans,
+New York,Nets,1977,1977,Nassau Veterans Memorial Coliseum,Uniondale,single NBA-only season before New Jersey move
