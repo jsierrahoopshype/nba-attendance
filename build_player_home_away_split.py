@@ -51,7 +51,7 @@ def load_game_context(data_dir: str) -> pd.DataFrame:
     floor is 1980 and a coverage report prints first, stopping the build if >2% of
     1980-2006 games are unresolved; without it the floor is 2007 and behavior is
     exactly as before."""
-    from arena_resolver import load_arena_resolver, PRE2007_SEASON_LO, UNMATCHED_GATE
+    from arena_resolver import load_arena_resolver, PRE2007_SEASON_HI, UNMATCHED_GATE
 
     games_path = os.path.join(data_dir, "Games.csv")
     if not os.path.exists(games_path):
@@ -62,11 +62,13 @@ def load_game_context(data_dir: str) -> pd.DataFrame:
     g["gameDate"] = pd.to_datetime(g["gameDate"], errors="coerce")
     g["season"] = derive_season(g["gameDate"])
 
-    floor = PRE2007_SEASON_LO if resolver.has_pre2007 else 2007
+    # floor is the real minimum first_season in arena_mapping_pre2007.csv (see
+    # arena_resolver.load_arena_resolver), not a hardcoded season.
+    floor = resolver.pre2007_lo if resolver.has_pre2007 else 2007
     if resolver.has_pre2007:
         _, _, frac = resolver.coverage_report(g)
         if frac > UNMATCHED_GATE:
-            sys.exit(f"STOP: {frac:.2%} of 1980-2006 games are unresolved "
+            sys.exit(f"STOP: {frac:.2%} of {floor}-{PRE2007_SEASON_HI} games are unresolved "
                      f"(> {UNMATCHED_GATE:.0%}); fix arena_mapping_pre2007.csv and re-run.")
 
     g = g[(g["season"] >= floor) & g["gameType"].isin(GAME_TYPES)].copy()

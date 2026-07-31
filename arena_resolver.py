@@ -28,9 +28,14 @@ from collections import defaultdict
 
 import pandas as pd
 
-PRE2007_SEASON_LO = 1980
+PRE2007_SEASON_LO = 1980   # fallback only — used when arena_mapping_pre2007.csv
+                            # is missing/empty and tier 2 is inert anyway. When the
+                            # file is present, ArenaResolver.pre2007_lo (the real
+                            # floor every caller should use) is derived from its
+                            # minimum first_season instead, so extending the mapping
+                            # further back needs no code change here or in any caller.
 PRE2007_SEASON_HI = 2006
-UNMATCHED_GATE = 0.02   # stop building if >2% of 1980-2006 games are unresolved
+UNMATCHED_GATE = 0.02   # stop building if >2% of pre-2007-window games are unresolved
 
 
 def _norm(s):
@@ -38,12 +43,18 @@ def _norm(s):
 
 
 class ArenaResolver:
-    def __init__(self, id_building, id_city, id_type, pre2007_index, has_pre2007):
+    def __init__(self, id_building, id_city, id_type, pre2007_index, has_pre2007,
+                 pre2007_lo=PRE2007_SEASON_LO):
         self.id_building = id_building      # arenaId -> building
         self.id_city = id_city              # arenaId -> city
         self.id_type = id_type              # arenaId -> type (home/neutral/bubble)
         self.pre2007 = pre2007_index        # (city, name) -> [(first, last, building, city)]
         self.has_pre2007 = has_pre2007
+        # The real floor of the pre-2007 window — the minimum first_season actually
+        # present in arena_mapping_pre2007.csv (see load_arena_resolver), not a
+        # hardcoded constant. Every caller that needs "how far back does tier 2 go"
+        # should read this, not PRE2007_SEASON_LO directly.
+        self.pre2007_lo = pre2007_lo
 
     # ---- tier 2 lookup for one (city, name, season) ----
     def _pre2007_lookup(self, city, name, season):
@@ -79,7 +90,7 @@ class ArenaResolver:
 
         # tier 2 — pre-2007 team-season lookup, arenaId ignored.
         if self.has_pre2007:
-            pre = g["season"].between(PRE2007_SEASON_LO, PRE2007_SEASON_HI)
+            pre = g["season"].between(self.pre2007_lo, PRE2007_SEASON_HI)
             if pre.any():
                 sub = g.loc[pre, ["hometeamCity", "hometeamName", "season"]]
                 resolved = {}
@@ -93,9 +104,14 @@ class ArenaResolver:
                 g.loc[pre & g["building"].notna(), "buildingType"] = "home"
         return g
 
-    def coverage_report(self, g, lo=PRE2007_SEASON_LO, hi=PRE2007_SEASON_HI, verbose=True):
+    def coverage_report(self, g, lo=None, hi=PRE2007_SEASON_HI, verbose=True):
         """Print/return the unmatched (city, name, season) combos in [lo, hi] RS+PO
-        games. Returns (unmatched_games, total_games, fraction)."""
+        games. Returns (unmatched_games, total_games, fraction).
+
+        lo defaults to self.pre2007_lo (the real floor derived from
+        arena_mapping_pre2007.csv), not a hardcoded season."""
+        if lo is None:
+            lo = self.pre2007_lo
         window = g[(g["season"] >= lo) & (g["season"] <= hi)
                    & g["gameType"].isin(("Regular Season", "Playoffs"))]
         total = len(window)
@@ -122,7 +138,7 @@ class ArenaResolver:
                         print(f"    … and {len(combos) - shown} more")
                         break
             else:
-                print("  all 1980-2006 games resolved to a building.")
+                print(f"  all {lo}-{hi} games resolved to a building.")
         return unmatched, total, frac
 
 
@@ -142,12 +158,19 @@ def load_arena_resolver(data_dir):
 
     pre2007_index = defaultdict(list)
     has_pre2007 = os.path.exists(pre2007_path)
+    pre2007_lo = PRE2007_SEASON_LO
     if has_pre2007:
         p = pd.read_csv(pre2007_path)
         for r in p.itertuples(index=False):
             pre2007_index[(_norm(r.teamCity), _norm(r.teamName))].append(
                 (int(r.first_season), int(r.last_season), r.building, r.city))
-    return ArenaResolver(id_building, id_city, id_type, dict(pre2007_index), has_pre2007)
+        # The real floor: however far back arena_mapping_pre2007.csv actually goes,
+        # not a hardcoded season. Extending the mapping further needs no code
+        # change anywhere — every caller reads this off the resolver instance.
+        if len(p):
+            pre2007_lo = int(p["first_season"].min())
+    return ArenaResolver(id_building, id_city, id_type, dict(pre2007_index), has_pre2007,
+                          pre2007_lo)
 
 
 def _selftest():
@@ -189,8 +212,27 @@ def _selftest():
     R2 = ArenaResolver(id_building, id_city, id_type, {}, False)
     a2 = R2.attach(g).set_index("gameId")
     assert pd.isna(a2.loc[1, "building"]) and a2.loc[4, "building"] == "United Center"
+
+    # Dynamic floor: a team-season BEFORE the default 1980 floor, present in the
+    # pre-2007 index, must stay unresolved unless pre2007_lo is actually lowered
+    # to admit it — proving the floor is a real gate, not just a lookup miss.
+    pre_deep = dict(pre)
+    pre_deep[("St. Louis", "Hawks")] = [(1962, 1968, "Kiel Auditorium", "St. Louis")]
+    g_deep = pd.DataFrame([
+        dict(gameId=5, arenaId=100, season=1965, gameType="Regular Season",
+             hometeamCity="St. Louis", hometeamName="Hawks"),
+    ])
+    R_stale_floor = ArenaResolver(id_building, id_city, id_type, pre_deep, True)  # pre2007_lo defaults to 1980
+    a_stale = R_stale_floor.attach(g_deep).set_index("gameId")
+    assert pd.isna(a_stale.loc[5, "building"]), \
+        "an unlowered floor must still exclude a pre-1980 season even if the mapping has the row"
+    R_deep = ArenaResolver(id_building, id_city, id_type, pre_deep, True, pre2007_lo=1962)
+    a_deep = R_deep.attach(g_deep).set_index("gameId")
+    assert a_deep.loc[5, "building"] == "Kiel Auditorium", a_deep.loc[5, "building"]
+
     print("arena_resolver self-test: OK (pre-2007 ignores backfilled arenaId; "
-          "2007+ unchanged; misses counted, never fall back)")
+          "2007+ unchanged; misses counted, never fall back; pre2007_lo actually "
+          "gates which seasons are attempted, not just a lookup detail)")
 
 
 if __name__ == "__main__":
