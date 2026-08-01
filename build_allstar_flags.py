@@ -124,7 +124,10 @@ def load_dashboard_ids():
     for r in read_csv(DASHBOARD_RECORDS_CSV):
         pid = (r.get("personId") or "").strip()
         if pid:
-            ids.add(pid)
+            # Defensive: normalize a stray "2544.0"-style float-formatted id
+            # (see arena_resolver.clean_person_id) so it still matches the
+            # clean integer strings this set gets compared against.
+            ids.add(str(int(float(pid))))
     return ids
 
 

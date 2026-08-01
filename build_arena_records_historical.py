@@ -75,6 +75,8 @@ def load_game_context(data_dir: str) -> pd.DataFrame:
 
 
 def build_records(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.DataFrame:
+    from arena_resolver import clean_person_id
+
     rec = defaultdict(
         lambda: {
             "wins": 0,
@@ -99,6 +101,9 @@ def build_records(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.Dat
     ):
         total += len(chunk)
         chunk = chunk.merge(ctx, on="gameId", how="inner")
+        if chunk.empty:
+            continue
+        chunk = clean_person_id(chunk, source="build_arena_records_historical.py")
         if chunk.empty:
             continue
 
@@ -156,6 +161,11 @@ def build_records(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.Dat
         .sort_values(["playerName", "building", "gameType"])
         .reset_index(drop=True)
     )
+    # Defensive second layer: enforce int64 at write time regardless of how the
+    # column got assembled, so a future stray NaN elsewhere in the pipeline
+    # can't silently repeat the float-personId/".0" bug again.
+    if len(df):
+        df["personId"] = df["personId"].astype("int64")
     print(f"Read {total:,} player rows | records: {len(df):,}")
     return df
 

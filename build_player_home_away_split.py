@@ -84,6 +84,8 @@ def load_game_context(data_dir: str) -> pd.DataFrame:
 
 
 def build(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.DataFrame:
+    from arena_resolver import clean_person_id
+
     rec = defaultdict(lambda: {
         "home_games": 0, "away_games": 0, "points": 0.0,
         "first_season": 9999, "last_season": 0, "playerName": "",
@@ -94,6 +96,9 @@ def build(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.DataFrame:
     for chunk in pd.read_csv(player_path, usecols=usecols, chunksize=chunksize, low_memory=False):
         total += len(chunk)
         chunk = chunk.merge(ctx, on="gameId", how="inner")
+        if chunk.empty:
+            continue
+        chunk = clean_person_id(chunk, source="build_player_home_away_split.py")
         if chunk.empty:
             continue
         chunk["numMinutes"] = pd.to_numeric(chunk["numMinutes"], errors="coerce")
@@ -135,6 +140,11 @@ def build(player_path: str, ctx: pd.DataFrame, chunksize: int) -> pd.DataFrame:
     df = pd.DataFrame(rows).sort_values(
         ["playerName", "arenaName"]
     ).reset_index(drop=True)
+    # Defensive second layer: enforce int64 at write time regardless of how the
+    # column got assembled, so a future stray NaN elsewhere in the pipeline
+    # can't silently repeat the float-personId/".0" bug again.
+    if len(df):
+        df["personId"] = df["personId"].astype("int64")
     print(f"Read {total:,} player rows | (player, arena) rows: {len(df):,}")
     return df
 

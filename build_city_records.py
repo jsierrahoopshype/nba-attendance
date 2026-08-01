@@ -56,7 +56,12 @@ def main():
             city = r["city"]
             if not city:
                 continue
-            key = (r["personId"], city, r["gameType"])
+            # Defensive second layer: normalize personId to a clean integer
+            # string regardless of how the source CSV wrote it (e.g. a stray
+            # "2544.0" from an upstream float-dtype leak), so this file can
+            # never propagate that formatting further downstream.
+            pid = str(int(float(r["personId"])))
+            key = (pid, city, r["gameType"])
             a = agg[key]
             a["games"] += as_int(r["games"])
             a["wins"] += as_int(r["wins"])
