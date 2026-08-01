@@ -32,6 +32,8 @@ import build_arena_records_historical as bar
 
 
 def build_records_by_season(player_path, ctx, chunksize):
+    from arena_resolver import clean_person_id
+
     rec = defaultdict(lambda: {
         "wins": 0, "losses": 0, "games": 0, "points": 0.0, "career_high": 0.0,
     })
@@ -43,6 +45,9 @@ def build_records_by_season(player_path, ctx, chunksize):
     for chunk in pd.read_csv(player_path, usecols=usecols, chunksize=chunksize, low_memory=False):
         total += len(chunk)
         chunk = chunk.merge(ctx, on="gameId", how="inner")
+        if chunk.empty:
+            continue
+        chunk = clean_person_id(chunk, source="build_arena_records_by_season.py")
         if chunk.empty:
             continue
         chunk["numMinutes"] = pd.to_numeric(chunk["numMinutes"], errors="coerce")
@@ -91,6 +96,11 @@ def build_records_by_season(player_path, ctx, chunksize):
     df = pd.DataFrame(rows).sort_values(
         ["playerName", "building", "gameType", "season"]
     ).reset_index(drop=True)
+    # Defensive second layer: enforce int64 at write time regardless of how the
+    # column got assembled, so a future stray NaN elsewhere in the pipeline
+    # can't silently repeat the float-personId/".0" bug again.
+    if len(df):
+        df["personId"] = df["personId"].astype("int64")
     print(f"Read {total:,} player rows | season-level records: {len(df):,}")
     return df
 

@@ -175,6 +175,8 @@ def build_team_arena_draw_by_season(games_ctx):
 def build_player_draws(player_path, games_ctx, chunksize):
     """One streaming pass over PlayerStatistics producing both the league-wide
     per-season player draw and the per-building per-season player draw."""
+    from arena_resolver import clean_person_id
+
     gctx = games_ctx[games_ctx["loo_ok"]][
         ["gameId", "season", "building", "attendance", "loo_baseline"]
     ].copy()
@@ -186,6 +188,9 @@ def build_player_draws(player_path, games_ctx, chunksize):
     usecols = ["personId", "firstName", "lastName", "gameId", "home", "numMinutes"]
     for chunk in pd.read_csv(player_path, usecols=usecols, chunksize=chunksize, low_memory=False):
         chunk = chunk.merge(gctx, on="gameId", how="inner")
+        if chunk.empty:
+            continue
+        chunk = clean_person_id(chunk, source="build_attendance_tables_historical.py")
         if chunk.empty:
             continue
         chunk["numMinutes"] = pd.to_numeric(chunk["numMinutes"], errors="coerce")

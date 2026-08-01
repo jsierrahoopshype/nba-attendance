@@ -42,6 +42,40 @@ def _norm(s):
     return str(s).strip() if s is not None else ""
 
 
+def clean_person_id(df, source=""):
+    """Coerce df['personId'] to a clean int64 column, dropping (and printing)
+    any row where it's missing or unparseable.
+
+    Root cause this guards: every historical-pathway script reads
+    PlayerStatistics.csv with pandas.read_csv(..., chunksize=...). Dtype is
+    inferred independently PER CHUNK — a single blank/malformed personId cell
+    anywhere in one chunk silently upcasts that whole chunk's personId column
+    to float64 for every row in it, not just the bad one. Once results from a
+    poisoned chunk (float, e.g. 2544.0) and a clean chunk (int, 2544) for
+    otherwise-identical players get assembled into one DataFrame/CSV, pandas
+    promotes the whole column to float64 — this is the literal ".0" that
+    leaked into personId-keyed filenames once the pre-2007 window widened to
+    1962 and pulled in games (and their PlayerStatistics.csv rows) that were
+    previously excluded by the old 1980 floor entirely.
+
+    Call this on every chunk from every such read, right after it's joined
+    against the game context and before it's used as a join/group key —
+    fixing the dtype here, at the earliest point personId is actually used,
+    stops the poisoning from ever reaching an output CSV."""
+    numeric = pd.to_numeric(df["personId"], errors="coerce")
+    bad = df.loc[numeric.isna()]
+    if len(bad):
+        label = f" [{source}]" if source else ""
+        for _, r in bad.iterrows():
+            nm = f"{r.get('firstName', '')} {r.get('lastName', '')}".strip()
+            print(f"  WARNING: dropping row with unparseable personId{label}: "
+                  f"gameId={r.get('gameId')!r} name={nm!r} "
+                  f"raw personId={r.get('personId')!r}")
+    df = df.loc[numeric.notna()].copy()
+    df["personId"] = numeric.loc[numeric.notna()].astype("int64")
+    return df
+
+
 class ArenaResolver:
     def __init__(self, id_building, id_city, id_type, pre2007_index, has_pre2007,
                  pre2007_lo=PRE2007_SEASON_LO):
