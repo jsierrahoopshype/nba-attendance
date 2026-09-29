@@ -472,7 +472,8 @@ function makeAllstarToggle(mount, onChange, opts) {
 }
 
 /* ---------- persistent site search (players, teams, arenas, cities) ----------
-   Injected at the top and bottom of every page from search.json. */
+   Injected at the top (below any HoopsMatic nav) and bottom of every page
+   from search.json. */
 const searchHref = it =>
   it.type === "player" ? playerHref(it.id, it.name) :
   it.type === "arena" ? arenaHref(it.slug) :
@@ -530,7 +531,39 @@ async function initSiteSearch() {
   try { items = await getJSON(DATA + "/search.json"); }
   catch (e) { return; }               // no search index → skip silently
   document.body.classList.add("has-site-search");
-  document.body.insertBefore(siteSearchBar("top", items), document.body.firstChild);
+  // On hoopsmatic.com the Worker injects the site nav as the first element of
+  // <body>; on github.io there is none. Insert the top bar directly before this
+  // page's own content (.container) so it always lands after any injected nav.
+  const content = document.body.querySelector(":scope > .container");
+  const topBar = siteSearchBar("top", items);
+  document.body.insertBefore(topBar, content || document.body.firstChild);
   document.body.appendChild(siteSearchBar("bottom", items));
+  keepBelowNav(topBar);
+}
+
+/* If the injected nav is taken out of flow (position:fixed/absolute) and the
+   page isn't padded for it, the in-flow bar would sit underneath it. Measure
+   the nav at runtime and push the bar down by exactly the overlap. No nav (or
+   an in-flow/sticky nav) → overlap 0 → no offset. */
+function keepBelowNav(bar) {
+  const nav = bar.previousElementSibling;
+  if (!nav) return;
+  bar.classList.add("after-nav");
+  const update = () => {
+    bar.style.marginTop = "";
+    const pos = getComputedStyle(nav).position;
+    if (pos !== "fixed" && pos !== "absolute") return;
+    const nr = nav.getBoundingClientRect();
+    if (!nr.height) return;
+    // Document-space bottom of the nav as it sits at the top of the page.
+    const navBottom = pos === "fixed" ? nr.bottom : nr.bottom + window.scrollY;
+    const barTop = bar.getBoundingClientRect().top + window.scrollY;
+    const overlap = Math.ceil(navBottom - barTop);
+    if (overlap > 0) bar.style.marginTop = overlap + "px";
+  };
+  update();
+  window.addEventListener("resize", update);
+  window.addEventListener("load", update);            // web fonts can change nav height
+  if (window.ResizeObserver) new ResizeObserver(update).observe(nav);
 }
 document.addEventListener("DOMContentLoaded", initSiteSearch);

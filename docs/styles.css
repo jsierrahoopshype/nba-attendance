@@ -258,6 +258,8 @@ table.lb thead th.rank{width:2.2rem}
    space on every page — worst on phones, where that's a third of the viewport. */
 .site-search{max-width:1400px;margin:0 auto 1.1rem;padding:0 1.5rem}
 .site-search.bottom{margin:1.6rem auto 0}
+/* breathing room under an injected HoopsMatic nav (absent on github.io) */
+.site-search.top.after-nav{padding-top:.9rem}
 .site-search .ss-inner{position:relative}
 .site-search input{width:100%;padding:.6rem .9rem;font-size:16px;font-family:inherit;
   border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
