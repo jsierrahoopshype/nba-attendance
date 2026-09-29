@@ -155,7 +155,15 @@ table.lb thead th.rank{width:2.2rem}
    shrink, no grow) plus the parent row's flex-wrap is what lets the whole
    value group move to its own line instead of being crushed into one that's
    too narrow for either the name or the values to wrap safely. */
-.rvals{display:flex;gap:.7rem;flex:0 0 auto;margin-left:auto;justify-content:flex-end}
+/* max-width:100% caps the group at the row's width once it has wrapped to its
+   own line: without it a long text value ("Arizona Veterans Memorial
+   Coliseum") kept the whole group on one max-content line and pushed the
+   page wider than a phone viewport. Only the first value (the text column,
+   e.g. the arena name) shrinks and wraps at spaces; later values (city,
+   number) keep their one-line width. Flex items keep a min-content floor,
+   so there are no mid-word breaks. */
+.rvals{display:flex;gap:.7rem;flex:0 0 auto;margin-left:auto;justify-content:flex-end;max-width:100%}
+.rvals .rval + .rval{flex-shrink:0}
 .rval{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;text-align:right}
 .rrow-head{padding:.4rem 0 .35rem;border-bottom:1px solid var(--border)}
 .rrow-head .rval{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;
