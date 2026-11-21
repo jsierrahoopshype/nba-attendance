@@ -109,7 +109,13 @@ def _bake(template, *, title, description, canonical, name_html, entity_global):
         r"<title>.*?</title>",
         "<title>" + title + "</title>\n"
         '<meta name="description" content="' + description + '">\n'
-        '<link rel="canonical" href="' + canonical + '">',
+        '<link rel="canonical" href="' + canonical + '">\n'
+        # Social preview tags from the page's own title/description/canonical.
+        # og:image comes from the hoopsmatic.com Worker (section card).
+        '<meta property="og:title" content="' + title + '">\n'
+        '<meta property="og:description" content="' + description + '">\n'
+        '<meta property="og:url" content="' + canonical + '">\n'
+        '<meta name="twitter:card" content="summary_large_image">',
         template, count=1, flags=re.S,
     )
     # These pages live one directory below docs/ (docs/arenas/, docs/cities/,
@@ -225,6 +231,10 @@ def generate_entity_pages(docs_dir=DOCS_DIR, kinds=("arenas", "cities", "players
         counts["cities"] = generate_city_pages(docs_dir)
     if "players" in kinds:
         counts["players"] = generate_player_pages(docs_dir)
+    # Sitemap is rebuilt from what's on disk, so it's always complete even
+    # when only some page kinds were regenerated.
+    from generate_sitemap import generate_sitemap
+    counts["sitemap urls"] = generate_sitemap(docs_dir)
     return counts
 
 
