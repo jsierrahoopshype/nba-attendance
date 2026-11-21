@@ -40,6 +40,9 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(HERE, "docs")
+# Canonical links are absolute and always on hoopsmatic.com (house rule: never
+# github.io, and a relative canonical resolves to whichever host served it).
+SITE = "https://hoopsmatic.com/nba-attendance/"
 
 
 def player_slug(name, person_id):
@@ -141,7 +144,7 @@ def generate_arena_pages(docs_dir=DOCS_DIR):
         )
         entity_global = '<script>window.ENTITY_SLUG = "' + _js_str(slug) + '";</script>'
         html = _bake(template, title=title, description=description,
-                     canonical=slug + ".html", name_html=_esc(name),
+                     canonical=SITE + "arenas/" + slug + ".html", name_html=_esc(name),
                      entity_global=entity_global)
         _write(os.path.join(out_dir, slug + ".html"), html)
     return len(index)
@@ -162,7 +165,7 @@ def generate_city_pages(docs_dir=DOCS_DIR):
         )
         entity_global = '<script>window.ENTITY_SLUG = "' + _js_str(slug) + '";</script>'
         html = _bake(template, title=title, description=description,
-                     canonical=slug + ".html", name_html=_esc(name),
+                     canonical=SITE + "cities/" + slug + ".html", name_html=_esc(name),
                      entity_global=entity_global)
         _write(os.path.join(out_dir, slug + ".html"), html)
     return len(index)
@@ -175,7 +178,7 @@ def _redirect_stub(target):
     return (
         "<!doctype html>\n<html><head><meta charset=\"utf-8\">\n"
         '<meta http-equiv="refresh" content="0; url=' + target + '">\n'
-        '<link rel="canonical" href="' + target + '">\n'
+        '<link rel="canonical" href="' + SITE + 'players/' + target + '">\n'
         "<script>location.replace(" + json.dumps(target) + ");</script>\n"
         "</head><body></body></html>\n"
     )
@@ -201,7 +204,7 @@ def generate_player_pages(docs_dir=DOCS_DIR):
         )
         entity_global = '<script>window.ENTITY_ID = "' + _js_str(pid) + '";</script>'
         html = _bake(template, title=title, description=description,
-                     canonical=slug + ".html", name_html=_esc(name),
+                     canonical=SITE + "players/" + slug + ".html", name_html=_esc(name),
                      entity_global=entity_global)
         _write(os.path.join(out_dir, slug + ".html"), html)
         # Cheap legacy redirect: the bare-id filename from the last regen (and
