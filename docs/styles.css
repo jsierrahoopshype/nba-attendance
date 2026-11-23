@@ -1,361 +1,352 @@
 /* ==========================================================================
-   NBA Attendance Tracker — shared stylesheet.
+   NBA Attendance Tracker — shared stylesheet (v2 look, Nov 2026).
 
-   Structure, component classes, the sortable table.lb pattern, and the mobile
-   card fallback are lifted from the sibling nba-polymarket tracker so this
-   reads as the same family of tools; the color tokens are the polymarket light
-   theme, fetched from that repo and mirrored exactly. Under the 860px
-   breakpoint, table.lb hides and its sortableTable()-generated .cards fallback
-   takes over — same data, one column of cards instead of a wide table.
+   Same family as the nba-polymarket tracker (DM Sans, light surfaces, blue
+   accent, sortable table.lb + mobile card fallback) but scaled up: bigger
+   type, softer layered surfaces, magnitude bars on ranked lists, a real
+   segmented control for tabs/toggles, and JetBrains Mono kept for numbers
+   only (names and UI labels are DM Sans).
+
+   Every class name from v1 is preserved: the ~9,000 generated entity pages
+   (docs/arenas|cities|players/*.html) share this one file, so restyling here
+   upgrades all of them without regenerating a single page.
+
+   Never put a literal body/head/style/script tag or an html comment opener
+   inside this file's comments: the hoopsmatic.com Worker scans proxied pages
+   for those strings when it injects its nav.
    ========================================================================== */
 
 :root{
-  --bg:#f5f5f7;--surface:#fff;--surface-hover:#f0f0f2;--border:#d1d1d6;
-  --text:#1d1d1f;--text-secondary:#6e6e73;--accent:#3b82f6;--accent-dim:rgba(59,130,246,.15);
-  --green:#1d8a40;--green-dim:rgba(52,199,89,.16);--green-bar:#34c759;
-  --red:#d12c2c;--red-dim:rgba(239,68,68,.13);--red-bar:#ef4444;
+  --bg:#f4f4f7;--surface:#fff;--surface-hover:#f6f7fb;--surface-sunk:#f0f1f5;
+  --border:#e2e3e9;--border-strong:#cfd1d9;
+  --text:#16171b;--text-secondary:#62646d;--text-faint:#8a8c95;
+  --accent:#2f6fe4;--accent-strong:#1f5ad0;--accent-dim:rgba(47,111,228,.12);--accent-faint:rgba(47,111,228,.06);
+  --green:#17803a;--green-dim:rgba(23,128,58,.12);--green-bar:rgba(23,128,58,.14);
+  --red:#c8292b;--red-dim:rgba(200,41,43,.1);--red-bar:rgba(200,41,43,.12);
   --orange:#b26b00;--orange-dim:rgba(245,158,11,.16);
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 1px 2px rgba(20,22,30,.04),0 6px 20px -8px rgba(20,22,30,.10);
+  --shadow-hover:0 2px 4px rgba(20,22,30,.05),0 12px 28px -10px rgba(20,22,30,.16);
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'DM Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  accent-color:var(--accent);
+  color-scheme:light;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{font-size:112%}
-body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
-.container{max-width:1400px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+html{font-size:115%;scrollbar-color:var(--border-strong) transparent}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::selection{background:rgba(47,111,228,.2);color:var(--text)}
+.container{max-width:1400px;margin:0 auto;padding:1.75rem 1.5rem 4rem}
 .container.narrow{max-width:1100px}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent);text-decoration:none;text-underline-offset:.18em}
+a:hover{text-decoration:underline}
+.mono{font-family:var(--mono)}
+.container :focus-visible,.site-search :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
-/* nav / tabs (both the <a> nav and the in-page tab buttons share this look) */
-.tabs{display:flex;gap:.3rem;margin-bottom:1.1rem;flex-wrap:wrap}
-.tabs a,.tabs button{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;padding:.45rem .85rem;
-  border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-secondary);
-  cursor:pointer;transition:.12s;text-decoration:none}
-.tabs a:hover,.tabs button:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.tabs a.active,.tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* ---------- page header ---------- */
+.hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.5rem;flex-wrap:wrap}
+.hdr h1{font-size:2.35rem;font-weight:700;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+.subtitle{color:var(--text-secondary);font-size:1.02rem;line-height:1.55;margin-bottom:1.6rem;max-width:46rem;text-wrap:pretty}
 
-/* header */
-.hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.35rem;flex-wrap:wrap}
-.hdr h1{font-size:1.45rem;font-weight:700;letter-spacing:-.03em}
-.subtitle{color:var(--text-secondary);font-size:.9rem;margin-bottom:1.25rem;max-width:62rem}
+/* ---------- tabs: one segmented control ----------
+   Both the in-page tab buttons and any <a> nav share it. Wraps onto a second
+   row (never scrolls sideways) and becomes an even grid on phones. */
+.tabs{display:flex;flex-wrap:wrap;gap:.25rem;padding:.3rem;margin-bottom:1.6rem;width:fit-content;max-width:100%;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.tabs a,.tabs button{font-family:var(--sans);font-size:.84rem;font-weight:600;letter-spacing:-.005em;
+  padding:.55rem 1.05rem;border:0;border-radius:10px;background:transparent;color:var(--text-secondary);
+  cursor:pointer;transition:background-color .15s,color .15s;text-decoration:none;white-space:nowrap}
+.tabs a:hover,.tabs button:hover{background:var(--surface-sunk);color:var(--text);text-decoration:none}
+.tabs a.active,.tabs button.active{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(31,90,208,.3)}
 
-/* section blocks */
-.block{margin-bottom:1.6rem}
-.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.6rem;flex-wrap:wrap}
-.block-head h2{font-size:.98rem;font-weight:700;letter-spacing:-.01em}
-.block-head .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);
-  text-transform:uppercase;letter-spacing:.05em}
-.explainer{color:var(--text-secondary);font-size:.84rem;margin-bottom:.9rem;max-width:60rem}
+/* ---------- section blocks ---------- */
+.block{margin-bottom:2rem}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:.35rem 1rem;margin-bottom:.8rem;flex-wrap:wrap}
+.block-head h2{font-size:1.3rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.block-head .sub{font-size:.8rem;color:var(--text-secondary);font-weight:500}
+.explainer{color:var(--text-secondary);font-size:.92rem;margin-bottom:1.1rem;max-width:46rem;text-wrap:pretty}
 .explainer .pos{color:var(--green);font-weight:600}.explainer .neg{color:var(--red);font-weight:600}
 
-/* segmented toggle */
-.toggle{display:inline-flex;gap:.3rem;flex-wrap:wrap}
-.toggle button{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;padding:.4rem .8rem;
-  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:.12s}
-.toggle button:hover{border-color:var(--accent);color:var(--accent)}
-.toggle button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+/* ---------- segmented toggle (game type, All-Stars) ---------- */
+.toggle{display:inline-flex;flex-wrap:wrap;gap:.2rem;padding:.2rem;background:var(--surface-sunk);
+  border:1px solid var(--border);border-radius:11px}
+.toggle button{font-family:var(--sans);font-size:.8rem;font-weight:600;padding:.4rem .85rem;border:0;
+  border-radius:8px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:background-color .15s,color .15s}
+.toggle button:hover{color:var(--text)}
+.toggle button.active{background:var(--surface);color:var(--accent-strong);
+  box-shadow:0 1px 2px rgba(20,22,30,.08),0 1px 6px rgba(20,22,30,.06)}
 
-/* "Show all N →" — appears once a list's qualifying rows exceed the default
-   50-row cap (sortableTable's LIST_PAGE_SIZE), below both the desktop table
-   and the mobile card fallback since they always render the same subset. */
-.show-all-btn{display:block;width:100%;margin-top:.7rem;font-family:'JetBrains Mono',monospace;
-  font-size:.74rem;font-weight:600;color:var(--accent);background:var(--surface);
-  border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;cursor:pointer;text-align:center}
-.show-all-btn:hover{border-color:var(--accent);background:var(--surface-hover)}
+/* "Show all N" under capped lists */
+.show-all-btn{display:block;width:100%;margin-top:.8rem;font-family:var(--sans);font-size:.86rem;font-weight:600;
+  color:var(--accent-strong);background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:.75rem 1rem;cursor:pointer;text-align:center;transition:border-color .15s,background-color .15s}
+.show-all-btn:hover{border-color:var(--accent);background:var(--accent-faint)}
 
-/* table */
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow-x:auto}
-table.lb{width:100%;border-collapse:collapse;font-size:.86rem}
-table.lb thead th{background:var(--surface-hover);color:var(--text-secondary);text-transform:uppercase;
-  letter-spacing:.04em;font-size:.64rem;font-weight:600;padding:.7rem .6rem;text-align:right;
-  border-bottom:1px solid var(--border);white-space:nowrap;user-select:none;transition:color .15s;position:sticky;top:0}
+/* ---------- table ---------- */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  overflow-x:auto;box-shadow:var(--shadow)}
+table.lb{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
+table.lb thead th{background:var(--surface);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;
+  font-size:.66rem;font-weight:700;padding:.85rem .75rem .7rem;text-align:right;border-bottom:1px solid var(--border);
+  white-space:nowrap;user-select:none;transition:color .15s;position:sticky;top:0;z-index:1}
 table.lb thead th.sortable{cursor:pointer}
 table.lb thead th.sortable:hover{color:var(--accent)}
-table.lb thead th.sorted-by{background:var(--accent-dim);color:var(--accent);font-weight:700}
+table.lb thead th.sorted-by{color:var(--accent-strong);background:var(--surface)}
 table.lb thead th.left{text-align:left}
-table.lb thead th .arr{font-size:.6rem;opacity:.8;margin-left:.15rem}
-table.lb tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+table.lb thead th .arr{font-size:.58rem;margin-left:.25rem}
+table.lb tbody tr{border-bottom:1px solid var(--border);transition:background-color .12s}
 table.lb tbody tr[data-href]{cursor:pointer}
 table.lb tbody tr:last-child{border-bottom:none}
 table.lb tbody tr:hover{background:var(--surface-hover)}
-table.lb td{padding:.5rem .6rem;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:500;white-space:nowrap}
-table.lb td.sorted-by{background:rgba(59,130,246,.06)}
-table.lb td.name{text-align:left;font-family:'DM Sans',sans-serif;font-weight:600;white-space:nowrap}
-table.lb td.rank{color:var(--text-secondary);font-size:.78rem;width:2.2rem;text-align:right}
+table.lb td{padding:.68rem .75rem;text-align:right;font-family:var(--mono);font-size:.86rem;font-weight:500;white-space:nowrap}
+table.lb td.sorted-by{background:var(--accent-faint);font-weight:600}
+table.lb td.name{text-align:left;font-family:var(--sans);font-size:.95rem;font-weight:600;white-space:nowrap}
+table.lb td.rank{color:var(--text-faint);font-size:.78rem;width:2.6rem;text-align:right;font-weight:600}
+table.lb tbody tr:nth-child(-n+3) td.rank{color:var(--accent-strong);font-weight:700}
 table.lb td.name a{color:var(--text)}
 table.lb td.name a:hover{color:var(--accent)}
 table.lb td.sub{color:var(--text-secondary)}
+table.lb td .sub{font-family:var(--mono);font-size:.78rem;color:var(--text-secondary);font-weight:500}
+table.lb thead th.rank{width:2.6rem}
+/* magnitude bar in the sorted column of ranked lists: --bar is set by
+   sortableTable() as the row's share of the biggest value shown. */
+table.lb td.has-bar{background:linear-gradient(var(--accent-dim),var(--accent-dim)) no-repeat right center / var(--bar) 64%}
+table.lb td.has-bar.bar-pos{background-image:linear-gradient(var(--green-bar),var(--green-bar))}
+table.lb td.has-bar.bar-neg{background-image:linear-gradient(var(--red-bar),var(--red-bar))}
 .delta{font-weight:600}
 .delta.pos{color:var(--green)}.delta.neg{color:var(--red)}.delta.flat{color:var(--text-secondary)}
-.dash{color:var(--text-secondary)}
-.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text-secondary);
-  border:1px solid var(--border);border-radius:20px;padding:.05rem .5rem;text-transform:capitalize;margin-left:.4rem;vertical-align:middle}
+.dash{color:var(--text-faint)}
+.pill{display:inline-block;font-family:var(--sans);font-size:.66rem;font-weight:600;color:var(--text-secondary);
+  background:var(--surface-sunk);border:1px solid var(--border);border-radius:20px;padding:.08rem .55rem;
+  text-transform:capitalize;margin-left:.45rem;vertical-align:middle}
 
-/* mobile card fallback for table.lb — built generically by sortableTable() from
-   the same cols, so every table gets one automatically. Hidden on desktop; swaps
-   in for .table-wrap under the 860px breakpoint (nba-polymarket's pattern). */
+/* ---------- mobile card fallback for table.lb ---------- */
 .cards{display:none}
-.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:.7rem .85rem;margin-bottom:.55rem;min-width:0;transition:border-color .12s}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:.85rem 1rem;margin-bottom:.6rem;min-width:0;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
 .card[data-href]{cursor:pointer}
-.card:hover{border-color:var(--accent)}
+.card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-hover)}
 .card:last-child{margin-bottom:0}
-.card.no-home{background:rgba(0,0,0,.045)}
-.card-title{font-family:'DM Sans',sans-serif;font-weight:600;font-size:.92rem;color:var(--text);
-  margin-bottom:.45rem;line-height:1.3;overflow-wrap:break-word}
+.card.no-home{background:var(--surface-sunk)}
+.card-title{font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--text);
+  margin-bottom:.55rem;line-height:1.3;overflow-wrap:break-word;letter-spacing:-.01em}
 .card-title a{color:var(--text)}
-/* Names/values wrap to a second line instead of ellipsis-truncating — a
-   truncated "Little Caesar…" loses information a static card can't recover
-   (no hover tooltip on touch). A 2-column (or wider) grid needs a minimum
-   column width generous enough that even a single long word ("Philadelphia",
-   12 characters) wraps at a space, not mid-word — auto-fit drops to a single
-   column by itself once the container can't fit two columns at that minimum,
-   rather than cramming two columns too narrow to hold one word. */
-.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.45rem .7rem}
-.card-stat{display:flex;flex-direction:column;gap:.15rem;min-width:0}
-.card-stat .card-lbl{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--text-secondary);
-  text-transform:uppercase;letter-spacing:.05em}
-.card-stat .card-val{font-family:'JetBrains Mono',monospace;font-size:.86rem;font-weight:600;
-  overflow-wrap:break-word}
-table.lb thead th.rank{width:2.2rem}
+/* names/values wrap at spaces instead of truncating; auto-fit drops to one
+   column before a column gets too narrow for a single long word */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.55rem .8rem}
+.card-stat{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+.card-stat .card-lbl{font-size:.64rem;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em}
+.card-stat .card-val{font-family:var(--mono);font-size:.9rem;font-weight:600;overflow-wrap:break-word;font-variant-numeric:tabular-nums}
+.card-stat .card-val a{font-family:var(--sans)}
 
-/* "you might also like" related-entity footer: always-visible responsive
-   card grid (not gated behind the mobile breakpoint like the .cards table
-   fallback above — there's no companion desktop table for this section). */
-.cards.always{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.7rem}
+/* "you might also like" related-entity footer (always-visible card grid) */
+.cards.always{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.8rem}
 .cards.always .card{margin-bottom:0}
 
-/* ---------- compact ranked-list rows (opts.ranked) ----------
-   Simple ranked lists (frontpage boxes, all-time draw kings, "Most Points"-
-   style mini leaderboards) were the worst offender for label-heavy bloat: a
-   bordered block per row with the field label repeated every time. This is a
-   single bordered list — one thin divider per row, a slim uppercase header
-   row establishes what each value column means ONCE, then every row is just
-   rank + name + right-aligned values. Sizing matches nba-polymarket's
-   .card-foot pattern (measured at 390px: label .58rem, value/row text .74rem,
-   name/title .92rem) rather than inventing new numbers. */
-.rlist{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:.1rem .8rem;margin-bottom:.6rem;min-width:0}
-/* flex-wrap here is the actual fix for mid-word breaks: .rname gets a min-width
-   generous enough for one long name/word, so when a long name AND several
-   value columns can't all fit on one line, .rvals (flex:0 0 auto, no shrink)
-   drops to a line of its own — pushed flush right by margin-left:auto — a
-   two-line row, rather than .rname being squeezed until a word inside it
-   breaks. This is the "drop to single-column before mid-word wrap" rule. */
-.rrow{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.6rem;row-gap:.1rem;
-  padding:.5rem 0;border-bottom:1px solid var(--border);min-width:0}
+/* ---------- compact ranked-list rows (opts.ranked, phones) ---------- */
+.rlist{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:.15rem 1rem;margin-bottom:.6rem;min-width:0;box-shadow:var(--shadow)}
+/* flex-wrap lets the value group drop to its own line instead of squeezing
+   the name until a word breaks mid-word */
+.rrow{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.7rem;row-gap:.15rem;
+  padding:.7rem 0;border-bottom:1px solid var(--border);min-width:0;font-variant-numeric:tabular-nums}
 .rrow:last-child{border-bottom:none}
 .rrow[data-href]{cursor:pointer}
 .rrow:hover{background:var(--surface-hover)}
-.rrank{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-secondary);
-  flex-shrink:0;width:1.3rem;text-align:right}
-.rname{flex:1 1 auto;min-width:9rem;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.86rem;
-  color:var(--text);line-height:1.25}
+/* magnitude bar under the row, same --bar the desktop cell uses */
+.rrow.has-bar{background:linear-gradient(var(--accent-dim),var(--accent-dim)) no-repeat left bottom 5px / var(--bar) 3px}
+.rrow.has-bar.bar-pos{background-image:linear-gradient(rgba(23,128,58,.35),rgba(23,128,58,.35))}
+.rrow.has-bar.bar-neg{background-image:linear-gradient(rgba(200,41,43,.3),rgba(200,41,43,.3))}
+.rrank{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--text-faint);flex-shrink:0;width:1.5rem;text-align:right}
+.rrank.top{color:var(--accent-strong);font-weight:700}
+.rname{flex:1 1 auto;min-width:9rem;font-family:var(--sans);font-weight:600;font-size:.96rem;color:var(--text);line-height:1.3}
 .rname a{color:var(--text)}
-/* value cells can hold text (a city name), not just numbers. flex:0 0 auto (no
-   shrink, no grow) plus the parent row's flex-wrap is what lets the whole
-   value group move to its own line instead of being crushed into one that's
-   too narrow for either the name or the values to wrap safely. */
-/* max-width:100% caps the group at the row's width once it has wrapped to its
-   own line: without it a long text value ("Arizona Veterans Memorial
-   Coliseum") kept the whole group on one max-content line and pushed the
-   page wider than a phone viewport. Only the first value (the text column,
-   e.g. the arena name) shrinks and wraps at spaces; later values (city,
-   number) keep their one-line width. Flex items keep a min-content floor,
-   so there are no mid-word breaks. */
-.rvals{display:flex;gap:.7rem;flex:0 0 auto;margin-left:auto;justify-content:flex-end;max-width:100%}
+/* value cells can hold text (a city name); max-width caps a wrapped group at
+   the row width so a long arena name can't push the page wider than a phone */
+.rvals{display:flex;gap:.8rem;flex:0 0 auto;margin-left:auto;justify-content:flex-end;max-width:100%}
 .rvals .rval + .rval{flex-shrink:0}
-.rval{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;text-align:right}
-.rrow-head{padding:.4rem 0 .35rem;border-bottom:1px solid var(--border)}
-.rrow-head .rval{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;
-  letter-spacing:.05em;font-weight:600}
+.rval{font-family:var(--mono);font-size:.84rem;font-weight:600;text-align:right}
+.rval a{font-family:var(--sans)}
+.rrow-head{padding:.6rem 0 .5rem}
+.rrow-head .rval{font-family:var(--sans);font-size:.64rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
 
-/* self-labeling rows (games/mean_delta/total_delta lists, e.g. all-time draw
-   kings): no header row, so each row is a genuine 2-line stack instead of a
-   single flex line — rank+name on top, then a plain-language second line
-   ("+255,027 total extra fans (+498/g · 512 g)") that carries its own label,
-   the same inline pattern the arena stat-card sub-line already uses. */
+/* self-labeling rows: rank+name on top, a plain-language stat line below */
 .rrow-self{display:block}
-.rrow-top{display:flex;align-items:baseline;gap:.6rem}
+.rrow-top{display:flex;align-items:baseline;gap:.7rem}
 .rrow-top .rname{min-width:0}
-.rrow-meta{margin-top:.2rem;padding-left:1.9rem;font-family:'JetBrains Mono',monospace;
-  font-size:.78rem;color:var(--text);overflow-wrap:break-word}
-.rsecondary{color:var(--text-secondary);font-size:.72rem;font-weight:500}
-/* line-1 context for entity-keyed self-label rows (e.g. Road legends: arena
-   name is the row's identity, city disambiguates it) — same treatment as
-   the .rrow-meta secondary text, just inline after the name instead of on
-   its own line. */
-.rsub{color:var(--text-secondary);font-weight:500;font-size:.78rem}
+.rrow-meta{margin-top:.25rem;padding-left:2.2rem;font-family:var(--mono);font-size:.84rem;font-weight:500;
+  color:var(--text);overflow-wrap:break-word}
+.rrow-meta a{font-family:var(--sans);font-weight:600}
+.rsecondary{color:var(--text-secondary);font-size:.76rem;font-weight:500}
+.rsub{color:var(--text-secondary);font-weight:500;font-size:.84rem}
 
-/* stat cards (detail pages) — each is a genuinely distinct stat type, so these
-   keep their own labeled card, but sized to read as a compact stat card, not
-   a page heading: value size, label size and padding match nba-polymarket's
-   own .stat-card, measured directly off their site at 390px (label .6rem,
-   value 1.25rem, padding .7rem .6rem — see the mobile override below). */
-.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin-bottom:1.3rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem;min-width:0}
-.stat-card .lbl{font-size:.6rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.25rem}
-.stat-card .num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;letter-spacing:-.02em;
-  overflow-wrap:break-word}
+/* ---------- stat cards (detail pages) ---------- */
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.9rem;margin-bottom:1.8rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.05rem 1.15rem 1.1rem;min-width:0;box-shadow:var(--shadow)}
+.stat-card .lbl{font-size:.7rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:.4rem}
+.stat-card .num{font-family:var(--sans);font-size:1.55rem;font-weight:700;letter-spacing:-.025em;line-height:1.15;
+  overflow-wrap:break-word;font-variant-numeric:tabular-nums;text-wrap:balance}
 .stat-card .num.pos{color:var(--green)}.stat-card .num.neg{color:var(--red)}
-/* the scope ("Regular Season", "all-time", a season) folds into .sub instead
-   of a separate label line — one fewer line per card, and .sub already wraps
-   at word boundaries so there's no mid-word-wrap risk to design around. */
-.stat-card .sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);margin-top:.2rem;
-  overflow-wrap:break-word}
+.stat-card .sub{font-size:.8rem;color:var(--text-secondary);margin-top:.4rem;overflow-wrap:break-word;line-height:1.4}
 .stat-card a{color:var(--text)}.stat-card a:hover{color:var(--accent)}
 
-/* compact info panel (city page): one line per stat instead of a labeled
-   block per stat — "2 arenas · 2,859 games hosted", "Top scorer: X — Y pts" —
-   for a handful of facts that don't each need their own card. */
-.info-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:.8rem 1rem;margin-bottom:1.3rem;display:flex;flex-direction:column;gap:.4rem}
-.info-line{font-size:.86rem;color:var(--text);overflow-wrap:break-word}
+/* compact info panel (city page) */
+.info-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1rem 1.15rem;margin-bottom:1.6rem;display:flex;flex-direction:column;gap:.5rem}
+.info-line{font-size:.95rem;color:var(--text);overflow-wrap:break-word}
 .info-line a{font-weight:600}
 
-/* detail-page header */
-.back{font-size:.76rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);display:inline-block;margin-bottom:1rem}
+/* ---------- detail-page header ---------- */
+.back{font-size:.84rem;font-weight:600;color:var(--text-secondary);display:inline-flex;align-items:center;gap:.3rem;margin-bottom:1.1rem}
 .back:hover{color:var(--accent);text-decoration:none}
-.ehead{border-bottom:1px solid var(--border);padding-bottom:1rem;margin-bottom:1.2rem}
-.ehead h1{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;line-height:1.2}
-.ehead .esub{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--text-secondary);
-  text-transform:uppercase;letter-spacing:.05em;margin-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
-.ehead .esub .sep{opacity:.5}
+.ehead{border-bottom:1px solid var(--border);padding-bottom:1.25rem;margin-bottom:1.6rem}
+.ehead h1{font-size:2.5rem;font-weight:700;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+.ehead .esub{font-size:.92rem;font-weight:500;color:var(--text-secondary);margin-top:.65rem;
+  display:flex;gap:.25rem .55rem;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums}
+.ehead .esub a{font-weight:600}
+.ehead .esub .sep{color:var(--border-strong)}
+.ehead .esub .pill{margin-left:0}
 
-/* leaderboard grid on arena page */
-.lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:1.2rem}
+/* ---------- leaderboard grid (arena/city/player pages) ---------- */
+.lb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.2rem;margin-bottom:1.6rem}
 .lb-card{min-width:0}
-.lb-card h3{font-size:.8rem;font-weight:700;margin:0 0 .5rem}
-.lb-card h3 .cap{color:var(--text-secondary);font-weight:400;font-size:.7rem;text-transform:none;letter-spacing:0}
-.section-title{font-size:1.02rem;font-weight:700;margin:1.4rem 0 .7rem}
+.lb-card h3{font-size:1rem;font-weight:700;letter-spacing:-.01em;margin:0 0 .6rem}
+.lb-card h3 .cap{color:var(--text-secondary);font-weight:500;font-size:.8rem;text-transform:none;letter-spacing:0}
+.section-title{font-size:1.3rem;font-weight:700;letter-spacing:-.02em;margin:2rem 0 .85rem}
 
-/* controls row */
-.controls{display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem}
-.field{display:flex;flex-direction:column;gap:.35rem}
-.field .lbl{font-size:.58rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+/* ---------- controls row ---------- */
+.controls{display:flex;gap:1rem 1.25rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.4rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field .lbl{font-size:.68rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
 .grow{flex:1 1 300px;min-width:0}
 
-/* search */
+/* ---------- search ---------- */
 .searchbox{position:relative}
-.gsearch{width:100%;padding:.6rem .9rem;font-size:16px;font-family:inherit;border:1px solid var(--border);
-  border-radius:10px;background:var(--surface);color:var(--text)}
-.gsearch:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-.gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.25rem;background:var(--surface);
-  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
-  max-height:22rem;overflow-y:auto;z-index:200;display:none}
+.gsearch,.site-search input{width:100%;padding:.8rem 1rem .8rem 2.75rem;font-size:16px;font-family:inherit;
+  border:1px solid var(--border);border-radius:14px;color:var(--text);box-shadow:var(--shadow);
+  background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%238a8c95' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 1rem center;
+  transition:border-color .15s,box-shadow .15s}
+.gsearch::placeholder,.site-search input::placeholder{color:var(--text-faint)}
+.gsearch:focus,.site-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-dim)}
+.gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.35rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 40px -12px rgba(20,22,30,.25);
+  max-height:22rem;overflow-y:auto;z-index:200;display:none;padding:.3rem}
 .gsearch-results.open{display:block}
-.gs-item{display:flex;align-items:center;gap:.55rem;padding:.5rem .8rem;border-bottom:1px solid var(--border);
+.gs-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:9px;
   text-decoration:none;color:var(--text);cursor:pointer}
-.gs-item:last-child{border-bottom:none}
 .gs-item:hover,.gs-item.sel{background:var(--surface-hover);text-decoration:none}
-.gs-main{flex:1;font-size:.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gs-sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--text-secondary);flex-shrink:0}
+.gs-main{flex:1;font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gs-sub{font-family:var(--mono);font-size:.74rem;color:var(--text-secondary);flex-shrink:0}
 
 .empty{text-align:center;padding:3rem 1rem;color:var(--text-secondary)}
-.loading{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-family:'JetBrains Mono',monospace;font-size:.8rem}
-.err{color:var(--red);padding:1.2rem .2rem;font-size:.85rem}
-.foot{text-align:center;font-size:.7rem;color:var(--text-secondary);margin-top:1.8rem;
-  font-family:'JetBrains Mono',monospace;line-height:1.7}
+.loading{text-align:center;padding:3rem 1rem;color:var(--text-faint);font-size:.9rem;font-weight:500}
+.err{color:var(--red);padding:1.2rem .2rem;font-size:.9rem}
+.foot{text-align:center;font-size:.8rem;color:var(--text-secondary);margin:2.4rem auto 0;max-width:46rem;line-height:1.7}
 
 /* in-page tab views */
 .view{display:none}.view.active{display:block}
 
-/* ---------- site search (top + bottom of content, normal document flow) ----------
-   Matches nba-polymarket's own pattern: a search box repeated near the top and
-   bottom of the page content, not pinned to the viewport. Previously this used
-   position:fixed at both edges, which permanently ate two chunks of vertical
-   space on every page — worst on phones, where that's a third of the viewport. */
-.site-search{max-width:1400px;margin:0 auto 1.1rem;padding:0 1.5rem}
-.site-search.bottom{margin:1.6rem auto 0}
-/* breathing room under an injected HoopsMatic nav (absent on github.io) */
-.site-search.top.after-nav{padding-top:.9rem}
+/* ---------- site search (top + bottom, normal flow, never fixed) ---------- */
+.site-search{max-width:1400px;margin:0 auto .4rem;padding:1.2rem 1.5rem 0}
+.site-search.bottom{margin:2rem auto 2rem;padding-top:0}
+.site-search.top.after-nav{padding-top:1.2rem}
 .site-search .ss-inner{position:relative}
-.site-search input{width:100%;padding:.6rem .9rem;font-size:16px;font-family:inherit;
-  border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
-.site-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-.site-search .gsearch-results{position:absolute;top:100%;left:0;right:0;margin-top:.25rem;background:var(--surface);
-  border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
-  max-height:20rem;overflow-y:auto;z-index:200;display:none}
-.site-search .gsearch-results.open{display:block}
-.gs-item .gs-type{font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;
-  letter-spacing:.05em;color:var(--accent);border:1px solid var(--border);border-radius:20px;
-  padding:.05rem .45rem;flex-shrink:0}
+.site-search .gsearch-results{max-height:20rem}
+.gs-item .gs-type{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--accent-strong);background:var(--accent-faint);border-radius:20px;padding:.12rem .5rem;flex-shrink:0}
 
-/* ---------- control row: Game type / Season / Leaderboards all align ----------
-   Every group is a .field (label on top, control below); the row bottom-aligns
-   the controls so the three sit on one baseline. The control elements share the
-   same height so they line up cleanly. */
+/* ---------- control row alignment ---------- */
 .controls .field{justify-content:flex-end}
-.controls .field .toggle button,
-.controls .field .season-select{height:2rem}
-.controls .field .toggle button{display:inline-flex;align-items:center;line-height:1}
-.season-field .season-select{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;
-  padding:0 .8rem;border:1px solid var(--border);border-radius:7px;background:var(--surface);
-  color:var(--text);cursor:pointer;min-width:9.5rem}
-.season-field .season-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.controls .field .season-select{height:2.45rem}
+.controls .field .toggle button{display:inline-flex;align-items:center;line-height:1;min-height:1.95rem}
+.season-field .season-select{font-family:var(--sans);font-size:.86rem;font-weight:600;
+  padding:0 2.3rem 0 .9rem;border:1px solid var(--border);border-radius:11px;color:var(--text);cursor:pointer;min-width:10.5rem;
+  -webkit-appearance:none;appearance:none;box-shadow:var(--shadow);
+  background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2362646d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right .85rem center}
+.season-field .season-select:hover{border-color:var(--border-strong)}
+.season-field .season-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-dim)}
 
-/* ---------- All-Star / all-players toggle ---------- */
-.allstar-note{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-secondary);
-  text-transform:uppercase;letter-spacing:.04em;align-self:center}
+/* All-Star note */
+.allstar-note{font-size:.74rem;color:var(--text-secondary);font-weight:500;align-self:center}
 
-/* players who never played here for the home team: shaded row in the leaderboard */
-table.lb tbody tr.no-home{background:rgba(0,0,0,.055)}
-table.lb tbody tr.no-home:hover{background:rgba(0,0,0,.09)}
+/* players who never played here for the home team: shaded row */
+table.lb tbody tr.no-home{background:var(--surface-sunk)}
+table.lb tbody tr.no-home:hover{background:#e9eaf0}
 
-/* season-mismatch note that replaces a draw table off-2026 */
-.draw-note{background:var(--surface);border:1px dashed var(--border);border-radius:10px;
-  padding:.9rem 1rem;color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
+/* season-mismatch note that replaces a draw table */
+.draw-note{background:var(--surface);border:1px dashed var(--border-strong);border-radius:12px;
+  padding:1rem 1.15rem;color:var(--text-secondary);font-size:.9rem;margin-bottom:1rem}
 
 /* fixed explainer above every draw section */
-.draw-explainer{color:var(--text-secondary);font-size:.82rem;margin:.1rem 0 .8rem;max-width:60rem}
+.draw-explainer{color:var(--text-secondary);font-size:.9rem;margin:.15rem 0 1rem;max-width:46rem;text-wrap:pretty}
 
-/* all-time team-draw rows: "incl. games as <old names>" under the current name */
-.team-hist{display:block;font-size:.64rem;color:var(--text-secondary);font-weight:400;margin-top:.12rem;line-height:1.2}
+/* all-time team rows: "incl. games as <old names>" */
+.team-hist{display:block;font-family:var(--sans);font-size:.72rem;color:var(--text-secondary);font-weight:500;margin-top:.15rem;line-height:1.25;white-space:normal}
 
-/* frontpage: responsive grid of ranking boxes */
-.fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:.4rem}
-/* min-width:0 on a grid/flex item is load-bearing: without it, a grid item
-   refuses to shrink below its content's natural (unwrapped) width, so one
-   long unwrapped value ("Mexico City") in a nested flex row pushes the whole
-   box — and the page — wider than the viewport instead of wrapping. */
-.fp-box{min-width:0;margin-bottom:0;border:1px solid var(--border);border-radius:12px;
-  background:var(--surface);padding:1rem 1.1rem;display:flex;flex-direction:column}
-.fp-box .block-head{margin-bottom:.5rem}
-.fp-box table{margin-top:.1rem}
-.fp-more{display:inline-block;margin-top:.7rem;font-family:'JetBrains Mono',monospace;
-  font-size:.68rem;font-weight:600;color:var(--accent)}
+/* ---------- frontpage: grid of ranking boxes ---------- */
+.fp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:.2rem}
+/* min-width:0 is load-bearing: lets a grid item shrink below its content's
+   unwrapped width so one long value can't push the page wider than a phone */
+.fp-box{min-width:0;margin-bottom:0;border:1px solid var(--border);border-radius:20px;
+  background:var(--surface);padding:1.35rem 1.4rem 1.2rem;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.fp-box .block-head{margin-bottom:.9rem;flex-direction:column;align-items:flex-start;gap:.2rem}
+.fp-box .block-head h2{font-size:1.35rem}
+/* inside a box the list sits flush: no second card around the table */
+.fp-box .table-wrap,.fp-box .rlist{border:0;box-shadow:none;border-radius:0;background:transparent}
+.fp-box .rlist{padding:0}
+.fp-box table.lb thead th{padding-left:.6rem;padding-right:.6rem;background:transparent}
+.fp-box table.lb thead th{white-space:normal;line-height:1.25;vertical-align:bottom}
+.fp-box table.lb td{padding:.62rem .6rem;font-size:.84rem}
+.fp-box table.lb td.name{font-size:.93rem;white-space:normal;min-width:6.5rem;line-height:1.3}
+.fp-box table{margin-top:0}
+/* the two draw boxes lead: span both columns' worth of emphasis via size */
+.fp-box:nth-child(-n+2) .block-head h2{font-size:1.5rem}
+.fp-more{align-self:flex-start;margin-top:auto;padding-top:.9rem;font-size:.88rem;font-weight:600;color:var(--accent-strong)}
 .fp-more:hover{text-decoration:underline}
 
 /* city page: building chips */
-.city-buildings{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 1rem}
-.city-buildings a{font-family:'JetBrains Mono',monospace;font-size:.66rem;padding:.3rem .6rem;
-  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text-secondary)}
+.city-buildings{display:flex;gap:.45rem;flex-wrap:wrap;margin:.3rem 0 1.2rem}
+.city-buildings a{font-size:.82rem;font-weight:600;padding:.4rem .8rem;border:1px solid var(--border);border-radius:20px;
+  background:var(--surface);color:var(--text-secondary);box-shadow:var(--shadow)}
 .city-buildings a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 
 @media(max-width:860px){
-  .container{padding:1rem 1rem 3rem}
-  .site-search{padding:0 1rem}
-  .hdr h1{font-size:1.2rem}
-  /* Matches nba-polymarket's own .stat-card at 390px exactly (padding, value
-     size) rather than an invented mobile size — measured off their live site:
-     padding .7rem .6rem, value 1.25rem. auto-fit/minmax picks 2 or 3 columns
-     by actual available width and drops to 1 before a column gets too narrow
-     for its content, instead of a fixed column count that can't adapt. */
-  .stat-cards{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.5rem}
-  .stat-card{padding:.7rem .6rem}
+  html{font-size:112%}
+  .container{padding:1.1rem 1rem 3rem}
+  .site-search{padding:1rem 1rem 0}
+  .site-search.top.after-nav{padding-top:1rem}
+  .hdr h1{font-size:1.85rem}
+  .subtitle{font-size:.95rem;margin-bottom:1.2rem}
+  /* tabs: even grid, every label fully visible, no sideways scrolling */
+  .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.4rem,1fr));width:100%}
+  .tabs a,.tabs button{text-align:center;padding:.6rem .5rem;white-space:normal}
+  .tabs > :last-child:nth-child(odd){grid-column:1/-1}
+  .block-head h2,.section-title{font-size:1.15rem}
+  .stat-cards{grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.6rem}
+  .stat-card{padding:.85rem .85rem .9rem}
   .stat-card .num{font-size:1.25rem}
-  .ehead h1{font-size:1.3rem}
+  .ehead h1{font-size:1.85rem}
+  .ehead .esub{font-size:.84rem}
   table.lb thead th{position:static}
-  .fp-grid{grid-template-columns:1fr}
-  /* mobile card fallback: same data as table.lb, one column of cards instead
-     of a wide table that would otherwise need horizontal scrolling. */
+  .fp-grid{grid-template-columns:1fr;gap:1rem}
+  .fp-box{padding:1.1rem 1rem 1rem;border-radius:16px}
+  .fp-box .block-head h2,.fp-box:nth-child(-n+2) .block-head h2{font-size:1.2rem}
+  .lb-grid{grid-template-columns:1fr}
+  /* mobile card fallback replaces the wide table */
   .table-wrap{display:none}
   .cards{display:block}
-  /* controls row: each field takes the full width and stacks, instead of
-     shrinking inputs/selects/toggles down to an unreadable sliver. */
-  .controls{gap:.7rem}
+  .cards.always{display:grid;grid-template-columns:1fr}
+  /* controls stack full width instead of shrinking to slivers */
+  .controls{gap:.85rem}
   .controls .field{width:100%}
   .controls .field.grow{flex-basis:100%}
-  .controls .field .toggle{width:100%}
-  .controls .field .toggle button{flex:1}
+  .controls .field .toggle{display:flex;width:100%}
+  .controls .field .toggle button{flex:1;justify-content:center;min-height:2.3rem}
   .season-field .season-select{width:100%;min-width:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
 }

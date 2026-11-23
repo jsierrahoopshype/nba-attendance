@@ -104,33 +104,41 @@ function sortableTable(mount, cols, rows, initial, opts) {
     }
     const capped = !showAll && arr.length > LIST_PAGE_SIZE;
     const visible = capped ? arr.slice(0, LIST_PAGE_SIZE) : arr;
+    const barOf = opts.ranked ? magnitudeBars(col, visible) : null;
+    const barAttr = row => {
+      const b = barOf && barOf(row);
+      return b ? { cls: " has-bar" + b.cls, style: ' style="--bar:' + b.w + '%"' } : { cls: "", style: "" };
+    };
 
     const rankHead = opts.ranked ? '<th class="rank"></th>' : "";
     const head = rankHead + cols.map(c => {
       const left = c.align === "left" ? " left" : "";
       if (c.sortable === false) return '<th class="' + left.trim() + '">' + esc(c.label) + "</th>";
       const sb = sort.key === c.key ? " sorted-by" : "";
+      const aria = sort.key === c.key ? ' aria-sort="' + (sort.dir === "desc" ? "descending" : "ascending") + '"' : "";
       const arrow = sort.key === c.key ? '<span class="arr">' + (sort.dir === "desc" ? "▼" : "▲") + "</span>" : "";
-      return '<th class="sortable' + left + sb + '" data-k="' + esc(c.key) + '">' + esc(c.label) + arrow + "</th>";
+      return '<th scope="col" class="sortable' + left + sb + '"' + aria + ' data-k="' + esc(c.key) + '">' + esc(c.label) + arrow + "</th>";
     }).join("");
     const body = visible.map((row, i) => {
       const href = row._href ? ' data-href="' + esc(row._href) + '"' : "";
       const rc = opts.rowClass ? opts.rowClass(row) : "";
       const rowCls = rc ? ' class="' + esc(rc) + '"' : "";
       const rankCell = opts.ranked ? '<td class="rank">' + (i + 1) + "</td>" : "";
+      const bar = barAttr(row);
       const tds = rankCell + cols.map(c => {
         const cls = [];
         if (c.align === "left") cls.push("name");
         if (c.tdcls) { const x = c.tdcls(row); if (x) cls.push(x); }
-        if (sort.key === c.key) cls.push("sorted-by");
-        return '<td' + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + ">" + c.cell(row) + "</td>";
+        let style = "";
+        if (sort.key === c.key) { cls.push("sorted-by" + bar.cls); style = bar.style; }
+        return '<td' + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + style + ">" + c.cell(row) + "</td>";
       }).join("");
       return "<tr" + rowCls + href + ">" + tds + "</tr>";
     }).join("");
     mount.innerHTML =
       '<div class="table-wrap"><table class="lb"><thead><tr>' + head +
       "</tr></thead><tbody>" + (body || '<tr><td class="dash">No data</td></tr>') + "</tbody></table></div>" +
-      cardsHtml(cols, visible, opts) +
+      cardsHtml(cols, visible, barOf ? Object.assign({}, opts, { barAttr }) : opts) +
       (capped ? '<button type="button" class="show-all-btn">Show all ' + arr.length.toLocaleString() + " →</button>" : "");
     if (capped) {
       mount.querySelector(".show-all-btn").addEventListener("click", () => { showAll = true; draw(); });
@@ -147,6 +155,26 @@ function sortableTable(mount, cols, rows, initial, opts) {
     draw();
   });
   return { setRows(r) { rows = r; showAll = false; draw(); } };
+}
+
+/* Magnitude bars for ranked lists: each row's share of the largest absolute
+   value shown in the sorted column (numbers only — a list sorted by name gets
+   no bars). Draw columns (signed extra-fan deltas) are tinted green/red by
+   sign; everything else uses the accent tint. Returns row -> {w, cls} | null. */
+const SIGNED_KEYS = new Set(["mean_delta", "total_delta"]);
+function magnitudeBars(col, rows) {
+  if (!col || !col.get || !rows.length) return null;
+  const num = r => { const v = col.get(r); return (typeof v === "number" && isFinite(v)) ? v : null; };
+  let max = 0;
+  for (const r of rows) { const v = num(r); if (v != null) max = Math.max(max, Math.abs(v)); }
+  if (!max) return null;
+  const signed = SIGNED_KEYS.has(col.key);
+  return row => {
+    const v = num(row);
+    if (v == null || v === -1 && !signed) return null;     // -1 = "missing" sentinel in overview cols
+    const w = Math.max(2, Math.round(Math.abs(v) / max * 100));
+    return { w, cls: signed ? (v < 0 ? " bar-neg" : " bar-pos") : "" };
+  };
 }
 
 /* Mobile card fallback for a sortable table — same cols/cell renderers, no
@@ -223,8 +251,9 @@ function rankedRowsHtml(titleCol, restCols, rows, opts) {
     const rc = opts.rowClass ? opts.rowClass(row) : "";
     const rowCls = rc ? " " + esc(rc) : "";
     const vals = restCols.map(c => '<span class="rval">' + c.cell(row) + "</span>").join("");
-    return '<div class="rrow' + rowCls + '"' + href + '>' +
-      '<span class="rrank">' + (i + 1) + '</span>' +
+    const bar = opts.barAttr ? opts.barAttr(row) : { cls: "", style: "" };
+    return '<div class="rrow' + rowCls + bar.cls + '"' + href + bar.style + '>' +
+      '<span class="rrank' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span>' +
       '<span class="rname">' + titleCol.cell(row) + "</span>" +
       '<span class="rvals">' + vals + "</span></div>";
   }).join("");
@@ -255,8 +284,9 @@ function selfLabelRowsHtml(titleCol, rows, opts, desc) {
     const meta = desc.headline.cell(row) + " " + esc(desc.headlineLabel || "") +
       (secondary ? ' <span class="rsecondary">(' + secondary + ")</span>" : "") +
       (desc.attribution ? " — " + desc.attribution.cell(row) : "");
-    return '<div class="rrow rrow-self' + rowCls + '"' + href + '>' +
-      '<div class="rrow-top"><span class="rrank">' + (i + 1) + '</span>' +
+    const bar = opts.barAttr ? opts.barAttr(row) : { cls: "", style: "" };
+    return '<div class="rrow rrow-self' + rowCls + bar.cls + '"' + href + bar.style + '>' +
+      '<div class="rrow-top"><span class="rrank' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span>' +
       '<span class="rname">' + name + "</span></div>" +
       '<div class="rrow-meta">' + meta + "</div></div>";
   }).join("");
