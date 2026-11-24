@@ -56,10 +56,108 @@ function playerSlug(name, id) {
 const playerHref = (id, name) => ROOT + "players/" + playerSlug(name, id) + ".html";
 const arenaHref = slug => ROOT + "arenas/" + encodeURIComponent(slug) + ".html";
 const cityHref = slug => ROOT + "cities/" + encodeURIComponent(slug) + ".html";
-const playerLink = (id, name) => '<a href="' + playerHref(id, name) + '">' + esc(name) + "</a>";
-const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(name) + "</a>";
+const playerLink = (id, name) => '<a href="' + playerHref(id, name) + '">' + face(id, name) + esc(name) + "</a>";
+const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + arenaLogo(slug) + esc(name) + "</a>";
 const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
 const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+/* ---------- faces and logos (the Head to Head section's sources and rules) ----------
+   Faces: nba-headshots cut-outs, face-fill first (the face filling the circle),
+   face-tight when a player has none, his initials when neither exists. The
+   personId -> file name list is data/heads.json (live/build_heads.py), so no
+   image is ever requested for a player without one. Logos: nba-headshots team
+   files, shown only beside the franchise's current name or a historical name
+   that has its own file — never today's logo beside an old name. An arena
+   carries its home team's logo, named as in the arena's last season there.
+   Pages render small placeholders (<i class=f data-p=ID>AB</i>,
+   <i class=lg data-t="Team">); hydrate() below fills them, wherever they appear. */
+const HS = "https://jsierrahoopshype.github.io/nba-headshots/";
+const FACE_FILL = HS + "players/headshots/face-fill/", FACE_TIGHT = HS + "players/headshots/face-tight/";
+const BUST = HS + "players/headshots/head-uniform-sharp/";
+const CURRENT_TEAMS = new Set(["Atlanta Hawks", "Boston Celtics", "Brooklyn Nets", "Charlotte Hornets", "Chicago Bulls",
+  "Cleveland Cavaliers", "Dallas Mavericks", "Denver Nuggets", "Detroit Pistons", "Golden State Warriors", "Houston Rockets",
+  "Indiana Pacers", "LA Clippers", "Los Angeles Lakers", "Memphis Grizzlies", "Miami Heat", "Milwaukee Bucks",
+  "Minnesota Timberwolves", "New Orleans Pelicans", "New York Knicks", "Oklahoma City Thunder", "Orlando Magic",
+  "Philadelphia 76ers", "Phoenix Suns", "Portland Trail Blazers", "Sacramento Kings", "San Antonio Spurs",
+  "Toronto Raptors", "Utah Jazz", "Washington Wizards"]);
+const HIST_LOGO = { "Charlotte Bobcats": "charlotte-bobcats", "New Orleans Hornets": "new-orleans-hornets",
+  "New Jersey Nets": "new-jersey-nets", "Seattle SuperSonics": "seattle-supersonics", "San Diego Clippers": "san-diego-clippers",
+  "Vancouver Grizzlies": "vancouver-grizzlies", "Washington Bullets": "washington-bullets" };
+function logoUrl(team) {
+  team = String(team || "").trim();
+  if (HIST_LOGO[team]) return HS + "teams/logos/historical/" + HIST_LOGO[team] + ".svg";
+  return CURRENT_TEAMS.has(team) ? HS + "teams/logos/current/svg/" + slugify(team) + ".svg" : "";
+}
+function initials(name) {
+  const w = String(name || "").replace(/\./g, " ").split(/\s+/).filter(x => x && !/^(jr|sr|ii|iii|iv|v),?$/i.test(x));
+  return w.length ? (w[0][0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase() : "?";
+}
+const face = (id, name) => '<i class="f" data-p="' + esc(id) + '">' + esc(initials(name)) + "</i>";
+const teamLogo = team => logoUrl(team) ? '<i class="lg" data-t="' + esc(team) + '"></i>' : "";
+const arenaLogo = slug => '<i class="lg" data-a="' + esc(slug) + '"></i>';
+const teamLabel = team => teamLogo(team) + esc(team);
+
+let HEADS = null, ARENA_TEAM = null, hydrateQueued = false;
+const headsP = fetch(DATA + "/heads.json").then(r => r.ok ? r.json() : {}).catch(() => ({}))
+  .then(h => { HEADS = h; queueHydrate(); });
+const arenasP = fetch(DATA + "/buildings/index.json").then(r => r.ok ? r.json() : []).catch(() => [])
+  .then(list => { ARENA_TEAM = {}; list.forEach(b => { if (b.home_team) ARENA_TEAM[b.slug] = b.home_team; }); queueHydrate(); });
+function addImg(el, src, fallback, onload) {
+  const img = new Image();
+  img.alt = ""; img.loading = "lazy"; img.decoding = "async";
+  img.onload = () => { if (onload) onload(); };
+  img.onerror = () => { if (fallback && img.dataset.t !== "1") { img.dataset.t = "1"; img.src = fallback; } else img.remove(); };
+  img.src = src;
+  el.appendChild(img);
+}
+function hydrate(root) {
+  if (HEADS) root.querySelectorAll("i.f[data-p], .ph[data-p]").forEach(el => {
+    const stem = HEADS[el.dataset.p];
+    el.removeAttribute("data-p");
+    if (!stem) return;                                   // no photo: the initials stay
+    const big = el.classList.contains("ph");
+    addImg(el, (big ? BUST : FACE_FILL) + stem + ".webp", FACE_TIGHT + stem + ".webp", () => el.classList.add("hs"));
+  });
+  root.querySelectorAll("i.lg[data-t]").forEach(el => {
+    const u = logoUrl(el.dataset.t); el.removeAttribute("data-t");
+    if (u) addImg(el, u); else el.remove();
+  });
+  if (ARENA_TEAM) root.querySelectorAll("i.lg[data-a]").forEach(el => {
+    const u = logoUrl(ARENA_TEAM[el.dataset.a]); el.removeAttribute("data-a");
+    if (u) addImg(el, u); else el.remove();
+  });
+}
+function queueHydrate() {
+  if (hydrateQueued) return;
+  hydrateQueued = true;
+  requestAnimationFrame(() => { hydrateQueued = false; hydrate(document); decorateHeader(); });
+}
+// every render (tables, cards, search results) goes through innerHTML: watch for it
+new MutationObserver(queueHydrate).observe(document.documentElement, { childList: true, subtree: true });
+
+/* Detail-page header, Head to Head hub style: a big face (player pages) or the
+   home team's logo (arena pages) beside the name. The header markup comes from
+   each page's own script; this only wraps it once it appears. */
+function decorateHeader() {
+  const h = document.querySelector(".ehead:not([data-dec])");
+  if (!h) return;
+  const page = (location.pathname.match(/\/(arenas|cities|players)\//) || [])[1];
+  let hero = "";
+  if (page === "players" && window.ENTITY_ID) {
+    const nm = (h.querySelector("h1") || {}).textContent || "";
+    hero = '<span class="ph" style="--s:72px" data-p="' + esc(window.ENTITY_ID) + '">' + esc(initials(nm)) + "</span>";
+  } else if (page === "arenas" && window.ENTITY_SLUG) {
+    if (!ARENA_TEAM) return;                             // wait for the arena list
+    const t = ARENA_TEAM[window.ENTITY_SLUG];
+    hero = t && logoUrl(t) ? '<i class="lg big" data-t="' + esc(t) + '"></i>' : "";
+  }
+  h.dataset.dec = "1";
+  const text = document.createElement("div");
+  text.className = "etext";
+  while (h.firstChild) text.appendChild(h.firstChild);
+  h.appendChild(text);
+  if (hero) { text.insertAdjacentHTML("beforebegin", '<div class="ehero">' + hero + "</div>"); hydrate(h); }
+}
 
 /* Any list capable of rendering more than this many rows shows only the top
    LIST_PAGE_SIZE by default, with a single "Show all" click revealing the
@@ -104,11 +202,6 @@ function sortableTable(mount, cols, rows, initial, opts) {
     }
     const capped = !showAll && arr.length > LIST_PAGE_SIZE;
     const visible = capped ? arr.slice(0, LIST_PAGE_SIZE) : arr;
-    const barOf = opts.ranked ? magnitudeBars(col, visible) : null;
-    const barAttr = row => {
-      const b = barOf && barOf(row);
-      return b ? { cls: " has-bar" + b.cls, style: ' style="--bar:' + b.w + '%"' } : { cls: "", style: "" };
-    };
 
     const rankHead = opts.ranked ? '<th class="rank"></th>' : "";
     const head = rankHead + cols.map(c => {
@@ -124,21 +217,19 @@ function sortableTable(mount, cols, rows, initial, opts) {
       const rc = opts.rowClass ? opts.rowClass(row) : "";
       const rowCls = rc ? ' class="' + esc(rc) + '"' : "";
       const rankCell = opts.ranked ? '<td class="rank">' + (i + 1) + "</td>" : "";
-      const bar = barAttr(row);
       const tds = rankCell + cols.map(c => {
         const cls = [];
         if (c.align === "left") cls.push("name");
         if (c.tdcls) { const x = c.tdcls(row); if (x) cls.push(x); }
-        let style = "";
-        if (sort.key === c.key) { cls.push("sorted-by" + bar.cls); style = bar.style; }
-        return '<td' + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + style + ">" + c.cell(row) + "</td>";
+        if (sort.key === c.key) cls.push("sorted-by");
+        return '<td' + (cls.length ? ' class="' + cls.join(" ") + '"' : "") + ">" + c.cell(row) + "</td>";
       }).join("");
       return "<tr" + rowCls + href + ">" + tds + "</tr>";
     }).join("");
     mount.innerHTML =
       '<div class="table-wrap"><table class="lb"><thead><tr>' + head +
       "</tr></thead><tbody>" + (body || '<tr><td class="dash">No data</td></tr>') + "</tbody></table></div>" +
-      cardsHtml(cols, visible, barOf ? Object.assign({}, opts, { barAttr }) : opts) +
+      cardsHtml(cols, visible, opts) +
       (capped ? '<button type="button" class="show-all-btn">Show all ' + arr.length.toLocaleString() + " →</button>" : "");
     if (capped) {
       mount.querySelector(".show-all-btn").addEventListener("click", () => { showAll = true; draw(); });
@@ -155,26 +246,6 @@ function sortableTable(mount, cols, rows, initial, opts) {
     draw();
   });
   return { setRows(r) { rows = r; showAll = false; draw(); } };
-}
-
-/* Magnitude bars for ranked lists: each row's share of the largest absolute
-   value shown in the sorted column (numbers only — a list sorted by name gets
-   no bars). Draw columns (signed extra-fan deltas) are tinted green/red by
-   sign; everything else uses the accent tint. Returns row -> {w, cls} | null. */
-const SIGNED_KEYS = new Set(["mean_delta", "total_delta"]);
-function magnitudeBars(col, rows) {
-  if (!col || !col.get || !rows.length) return null;
-  const num = r => { const v = col.get(r); return (typeof v === "number" && isFinite(v)) ? v : null; };
-  let max = 0;
-  for (const r of rows) { const v = num(r); if (v != null) max = Math.max(max, Math.abs(v)); }
-  if (!max) return null;
-  const signed = SIGNED_KEYS.has(col.key);
-  return row => {
-    const v = num(row);
-    if (v == null || v === -1 && !signed) return null;     // -1 = "missing" sentinel in overview cols
-    const w = Math.max(2, Math.round(Math.abs(v) / max * 100));
-    return { w, cls: signed ? (v < 0 ? " bar-neg" : " bar-pos") : "" };
-  };
 }
 
 /* Mobile card fallback for a sortable table — same cols/cell renderers, no
@@ -251,9 +322,8 @@ function rankedRowsHtml(titleCol, restCols, rows, opts) {
     const rc = opts.rowClass ? opts.rowClass(row) : "";
     const rowCls = rc ? " " + esc(rc) : "";
     const vals = restCols.map(c => '<span class="rval">' + c.cell(row) + "</span>").join("");
-    const bar = opts.barAttr ? opts.barAttr(row) : { cls: "", style: "" };
-    return '<div class="rrow' + rowCls + bar.cls + '"' + href + bar.style + '>' +
-      '<span class="rrank' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span>' +
+    return '<div class="rrow' + rowCls + '"' + href + '>' +
+      '<span class="rrank">' + (i + 1) + '</span>' +
       '<span class="rname">' + titleCol.cell(row) + "</span>" +
       '<span class="rvals">' + vals + "</span></div>";
   }).join("");
@@ -284,9 +354,8 @@ function selfLabelRowsHtml(titleCol, rows, opts, desc) {
     const meta = desc.headline.cell(row) + " " + esc(desc.headlineLabel || "") +
       (secondary ? ' <span class="rsecondary">(' + secondary + ")</span>" : "") +
       (desc.attribution ? " — " + desc.attribution.cell(row) : "");
-    const bar = opts.barAttr ? opts.barAttr(row) : { cls: "", style: "" };
-    return '<div class="rrow rrow-self' + rowCls + bar.cls + '"' + href + bar.style + '>' +
-      '<div class="rrow-top"><span class="rrank' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span>' +
+    return '<div class="rrow rrow-self' + rowCls + '"' + href + '>' +
+      '<div class="rrow-top"><span class="rrank">' + (i + 1) + '</span>' +
       '<span class="rname">' + name + "</span></div>" +
       '<div class="rrow-meta">' + meta + "</div></div>";
   }).join("");
@@ -336,7 +405,7 @@ function autocomplete(input, box, items, opts) {
     if (!matches.length) { close(); return; }
     box.innerHTML = matches.map((m, i) =>
       '<a class="gs-item" href="' + href(m) + '" data-i="' + i + '">' +
-      '<span class="gs-main">' + esc(m.name) + '</span>' +
+      '<span class="gs-main">' + (m.personId ? face(m.personId, m.name) : "") + esc(m.name) + '</span>' +
       '<span class="gs-sub">' + esc(sub(m)) + "</span></a>").join("");
     box.classList.add("open"); sel = -1;
   }
@@ -385,7 +454,7 @@ const drawDeltaCols = () => [
   { key: "total_delta", label: DRAW_TOTAL_LABEL, defaultDir: "desc", get: drawTotal, cell: drawTotalCell },
 ];
 /* All-time team rows carry `historical` (era names folded in) -> subnote. */
-const teamNameCell = r => esc(r.team || ((r.teamCity || "") + " " + (r.teamName || "")).trim()) +
+const teamNameCell = r => teamLabel(r.team || ((r.teamCity || "") + " " + (r.teamName || "")).trim()) +
   (r.historical && r.historical.length
     ? '<span class="sub team-hist">incl. games as ' + esc(r.historical.join(", ")) + "</span>" : "");
 
@@ -534,7 +603,8 @@ function siteSearchBar(pos, items) {
     if (!matches.length) { close(); return; }
     box.innerHTML = matches.map((m, i) =>
       '<a class="gs-item" href="' + searchHref(m) + '" data-i="' + i + '">' +
-      '<span class="gs-main">' + esc(m.name) + "</span>" +
+      '<span class="gs-main">' + (m.type === "player" ? face(m.id, m.name) : m.type === "arena" ? arenaLogo(m.slug) :
+        m.type === "team" ? teamLogo(m.name) : "") + esc(m.name) + "</span>" +
       (m.sub ? '<span class="gs-sub">' + esc(m.sub) + "</span>" : "") +
       '<span class="gs-type">' + esc(m.type) + "</span></a>").join("");
     box.classList.add("open"); sel = -1;

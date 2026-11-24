@@ -64,13 +64,24 @@ jobs:
         run: python3 live/build_live_season.py
 
       - name: Front-page notes (last night at the gate)
-        run: python3 live/build_notes.py
+        run: |
+          python3 live/build_notes.py
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, re
+          n = json.load(open("docs/data/notes.json"))
+          clean = lambda t: re.sub(r"\[\[[pat]:(?:[^|\]]+\|)?([^\]]+)\]\]", r"\1", t or "")
+          for night in n.get("nights", [])[:1]:
+              print(f"### Last night at the gate, {night['label']}")
+              print("- " + clean(night["featured"]["t"]))
+              for x in night.get("notes", []):
+                  print("- " + clean(x["t"]))
+          PY
 
       - name: Sitemap
         run: python3 generate_sitemap.py
 
-      - name: Commit source data (main only)
-        if: github.ref == 'refs/heads/main'
+      - name: Commit source data
+        # on main: the daily data; on a claude/** branch: the same files, so a pull request carries them
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

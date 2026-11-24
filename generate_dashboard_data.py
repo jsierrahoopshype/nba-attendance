@@ -418,6 +418,17 @@ def load_game_counts(data_dir):
                 for k, v in gb.iterrows()}
     building_range = _ranges("building")
     city_range = _ranges("city")
+    # The building's home team as named in its LAST season there (Seattle Center
+    # Coliseum -> Seattle SuperSonics, never today's franchise name), for the
+    # team logo beside the arena. Neutral sites get none.
+    g["home_team"] = (g["hometeamCity"].astype(str).str.strip() + " " +
+                      g["hometeamName"].astype(str).str.strip()).str.strip()
+    last = g[g["season"] == g.groupby("building")["season"].transform("max")]
+    if "buildingType" in last:
+        last = last[last["buildingType"] == "home"]
+    for b, sub in last.groupby("building"):
+        if b in building_range and len(sub):
+            building_range[b]["home_team"] = sub["home_team"].mode().iloc[0]
     return building_games, city_games, building_range, city_range
 
 
@@ -1029,6 +1040,7 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "player_game_rows": sum(r["games"] for r in recs),
             "first_season": span(name, recs)[0],
             "last_season": span(name, recs)[1],
+            "home_team": building_range.get(name, {}).get("home_team", ""),
         })
     write_json(os.path.join(DATA_DIR, "buildings", "index.json"), index)
 
@@ -1043,6 +1055,7 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "city": recs[0]["city"],
             "city_slug": slugify(recs[0]["city"]),
             "buildingType": recs[0]["buildingType"],
+            "home_team": building_range.get(name, {}).get("home_team", ""),
             "total_games": building_games.get(name, 0),
             "player_game_rows": sum(r["games"] for r in recs),
             "first_season": span(name, recs)[0],
