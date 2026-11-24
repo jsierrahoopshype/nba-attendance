@@ -145,14 +145,14 @@ function renderCards() {
       o.winningest_player ? playerLink(o.winningest_player.personId, o.winningest_player.name) : "—",
       o.winningest_player ? pct(o.winningest_player.win_pct) + " · " + o.winningest_player.games + " g (min 15)" : "");
     html += card("Winningest Team",
-      o.winningest_team ? esc(o.winningest_team.team) : "—",
+      o.winningest_team ? teamLabel(o.winningest_team.team) : "—",
       o.winningest_team ? pct(o.winningest_team.win_pct) + " · " + o.winningest_team.games + " g (min 20)" : "");
     html += card("Avg Attendance",
       o.avg_attendance == null ? "—" : fmtInt(o.avg_attendance),
       esc(o.avg_attendance_label || ""));
     if (o.biggest_draw) {
       html += card("Biggest Draw",
-        esc(o.biggest_draw.team),
+        teamLabel(o.biggest_draw.team),
         signed(o.biggest_draw.mean_delta) + " extra fans/game · " + o.biggest_draw.games + " g (min 15)", "all-time");
     }
     if (o.sellout) {

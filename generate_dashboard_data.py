@@ -31,7 +31,9 @@ import shutil
 from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(HERE, "output")
+# live/build_live_season.py points this at its combined (base + season in progress)
+# copy, so the committed output/ base is never touched by the daily build.
+OUTPUT_DIR = os.environ.get("ATTENDANCE_OUTPUT_DIR") or os.path.join(HERE, "output")
 DATA_DIR = os.path.join(HERE, "docs", "data")
 
 RECORDS_CSV = os.path.join(OUTPUT_DIR, "player_arena_records_2007.csv")
@@ -221,12 +223,27 @@ def _draw_aggregate(rows, id_field, extra_fields, min_games):
     return out
 
 
+def season_min_games(rows, season, full_min):
+    """The road-games floor for one season. A finished season keeps full_min
+    (a team plays 41 road games, so the busiest player is far past it); a
+    season in progress, whose busiest visitor has only played a few road games,
+    gets half of that busiest count (at least 3), so its lists aren't empty in
+    November. Same rule for every season, so finished seasons never change."""
+    top = max((as_int(r["games"]) for r in rows if as_int(r["season"]) == season), default=0)
+    return min(full_min, max(3, top // 2)) if full_min else 0
+
+
 def _draw_by_season(rows, id_field, extra_fields, min_games):
     """Group season draw rows into {str(season): [row, ...]}, min_games applied
-    per season, each season's list sorted by per-game delta desc."""
+    per season (season_min_games: lower while a season is in progress), each
+    season's list sorted by per-game delta desc."""
     by_season = defaultdict(list)
+    floors = {}
     for r in rows:
-        if as_int(r["games"]) < min_games:
+        se = as_int(r["season"])
+        if se not in floors:
+            floors[se] = season_min_games(rows, se, min_games)
+        if as_int(r["games"]) < floors[se]:
             continue
         by_season[as_int(r["season"])].append({
             id_field: r[id_field], **{k: r[k] for k in extra_fields},
@@ -262,6 +279,9 @@ def build_draw(data_dir, player_filename, chunksize):
                            "total_delta": as_float(r["total_delta"])} for r in trows]
         return {
             "seasons": seasons,
+            "min_games": PLAYER_DRAW_MIN_GAMES,
+            "min_games_by_season": {str(se): season_min_games(prows, se, PLAYER_DRAW_MIN_GAMES)
+                                    for se in seasons},
             "players": {
                 "all": _draw_aggregate(prows, "personId", p_extra, PLAYER_DRAW_MIN_GAMES),
                 "by_season": _draw_by_season(prows, "personId", p_extra, PLAYER_DRAW_MIN_GAMES),
@@ -398,6 +418,17 @@ def load_game_counts(data_dir):
                 for k, v in gb.iterrows()}
     building_range = _ranges("building")
     city_range = _ranges("city")
+    # The building's home team as named in its LAST season there (Seattle Center
+    # Coliseum -> Seattle SuperSonics, never today's franchise name), for the
+    # team logo beside the arena. Neutral sites get none.
+    g["home_team"] = (g["hometeamCity"].astype(str).str.strip() + " " +
+                      g["hometeamName"].astype(str).str.strip()).str.strip()
+    last = g[g["season"] == g.groupby("building")["season"].transform("max")]
+    if "buildingType" in last:
+        last = last[last["buildingType"] == "home"]
+    for b, sub in last.groupby("building"):
+        if b in building_range and len(sub):
+            building_range[b]["home_team"] = sub["home_team"].mode().iloc[0]
     return building_games, city_games, building_range, city_range
 
 
@@ -1009,6 +1040,7 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "player_game_rows": sum(r["games"] for r in recs),
             "first_season": span(name, recs)[0],
             "last_season": span(name, recs)[1],
+            "home_team": building_range.get(name, {}).get("home_team", ""),
         })
     write_json(os.path.join(DATA_DIR, "buildings", "index.json"), index)
 
@@ -1023,6 +1055,7 @@ def build_buildings(records, building_games, allstar_ids, draw_by_slug,
             "city": recs[0]["city"],
             "city_slug": slugify(recs[0]["city"]),
             "buildingType": recs[0]["buildingType"],
+            "home_team": building_range.get(name, {}).get("home_team", ""),
             "total_games": building_games.get(name, 0),
             "player_game_rows": sum(r["games"] for r in recs),
             "first_season": span(name, recs)[0],
@@ -1411,8 +1444,9 @@ def build_frontpage(records, home_away_by_slug, sellout_by_building):
     # ---- (2) biggest draws this season (league-wide players, min road games) ----
     # Emit ALL qualifiers (not just the top FRONTPAGE_ROWS) so the box can default
     # to All-Stars only and still fill up after the client-side filter.
+    season_min = season_min_games(pdraw, latest, SEASON_DRAW_MIN_GAMES)
     season_players = [r for r in pdraw if as_int(r["season"]) == latest
-                      and as_int(r["games"]) >= SEASON_DRAW_MIN_GAMES]
+                      and as_int(r["games"]) >= season_min]
     boxes["biggest_draws_season"] = [
         {"personId": r["personId"], "playerName": r["playerName"],
          "mean_delta": as_float(r["mean_delta"]), "games": as_int(r["games"]),
@@ -1477,6 +1511,8 @@ def build_frontpage(records, home_away_by_slug, sellout_by_building):
     write_json(os.path.join(DATA_DIR, "frontpage.json"),
                {"latest_season": latest,
                 "latest_label": _season_label(latest) if latest else "",
+                "season_min_games": season_min,
+                "draw_king_min_games": DRAW_KING_MIN_GAMES,
                 "boxes": boxes})
     return {k: len(v) for k, v in boxes.items()}
 

@@ -33,6 +33,7 @@
 
   <!-- TAB 0: HOME (landing) -->
   <section class="view active" id="view-home">
+    <div id="notes"></div>
     <div id="frontpageGrid"><div class="loading">Loading rankings…</div></div>
   </section>
 
@@ -59,7 +60,7 @@
       <div id="teamTable"><div class="loading">Loading…</div></div>
     </div>
     <div class="block">
-      <div class="block-head"><h2>Players</h2><span class="sub" id="playerDrawSub">visiting players with 20+ qualifying road games</span></div>
+      <div class="block-head"><h2>Players</h2><span class="sub" id="playerDrawSub"></span></div>
       <div id="playerDrawAllstar" class="controls"></div>
       <div id="playerDrawTable"></div>
     </div>
@@ -203,7 +204,8 @@ function normalizeDraw(d) {
   if (Array.isArray(d.teams) || Array.isArray(d.players))
     return { seasons: [], teams: wrap(d.teams), players: wrap(d.players) };
   return { seasons: d.seasons || [], teams: d.teams || { all: [], by_season: {} },
-           players: d.players || { all: [], by_season: {} } };
+           players: d.players || { all: [], by_season: {} },
+           min_games: d.min_games, min_games_by_season: d.min_games_by_season || {} };
 }
 
 function drawScope(node) {
@@ -235,8 +237,10 @@ function renderDraw() {
   const allPlayers = drawScope(DRAW.players);
   const playerRows = filterAllstar(allPlayers, p => p.personId, drawAllstarMode)
     .map(p => ({ ...p, _href: playerHref(p.personId, p.playerName) }));
+  const minG = drawSeason == null ? (DRAW.min_games || 20)
+    : ((DRAW.min_games_by_season || {})[String(drawSeason)] || DRAW.min_games || 20);
   document.getElementById("playerDrawSub").textContent =
-    playerRows.length + (drawAllstarMode ? " All-Star" : "") + " visiting players · 20+ road games · " + scopeLabel;
+    playerRows.length + (drawAllstarMode ? " All-Star" : "") + " visiting players · " + minG + "+ road games · " + scopeLabel;
   const pmount = document.getElementById("playerDrawTable");
   pmount.innerHTML = playerRows.length ? "" : '<div class="empty">No player draw for ' + esc(scopeLabel) + ".</div>";
   if (playerRows.length) {
@@ -269,8 +273,8 @@ async function initRecords() {
       cell: r => r.winningest_player ? playerLink(r.winningest_player.personId, r.winningest_player.name) + ' <span class="sub">' + pct(r.winningest_player.win_pct) + "</span>" : '<span class="dash">—</span>' },
     { key: "winningest_team", label: "Winningest Team", align: "left", defaultDir: "desc",
       get: r => r.winningest_team ? r.winningest_team.win_pct : -1,
-      cell: r => r.winningest_team ? esc(r.winningest_team.team) + ' <span class="sub">' + pct(r.winningest_team.win_pct) + "</span>" : '<span class="dash">—</span>' },
-    { key: "avg_attendance", label: "Avg Att. (2026)", defaultDir: "desc",
+      cell: r => r.winningest_team ? teamLabel(r.winningest_team.team) + ' <span class="sub">' + pct(r.winningest_team.win_pct) + "</span>" : '<span class="dash">—</span>' },
+    { key: "avg_attendance", label: "Avg Att.", defaultDir: "desc",
       get: r => r.avg_attendance == null ? -1 : r.avg_attendance,
       cell: r => r.avg_attendance == null ? '<span class="dash">—</span>' : fmtInt(r.avg_attendance) },
   ];
@@ -303,9 +307,65 @@ async function initCities() {
   wireRowNav(mount);
 }
 
+/* ---------- HOME: last night at the gate (docs/data/notes.json) ----------
+   Rebuilt every morning by live/build_notes.py from the season in progress.
+   Note text carries tokens ([[p:id|Name]], [[a:slug|Arena]], [[t:Team]]) that
+   become links with faces and logos here; everything else is escaped. */
+function noteHtml(t) {
+  return String(t).split(/(\[\[[pat]:[^\]]+\]\])/).map(part => {
+    const m = part.match(/^\[\[([pat]):([^|\]]+)(?:\|([^\]]+))?\]\]$/);
+    if (!m) return esc(part);
+    if (m[1] === "p") return playerLink(m[2], m[3] || "");
+    if (m[1] === "a") return arenaLink(m[2], m[3] || m[2]);
+    return teamLabel(m[2]);
+  }).join("");
+}
+function noteImg(img, text, big) {
+  if (!img) return "";
+  if (img.p) {
+    img = { p: String(img.p).replace(/\D/g, "") };      // a personId: digits only
+    const nm = (String(text).match(new RegExp("\\[\\[p:" + img.p + "\\|([^\\]]+)\\]\\]")) || [])[1] || "";
+    return big ? '<span class="ph" style="--s:56px" data-p="' + esc(img.p) + '">' + esc(initials(nm)) + "</span>" : face(img.p, nm);
+  }
+  if (img.t) return logoUrl(img.t) ? '<i class="lg' + (big ? " big" : "") + '" data-t="' + esc(img.t) + '"></i>' : "";
+  if (img.a) return '<i class="lg' + (big ? " big" : "") + '" data-a="' + esc(img.a) + '"></i>';
+  return "";
+}
+const countsLine = c => c ? fmtInt(c.games) + " game" + (c.games === 1 ? "" : "s") + " · " + fmtInt(c.fans) + " fans · " +
+  fmtInt(c.sellouts) + " sellout" + (c.sellouts === 1 ? "" : "s") : "";
+async function renderNotes() {
+  let n;
+  try { n = await getJSON(DATA + "/notes.json"); } catch (e) { return; }
+  const nights = (n && n.nights) || [];
+  if (!nights.length) return;
+  const last = nights[0];
+  const sub = document.querySelector(".subtitle");
+  if (sub && !sub.dataset.night) {
+    sub.dataset.night = "1";
+    sub.insertAdjacentHTML("beforeend", " Latest game night: <b>" + esc(last.label) + "</b>, updated every morning.");
+  }
+  const f = last.featured || {};
+  let html = '<section class="night"><div class="block-head"><h2>Last night at the gate</h2>' +
+    '<span class="sub">' + esc(last.label) + "</span></div>" +
+    '<article class="feat"><div class="feat-img">' + noteImg(f.img, f.t, true) + "</div><div>" +
+    '<p class="feat-t">' + noteHtml(f.t || "") + "</p>" +
+    '<p class="counts">' + esc(countsLine(last.counts)) + "</p></div></article>";
+  if ((last.notes || []).length)
+    html += '<ul class="notes">' + last.notes.map(x =>
+      '<li><span class="nimg">' + noteImg(x.img, x.t, false) + "</span><span>" + noteHtml(x.t) + "</span></li>").join("") + "</ul>";
+  html += "</section>";
+  if (nights.length > 1)
+    html += '<section class="block"><div class="block-head"><h2>Earlier nights</h2><span class="sub">' +
+      esc(n.season_label || "") + "</span></div><ul class=\"nights\">" + nights.slice(1).map(x =>
+        '<li><span class="nd">' + esc(x.label) + " · " + esc(countsLine(x.counts)) + "</span>" +
+        noteHtml((x.featured || {}).t || "") + "</li>").join("") + "</ul></section>";
+  document.getElementById("notes").innerHTML = html;
+}
+
 /* ---------- HOME: six ranking boxes ---------- */
 const FP_ROWS = 10;
 async function initHome() {
+  renderNotes();
   let fp;
   try { fp = await getJSON(DATA + "/frontpage.json"); }
   catch (err) { document.getElementById("frontpageGrid").innerHTML = '<div class="err">Failed to load rankings: ' + esc(err.message) + "</div>"; return; }
@@ -324,9 +384,9 @@ async function initHome() {
   const hiCol = { key: "career_high", label: "Hi", defaultDir: "desc", get: r => r.career_high, cell: r => fmtInt(r.career_high) };
 
   const boxes = [
-    { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top All-Star visiting players, min 15 road games",
+    { title: "Biggest draws" + (sl ? " · " + sl : ""), sub: "top All-Star visiting players, min " + (fp.season_min_games || 15) + " road games",
       rows: b.biggest_draws_season, tab: "draw", allstar: true, cols: [playerCol, gCol, meanCol] },
-    { title: "All-time draw kings", sub: "career total & avg draw, min 100 road games",
+    { title: "All-time draw kings", sub: "career total & avg draw, min " + (fp.draw_king_min_games || 100) + " road games",
       rows: b.draw_kings_alltime, tab: "draw", initial: { key: "total_delta", dir: "desc" },
       cols: [playerCol, gCol, meanCol, totalCol] },
     { title: "Arena attendance" + (sl ? " · " + sl : ""), sub: "avg attendance, latest season",
