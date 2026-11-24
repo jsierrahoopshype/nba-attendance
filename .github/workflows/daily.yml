@@ -1,0 +1,127 @@
+# Daily build of hoopsmatic.com/nba-attendance/ with the season in progress.
+#
+#  1. live/fetch_live_season.py   final games of 2026-27 from NBA.com's public CDN -> data/live/<season>/
+#  2. live/build_heads.py         headshot file list from nba-headshots (names only) -> data/heads.json
+#  3. live/build_live_season.py   base (output/, Jorge's full local build) + season in progress -> docs/data/
+#  4. live/build_notes.py         "last night at the gate" notes for the front page -> docs/data/notes.json
+#  5. commit only the small source files (data/live/, data/heads.json, data/sitemap_lastmod.json),
+#     never docs/data/ or output/
+#  6. publish the built site to GitHub Pages (needs Settings > Pages > Source: GitHub Actions)
+#
+# Branch pushes (claude/**) run steps 1-4 as a dry run: nothing is committed or published, the
+# results are attached to the run as an artifact.
+name: Daily build
+
+on:
+  schedule:
+    - cron: '17 9 * * *'     # 09:17 UTC: every late West Coast game is final and in the CDN
+    - cron: '47 13 * * *'    # 13:47 UTC: backup pass for box scores published late
+  workflow_dispatch:
+  push:
+    branches: [main, 'claude/**']
+    paths-ignore: ['README.md']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      publish: ${{ steps.pages.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python packages
+        run: pip install --quiet pandas
+
+      - name: Fetch the season in progress (NBA.com CDN)
+        run: python3 live/fetch_live_season.py
+
+      - name: Headshot list (nba-headshots, file names only)
+        run: |
+          TMP="$RUNNER_TEMP/heads"
+          if git clone -q --depth 1 --filter=blob:none --no-checkout https://github.com/jsierrahoopshype/nba-headshots "$TMP"; then
+            git -C "$TMP" ls-tree --name-only HEAD players/headshots/face-tight/ players/headshots/face-fill/ \
+              players/headshots/head-uniform-sharp/ > "$RUNNER_TEMP/heads.txt"
+            python3 live/build_heads.py "$RUNNER_TEMP/heads.txt" || echo "::warning::headshot list not rebuilt; keeping the committed one"
+          else
+            echo "::warning::nba-headshots unreachable; keeping the committed headshot list"
+          fi
+
+      - name: Build site data (base + season in progress)
+        run: python3 live/build_live_season.py
+
+      - name: Front-page notes (last night at the gate)
+        run: python3 live/build_notes.py
+
+      - name: Sitemap
+        run: python3 generate_sitemap.py
+
+      - name: Commit source data (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live data/heads.json data/sitemap_lastmod.json
+          if git diff --cached --quiet; then echo "No new source data."; exit 0; fi
+          git commit -q -m "Daily data: season in progress [skip ci]"
+          for i in 1 2 3; do git pull -q --rebase && git push -q && exit 0; sleep 5; done
+          echo "::error::could not push the daily data"; exit 1
+
+      - name: Is Pages set to publish from Actions?
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bt=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo unknown)
+          echo "Pages build type: $bt"
+          if [ "${{ github.ref }}" = "refs/heads/main" ] && [ "$bt" = "workflow" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              echo "- Not published: GitHub Pages still publishes from the main branch's docs/ folder. Switch it once at https://github.com/${{ github.repository }}/settings/pages (Source: GitHub Actions)." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+      - name: Package the site
+        if: steps.pages.outputs.publish == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Dry-run results (branches)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run
+          retention-days: 5
+          path: |
+            data/live
+            data/heads.json
+            docs/data/frontpage.json
+            docs/data/notes.json
+            docs/data/draw.json
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

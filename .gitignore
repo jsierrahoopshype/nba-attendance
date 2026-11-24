@@ -5,3 +5,4 @@ data/PlayByPlay.parquet
 
 __pycache__/
 *.pyc
+output_live/
