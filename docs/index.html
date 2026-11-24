@@ -323,6 +323,7 @@ function noteHtml(t) {
 function noteImg(img, text, big) {
   if (!img) return "";
   if (img.p) {
+    img = { p: String(img.p).replace(/\D/g, "") };      // a personId: digits only
     const nm = (String(text).match(new RegExp("\\[\\[p:" + img.p + "\\|([^\\]]+)\\]\\]")) || [])[1] || "";
     return big ? '<span class="ph" style="--s:56px" data-p="' + esc(img.p) + '">' + esc(initials(nm)) + "</span>" : face(img.p, nm);
   }

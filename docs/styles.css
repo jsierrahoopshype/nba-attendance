@@ -269,8 +269,10 @@ table.lb tbody tr.no-home{background:var(--surface-hover)}
 .notes{list-style:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:.5rem}
 .notes li{display:flex;gap:.55rem;align-items:center;padding:.55rem .8rem;min-height:3.1rem;border-bottom:1px solid var(--border);font-size:.84rem;line-height:1.4}
 .notes li:last-child{border-bottom:none}
-.notes li .f,.notes li .lg{margin:0}
-.notes li .lg{width:24px;height:24px}
+.notes li .nimg .f,.notes li .nimg .lg{margin:0}
+.notes li .nimg .lg{width:24px;height:24px}
+.feat-t .f,.notes .f,.nights .f{width:22px;height:22px;margin-right:.25rem}
+.feat-t .lg,.notes .lg,.nights .lg{margin-right:.2rem}
 .notes li .nimg{flex:0 0 24px;display:flex;justify-content:center}
 .nights{list-style:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .nights li{padding:.55rem .8rem;border-bottom:1px solid var(--border);font-size:.8rem;line-height:1.4}

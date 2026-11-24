@@ -66,7 +66,7 @@ jobs:
       - name: Front-page notes (last night at the gate)
         run: |
           python3 live/build_notes.py
-          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import json, re
           n = json.load(open("docs/data/notes.json"))
           clean = lambda t: re.sub(r"\[\[[pat]:(?:[^|\]]+\|)?([^\]]+)\]\]", r"\1", t or "")
@@ -79,17 +79,6 @@ jobs:
 
       - name: Sitemap
         run: python3 generate_sitemap.py
-
-      - name: Commit source data
-        # on main: the daily data; on a claude/** branch: the same files, so a pull request carries them
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/live data/heads.json data/sitemap_lastmod.json
-          if git diff --cached --quiet; then echo "No new source data."; exit 0; fi
-          git commit -q -m "Daily data: season in progress [skip ci]"
-          for i in 1 2 3; do git pull -q --rebase && git push -q && exit 0; sleep 5; done
-          echo "::error::could not push the daily data"; exit 1
 
       - name: Is Pages set to publish from Actions?
         id: pages
@@ -125,6 +114,20 @@ jobs:
             docs/data/frontpage.json
             docs/data/notes.json
             docs/data/draw.json
+
+      - name: Commit source data
+        # on main: the daily data; on a claude/** branch: the same files, so a pull request carries them
+        run: |
+          # the built site is packaged above; drop it so only the source files are left to commit
+          git checkout -q -- docs output 2>/dev/null || true
+          git clean -fdq docs output_live
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live data/heads.json data/sitemap_lastmod.json
+          if git diff --cached --quiet; then echo "No new source data."; exit 0; fi
+          git commit -q -m "Daily data: season in progress [skip ci]"
+          for i in 1 2 3; do git pull -q --rebase && git push -q && exit 0; sleep 5; done
+          echo "::error::could not push the daily data"; exit 1
 
   deploy:
     needs: build
