@@ -310,14 +310,16 @@ async function initCities() {
 /* ---------- HOME: last night at the gate (docs/data/notes.json) ----------
    Rebuilt every morning by live/build_notes.py from the season in progress.
    Note text carries tokens ([[p:id|Name]], [[a:slug|Arena]], [[t:Team]]) that
-   become links with faces and logos here; everything else is escaped. */
+   become plain links (players, arenas) or plain names (teams): faces and logos
+   go only at the start of a note, never inside the sentence. Everything else
+   is escaped. */
 function noteHtml(t) {
   return String(t).split(/(\[\[[pat]:[^\]]+\]\])/).map(part => {
     const m = part.match(/^\[\[([pat]):([^|\]]+)(?:\|([^\]]+))?\]\]$/);
     if (!m) return esc(part);
-    if (m[1] === "p") return playerLink(m[2], m[3] || "");
-    if (m[1] === "a") return arenaLink(m[2], m[3] || m[2]);
-    return teamLabel(m[2]);
+    if (m[1] === "p") return plainPlayerLink(m[2], m[3] || "");
+    if (m[1] === "a") return plainArenaLink(m[2], m[3] || m[2]);
+    return esc(m[2]);
   }).join("");
 }
 function noteImg(img, text, big) {
@@ -325,7 +327,9 @@ function noteImg(img, text, big) {
   if (img.p) {
     img = { p: String(img.p).replace(/\D/g, "") };      // a personId: digits only
     const nm = (String(text).match(new RegExp("\\[\\[p:" + img.p + "\\|([^\\]]+)\\]\\]")) || [])[1] || "";
-    return big ? '<span class="ph" style="--s:56px" data-p="' + esc(img.p) + '">' + esc(initials(nm)) + "</span>" : face(img.p, nm);
+    if (!big) return face(img.p, nm);
+    if (HEADS && !HEADS[img.p]) return "";
+    return '<span class="ph' + (HEADS ? "" : " pend") + '" style="--s:56px" data-p="' + esc(img.p) + '"></span>';
   }
   if (img.t) return logoUrl(img.t) ? '<i class="lg' + (big ? " big" : "") + '" data-t="' + esc(img.t) + '"></i>' : "";
   if (img.a) return '<i class="lg' + (big ? " big" : "") + '" data-a="' + esc(img.a) + '"></i>';
@@ -338,6 +342,7 @@ async function renderNotes() {
   try { n = await getJSON(DATA + "/notes.json"); } catch (e) { return; }
   const nights = (n && n.nights) || [];
   if (!nights.length) return;
+  await headsP;                     // so players without a photo never get an empty circle
   const last = nights[0];
   const sub = document.querySelector(".subtitle");
   if (sub && !sub.dataset.night) {
@@ -357,8 +362,9 @@ async function renderNotes() {
   if (nights.length > 1)
     html += '<section class="block"><div class="block-head"><h2>Earlier nights</h2><span class="sub">' +
       esc(n.season_label || "") + "</span></div><ul class=\"nights\">" + nights.slice(1).map(x =>
-        '<li><span class="nd">' + esc(x.label) + " · " + esc(countsLine(x.counts)) + "</span>" +
-        noteHtml((x.featured || {}).t || "") + "</li>").join("") + "</ul></section>";
+        '<li><span class="nimg">' + noteImg((x.featured || {}).img, (x.featured || {}).t, false) + "</span><span>" +
+        '<span class="nd">' + esc(x.label) + " · " + esc(countsLine(x.counts)) + "</span>" +
+        noteHtml((x.featured || {}).t || "") + "</span></li>").join("") + "</ul></section>";
   document.getElementById("notes").innerHTML = html;
 }
 

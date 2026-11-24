@@ -126,10 +126,10 @@ function renderCards() {
   ];
   if (o) {
     lines.push("Top scorer: " + (o.top_scorer
-      ? playerLink(o.top_scorer.personId, o.top_scorer.name) + " — " + fmtInt(o.top_scorer.points) + " pts"
+      ? plainPlayerLink(o.top_scorer.personId, o.top_scorer.name) + " — " + fmtInt(o.top_scorer.points) + " pts"
       : "—"));
     lines.push("Winningest player: " + (o.winningest_player
-      ? playerLink(o.winningest_player.personId, o.winningest_player.name) + " — " +
+      ? plainPlayerLink(o.winningest_player.personId, o.winningest_player.name) + " — " +
         pct(o.winningest_player.win_pct) + " (" + o.winningest_player.games + " g, min 15)"
       : "—"));
   }

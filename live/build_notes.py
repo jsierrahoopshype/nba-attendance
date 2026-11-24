@@ -58,6 +58,16 @@ def ordinal_day(d):
     return f"{t.strftime('%A')}, {t.strftime('%b')} {t.day}"
 
 
+# Several ways to say each kind of note, so the page doesn't read the same
+# every morning. pick() rotates through them by date (each kind on its own
+# offset), so consecutive nights use different wording and a rebuild of the
+# same night always gives the same sentence.
+def pick(variants, date, kind):
+    day = pd.Timestamp(date).toordinal()
+    off = sum(ord(c) for c in kind)
+    return variants[(day + off) % len(variants)]
+
+
 def P(pid, name):
     return f"[[p:{int(pid)}|{name}]]"
 
@@ -155,11 +165,24 @@ def night_notes(date, se, g, p, cap, bests):
         r = dd.sort_values("delta", ascending=False).iloc[0]
         if r["delta"] > 0:
             ts = top_scorer(r["gameId"], r["awayteamId"])
-            text = (f"The {T(r['away'])} drew {fmt(r['delta'])} more fans than usual at {A(r['building'])}: "
-                    f"{fmt(r['attendance'])}, against a {season_label(se)} average of {fmt(r['base'])} there.")
+            v = dict(t=T(r["away"]), a=A(r["building"]), d=fmt(r["delta"]), att=fmt(r["attendance"]),
+                     b=fmt(r["base"]), s=season_label(se))
+            text = pick([
+                "The {t} drew {d} more fans than usual at {a}: {att}, against a {s} average of {b} there.",
+                "{a} had {d} more people in the seats than on a normal night when the {t} came to town ({att}, against a {b} average).",
+                "Nobody moved the turnstiles like the {t}. {att} showed up at {a}, {d} above what the building usually draws this season.",
+                "The {t} packed {a} with {att}, {d} over its {s} average.",
+                "{att} fans came out at {a} for the {t}, {d} more than the building's usual {b} this season.",
+            ], date, "draw").format(**v)
             img = {"t": r["away"]}
             if ts:
-                text += f" {P(ts[0], ts[1])} led them with {ts[2]} points."
+                text += " " + pick([
+                    "{p} led them with {n} points.",
+                    "{p} gave them {n} points.",
+                    "{p} put up {n} for the visitors.",
+                    "{p} scored {n}.",
+                    "{p} was their top scorer with {n}.",
+                ], date, "draw-scorer").format(p=P(ts[0], ts[1]), n=ts[2])
                 img = {"p": ts[0]}
             featured = {"k": "draw", "t": text, "img": img}
             notes.append(featured)
@@ -174,9 +197,12 @@ def night_notes(date, se, g, p, cap, bests):
     elif len(prior_b) >= 2 and r["attendance"] > prior_b["attendance"].max():
         tail = ", its biggest crowd of the season"
     where = A(r["building"]) if isinstance(r["building"], str) else r["arenaName"]
-    notes.append({"k": "crowd", "img": {"t": r["home"]},
-                  "t": f"Biggest crowd of the night: {fmt(r['attendance'])} at {where} for the {T(r['away'])} "
-                       f"at the {T(r['home'])}{tail}."})
+    notes.append({"k": "crowd", "img": {"t": r["home"]}, "t": pick([
+        "Biggest crowd of the night: {att} at {w} for the {aw} at the {h}{tail}.",
+        "{w} had the night's biggest house, {att} for the {aw} at the {h}{tail}.",
+        "The largest crowd in the league was at {w}: {att} for the {aw} at the {h}{tail}.",
+        "No arena held more people than {w}, where {att} watched the {aw} at the {h}{tail}.",
+    ], date, "crowd").format(att=fmt(r["attendance"]), w=where, aw=T(r["away"]), h=T(r["home"]), tail=tail)})
 
     # 3. building bests
     highs = []
@@ -194,10 +220,15 @@ def night_notes(date, se, g, p, cap, bests):
         games, best = g0 + g1, max(b0, b1)
         if games >= HIGH_MIN_PRIOR_GAMES and s["points"] > best:
             highs.append((int(s["points"]), pid, f"{s['firstName']} {s['lastName']}".strip(), s["building"], games, best))
-    for pts, pid, name, b, games, best in sorted(highs, reverse=True)[:3]:
-        n = {"k": "high", "img": {"p": pid},
-             "t": f"{P(pid, name)} scored {pts} at {A(b)}, his most there in {games + 1} games "
-                  f"(previous best: {best})."}
+    for i, (pts, pid, name, b, games, best) in enumerate(sorted(highs, reverse=True)[:3]):
+        n = {"k": "high", "img": {"p": pid}, "t": pick([
+            "{p} scored {pts} at {a}, his most there in {g1} games (previous best: {best}).",
+            "{p} had never scored more than {best} at {a} in {g} games. He put up {pts}.",
+            "{pts} points for {p} at {a}, a new personal best in that building ({best} was his high over {g} earlier games).",
+            "{ps} {pts} at {a} beat his old best there by {diff}.",
+        ], (pd.Timestamp(date) + pd.Timedelta(days=i)).strftime("%Y-%m-%d"), "high").format(p=P(pid, name), ps=P(pid, name) + ("'" if name.endswith("s") else "'s"), pts=pts, a=A(b), g=games, g1=games + 1, best=best,
+                                         diff=pts - best)}
+        n["pts"] = pts
         notes.append(n)
         if featured is None:
             featured = n
@@ -206,9 +237,13 @@ def night_notes(date, se, g, p, cap, bests):
     if len(dd) >= 2:
         r = dd.sort_values("delta").iloc[0]
         if r["delta"] < 0:
-            notes.append({"k": "low", "img": {"t": r["home"]},
-                          "t": f"Lightest crowd relative to normal: {fmt(r['attendance'])} at {A(r['building'])} for the "
-                               f"{T(r['away'])}, {fmt(-r['delta'])} under its {season_label(se)} average."})
+            notes.append({"k": "low", "img": {"t": r["home"]}, "t": pick([
+                "Lightest crowd relative to normal: {att} at {a} for the {t}, {d} under its {s} average.",
+                "{a} came in {d} below its usual crowd for the {t} ({att}).",
+                "The {t} didn't move the needle at {a}: {att}, {d} short of the building's average this season.",
+                "Quietest building compared with its norm: {a}, with {att} for the {t}, {d} under average.",
+            ], date, "low").format(att=fmt(r["attendance"]), a=A(r["building"]), t=T(r["away"]),
+                                   d=fmt(-r["delta"]), s=season_label(se))})
 
     # 5. sellouts and sellout runs
     sold = [r for _, r in df.iterrows() if isinstance(r["building"], str) and r["building"] in cap
@@ -219,11 +254,24 @@ def night_notes(date, se, g, p, cap, bests):
         if len(home) >= 5 and (home["attendance"] >= cap[b] * (1 - SELLOUT_WITHIN)).all():
             runs.append((len(home), b))
     if sold:
-        t = (f"{len(sold)} of {len(df)} games " + ("was a sellout." if len(sold) == 1 else "were sellouts.")
-             if len(sold) < len(df) else f"All {len(df)} games were sellouts.")
+        n_, N_ = len(sold), len(df)
+        if n_ == N_:
+            t = pick(["All {N} games were sellouts.", "Every one of the {N} games sold out.",
+                      "{N} games, {N} sellouts."], date, "sold").format(N=N_)
+        elif n_ == 1:
+            t = pick(["1 of {N} games was a sellout.", "Only one of the {N} games sold out.",
+                      "One sellout in {N} games."], date, "sold").format(N=N_)
+        else:
+            t = pick(["{n} of {N} games were sellouts.", "Sellouts: {n} of {N} games.",
+                      "{n} of the {N} buildings were full.", "{n} sellouts across {N} games."],
+                     date, "sold").format(n=n_, N=N_)
         if runs:
             n, b = max(runs)
-            t += f" {A(b)} has sold out all {n} of its games this season."
+            t += " " + pick(["{a} has sold out all {k} of its games this season.",
+                             "{a} is {k} for {k} on sellouts this season.",
+                             "Every game at {a} this season has been a sellout, {k} so far.",
+                             "{a} hasn't had an empty seat to sell all season: {k} games, {k} sellouts."],
+                            date, "run").format(a=A(b), k=n)
         notes.append({"k": "sellouts", "t": t, "img": {"a": slugify(max(runs)[1])} if runs else None})
 
     # 6. league pace
@@ -235,12 +283,30 @@ def night_notes(date, se, g, p, cap, bests):
         d = pd.to_datetime(hist["gameDate"], errors="coerce")
         prev = hist[((d.dt.year + (d.dt.month >= 8).astype(int)) == se - 1) & (hist["attendance"].fillna(0) > 0)]
         avg = season_att["attendance"].mean()
-        t = f"League average so far: {fmt(avg)} fans per game over {len(season_att)} games"
+        cmp = ""
         if len(prev) >= 600:
             chg = 100 * (avg / prev["attendance"].mean() - 1)
-            word = "above" if chg >= 0 else "below"
-            t += f", {abs(chg):.1f}% {word} {season_label(se - 1)}'s {fmt(prev['attendance'].mean())}"
-        notes.append({"k": "pace", "t": t + "."})
+            cmp = (f"{abs(chg):.1f}% {'above' if chg >= 0 else 'below'} {season_label(se - 1)}'s "
+                   f"{fmt(prev['attendance'].mean())}")
+        v = dict(avg=fmt(avg), n=len(season_att), c=cmp)
+        t = pick([
+            "League average so far: {avg} fans per game over {n} games" + (", {c}." if cmp else "."),
+            "Through {n} games, NBA crowds average {avg}" + (", {c}." if cmp else "."),
+            "The average NBA crowd this season is {avg} after {n} games" + (", {c}." if cmp else "."),
+        ], date, "pace").format(**v)
+        notes.append({"k": "pace", "t": t})
+
+    # Lead with whatever stands out most, so the top of the page isn't the same
+    # kind of note every morning: the league's biggest crowd of the season, then
+    # a 35-point building best, then the night's biggest road draw.
+    crowd_n = next((n for n in notes if n["k"] == "crowd"), None)
+    high_n = next((n for n in notes if n["k"] == "high" and n.get("pts", 0) >= 35), None)
+    if crowd_n and "biggest NBA crowd of the season" in crowd_n["t"]:
+        featured = crowd_n
+    elif high_n:
+        featured = high_n
+    for n in notes:
+        n.pop("pts", None)
 
     counts = {"games": int(len(night)), "fans": int(att["attendance"].sum()), "sellouts": len(sold)}
     return {"date": date, "label": ordinal_day(date), "counts": counts,

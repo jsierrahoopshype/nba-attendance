@@ -57,23 +57,31 @@ const playerHref = (id, name) => ROOT + "players/" + playerSlug(name, id) + ".ht
 const arenaHref = slug => ROOT + "arenas/" + encodeURIComponent(slug) + ".html";
 const cityHref = slug => ROOT + "cities/" + encodeURIComponent(slug) + ".html";
 const playerLink = (id, name) => '<a href="' + playerHref(id, name) + '">' + face(id, name) + esc(name) + "</a>";
+// links for running text: no face or logo in the middle of a sentence
+const plainPlayerLink = (id, name) => '<a href="' + playerHref(id, name) + '">' + esc(name) + "</a>";
+const plainArenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + esc(name) + "</a>";
 const arenaLink = (slug, name) => '<a href="' + arenaHref(slug) + '">' + arenaLogo(slug) + esc(name) + "</a>";
 const cityLink = (slug, name) => '<a href="' + cityHref(slug) + '">' + esc(name) + "</a>";
 const slugify = name => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 /* ---------- faces and logos (the Head to Head section's sources and rules) ----------
    Faces: nba-headshots cut-outs, face-fill first (the face filling the circle),
-   face-tight when a player has none, his initials when neither exists. The
-   personId -> file name list is data/heads.json (live/build_heads.py), so no
-   image is ever requested for a player without one. Logos: nba-headshots team
+   face-tight when a player has none, and NOTHING when neither exists (no
+   initials circle, a HoopsMatic-wide rule). The personId -> file name list is
+   data/heads.json (live/build_heads.py), so no image is ever requested for a
+   player without one, and no empty circle is drawn for him. The image
+   addresses are written out in full (never built from pieces) so the
+   hoopsmatic.com Worker's same-origin pass rewrites them to
+   hoopsmatic.com/img/nba-headshots/: visitors never contact GitHub. Logos: nba-headshots team
    files, shown only beside the franchise's current name or a historical name
    that has its own file — never today's logo beside an old name. An arena
    carries its home team's logo, named as in the arena's last season there.
    Pages render small placeholders (<i class=f data-p=ID>AB</i>,
    <i class=lg data-t="Team">); hydrate() below fills them, wherever they appear. */
-const HS = "https://jsierrahoopshype.github.io/nba-headshots/";
-const FACE_FILL = HS + "players/headshots/face-fill/", FACE_TIGHT = HS + "players/headshots/face-tight/";
-const BUST = HS + "players/headshots/head-uniform-sharp/";
+const FACE_FILL = "https://jsierrahoopshype.github.io/nba-headshots/players/headshots/face-fill/";
+const FACE_TIGHT = "https://jsierrahoopshype.github.io/nba-headshots/players/headshots/face-tight/";
+const BUST = "https://jsierrahoopshype.github.io/nba-headshots/players/headshots/head-uniform-sharp/";
+const LOGOS = "https://jsierrahoopshype.github.io/nba-headshots/teams/logos/";
 const CURRENT_TEAMS = new Set(["Atlanta Hawks", "Boston Celtics", "Brooklyn Nets", "Charlotte Hornets", "Chicago Bulls",
   "Cleveland Cavaliers", "Dallas Mavericks", "Denver Nuggets", "Detroit Pistons", "Golden State Warriors", "Houston Rockets",
   "Indiana Pacers", "LA Clippers", "Los Angeles Lakers", "Memphis Grizzlies", "Miami Heat", "Milwaukee Bucks",
@@ -85,14 +93,19 @@ const HIST_LOGO = { "Charlotte Bobcats": "charlotte-bobcats", "New Orleans Horne
   "Vancouver Grizzlies": "vancouver-grizzlies", "Washington Bullets": "washington-bullets" };
 function logoUrl(team) {
   team = String(team || "").trim();
-  if (HIST_LOGO[team]) return HS + "teams/logos/historical/" + HIST_LOGO[team] + ".svg";
-  return CURRENT_TEAMS.has(team) ? HS + "teams/logos/current/svg/" + slugify(team) + ".svg" : "";
+  if (HIST_LOGO[team]) return LOGOS + "historical/" + HIST_LOGO[team] + ".svg";
+  return CURRENT_TEAMS.has(team) ? LOGOS + "current/svg/" + slugify(team) + ".svg" : "";
 }
 function initials(name) {
   const w = String(name || "").replace(/\./g, " ").split(/\s+/).filter(x => x && !/^(jr|sr|ii|iii|iv|v),?$/i.test(x));
   return w.length ? (w[0][0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase() : "?";
 }
-const face = (id, name) => '<i class="f" data-p="' + esc(id) + '">' + esc(initials(name)) + "</i>";
+// A face only for a player with a photo. Before heads.json has loaded the
+// placeholder stays hidden (.pend); hydrate() then shows it or removes it.
+const face = (id, name) => {
+  if (HEADS && !HEADS[id]) return "";
+  return '<i class="f' + (HEADS ? "" : " pend") + '" data-p="' + esc(id) + '"></i>';
+};
 const teamLogo = team => logoUrl(team) ? '<i class="lg" data-t="' + esc(team) + '"></i>' : "";
 const arenaLogo = slug => '<i class="lg" data-a="' + esc(slug) + '"></i>';
 const teamLabel = team => teamLogo(team) + esc(team);
@@ -102,11 +115,14 @@ const headsP = fetch(DATA + "/heads.json").then(r => r.ok ? r.json() : {}).catch
   .then(h => { HEADS = h; queueHydrate(); });
 const arenasP = fetch(DATA + "/buildings/index.json").then(r => r.ok ? r.json() : []).catch(() => [])
   .then(list => { ARENA_TEAM = {}; list.forEach(b => { if (b.home_team) ARENA_TEAM[b.slug] = b.home_team; }); queueHydrate(); });
-function addImg(el, src, fallback, onload) {
+function addImg(el, src, fallback, onload, onfail) {
   const img = new Image();
   img.alt = ""; img.loading = "lazy"; img.decoding = "async";
   img.onload = () => { if (onload) onload(); };
-  img.onerror = () => { if (fallback && img.dataset.t !== "1") { img.dataset.t = "1"; img.src = fallback; } else img.remove(); };
+  img.onerror = () => {
+    if (fallback && img.dataset.t !== "1") { img.dataset.t = "1"; img.src = fallback; }
+    else if (onfail) onfail(); else img.remove();
+  };
   img.src = src;
   el.appendChild(img);
 }
@@ -114,9 +130,11 @@ function hydrate(root) {
   if (HEADS) root.querySelectorAll("i.f[data-p], .ph[data-p]").forEach(el => {
     const stem = HEADS[el.dataset.p];
     el.removeAttribute("data-p");
-    if (!stem) return;                                   // no photo: the initials stay
+    if (!stem) { el.remove(); return; }                  // no photo: no circle at all
+    el.classList.remove("pend");
     const big = el.classList.contains("ph");
-    addImg(el, (big ? BUST : FACE_FILL) + stem + ".webp", FACE_TIGHT + stem + ".webp", () => el.classList.add("hs"));
+    addImg(el, (big ? BUST : FACE_FILL) + stem + ".webp", FACE_TIGHT + stem + ".webp", () => el.classList.add("hs"),
+      () => el.remove());                                 // both files failed: no circle either
   });
   root.querySelectorAll("i.lg[data-t]").forEach(el => {
     const u = logoUrl(el.dataset.t); el.removeAttribute("data-t");
@@ -144,8 +162,8 @@ function decorateHeader() {
   const page = (location.pathname.match(/\/(arenas|cities|players)\//) || [])[1];
   let hero = "";
   if (page === "players" && window.ENTITY_ID) {
-    const nm = (h.querySelector("h1") || {}).textContent || "";
-    hero = '<span class="ph" style="--s:72px" data-p="' + esc(window.ENTITY_ID) + '">' + esc(initials(nm)) + "</span>";
+    if (!HEADS) return;                                  // wait for the photo list
+    hero = HEADS[window.ENTITY_ID] ? '<span class="ph" style="--s:72px" data-p="' + esc(window.ENTITY_ID) + '"></span>' : "";
   } else if (page === "arenas" && window.ENTITY_SLUG) {
     if (!ARENA_TEAM) return;                             // wait for the arena list
     const t = ARENA_TEAM[window.ENTITY_SLUG];
