@@ -96,7 +96,7 @@ a:hover{text-decoration:underline;text-underline-offset:2px}
 table.lb{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;font-variant-numeric:tabular-nums}
 table.lb thead th{background:var(--surface-hover);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;
   font-size:.6rem;font-weight:600;padding:.6rem .55rem;text-align:right;border-bottom:1px solid var(--border);
-  white-space:nowrap;user-select:none;vertical-align:bottom;line-height:1.3}
+  user-select:none;vertical-align:bottom;line-height:1.3}
 table.lb thead th.sortable{cursor:pointer}
 table.lb thead th.sortable:hover{color:var(--text)}
 table.lb thead th.sorted-by{color:var(--text)}
@@ -109,8 +109,9 @@ table.lb td{padding:.5rem .55rem;height:2.9rem;text-align:right;font-family:var(
   border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
 table.lb tbody tr:last-child td{border-bottom:none}
 table.lb td.sorted-by{font-weight:700}
-table.lb td.name{text-align:left;font-family:var(--sans);font-weight:700;font-size:.82rem}
+table.lb td.name{text-align:left;font-family:var(--sans);font-weight:700;font-size:.82rem;white-space:normal;line-height:1.3}
 table.lb td.name a{display:inline-flex;align-items:center}
+table.lb td.name .sub:not(.team-hist){white-space:nowrap;display:inline-block}
 table.lb td.rank{color:var(--text-secondary);font-size:.7rem;width:2.2rem}
 table.lb thead th.rank{width:2.2rem}
 table.lb td.sub{color:var(--text-secondary)}
@@ -273,6 +274,8 @@ table.lb tbody tr.no-home{background:var(--surface-hover)}
 .notes li .nimg .lg{width:24px;height:24px}
 .feat-t .f,.notes .f,.nights .f{width:22px;height:22px;margin-right:.25rem}
 .feat-t .lg,.notes .lg,.nights .lg{margin-right:.2rem}
+/* a note that already leads with the player's face: no second face on his name */
+.notes li .nimg:not(:empty) + span > a:first-child > .f{display:none}
 .notes li .nimg{flex:0 0 24px;display:flex;justify-content:center}
 .nights{list-style:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .nights li{padding:.55rem .8rem;border-bottom:1px solid var(--border);font-size:.8rem;line-height:1.4}
