@@ -1,6 +1,6 @@
 # Daily build of hoopsmatic.com/nba-attendance/ with the season in progress.
 #
-#  1. live/fetch_live_season.py   final games of 2026-27 from NBA.com's public CDN -> data/live/<season>/
+#  1. live/fetch_live_season.py   2026-27 games from the section's own public Kaggle dataset -> data/live/<season>/
 #  2. live/build_heads.py         headshot file list from nba-headshots (names only) -> data/heads.json
 #  3. live/build_live_season.py   base (output/, Jorge's full local build) + season in progress -> docs/data/
 #  4. live/build_notes.py         "last night at the gate" notes for the front page -> docs/data/notes.json
@@ -44,9 +44,9 @@ jobs:
           python-version: '3.12'
 
       - name: Python packages
-        run: pip install --quiet pandas
+        run: pip install --quiet pandas kagglehub
 
-      - name: Fetch the season in progress (NBA.com CDN)
+      - name: Fetch the season in progress (public Kaggle dataset)
         run: python3 live/fetch_live_season.py
 
       - name: Headshot list (nba-headshots, file names only)
