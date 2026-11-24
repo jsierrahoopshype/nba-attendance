@@ -172,9 +172,9 @@ table.lb td > .delta.pos,table.lb td > .delta.neg{background:none;padding:0}
 .stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.2rem,1fr));gap:.4rem;margin-bottom:1.4rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.55rem .65rem;display:flex;flex-direction:column;gap:.1rem;min-width:0}
 .stat-card .lbl{font-size:.66rem;font-weight:700;color:var(--text-secondary)}
-.stat-card .num{font-size:.92rem;font-weight:700;line-height:1.25;overflow-wrap:anywhere;display:flex;align-items:center;flex-wrap:wrap}
-.stat-card .num a{display:inline-flex;align-items:center}
-.stat-card .num.pos,.stat-card .num.neg{font-family:var(--mono);align-self:flex-start;padding:0 .3rem;border-radius:6px}
+.stat-card .num{font-size:.92rem;font-weight:700;line-height:1.3;overflow-wrap:break-word}
+.stat-card .num .f{width:22px;height:22px;margin-right:.3rem}
+.stat-card .num.pos,.stat-card .num.neg{font-family:var(--mono);display:inline-block;padding:0 .3rem;border-radius:6px}
 .stat-card .num.pos{background:var(--green-dim)}.stat-card .num.neg{background:var(--red-dim)}
 .stat-card .sub{font-family:var(--mono);font-size:.6rem;color:var(--text-secondary);overflow-wrap:break-word;line-height:1.4}
 
