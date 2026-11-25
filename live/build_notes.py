@@ -42,6 +42,7 @@ HIGH_MIN_POINTS = 25        # a building best has to be a real scoring night
 HIGH_MIN_PRIOR_GAMES = 3    # ... and beat at least a few earlier games there
 SELLOUT_WITHIN = 0.005      # same rule as generate_dashboard_data.py
 NIGHTS_KEPT = 10
+ROAD_MIN_GAMES = 4          # road games before a team can lead the road-draw note
 
 
 def slugify(name):
@@ -130,6 +131,17 @@ def capacities(se, g):
     return cap
 
 
+def road_draw_deltas(g):
+    """Every regular-season game with a crowd: the visitors, the date, and the crowd minus the
+    home building's average in its other games this season (same comparison as the notes)."""
+    rs = g[(g["gameType"] == "Regular Season") & (g["attendance"].fillna(0) > 0)].dropna(subset=["building"])
+    tot = rs.groupby("building")["attendance"].agg(["sum", "count"])
+    x = rs.join(tot, on="building")
+    x = x[x["count"] - 1 >= MIN_BASELINE_GAMES]
+    base = (x["sum"] - x["attendance"]) / (x["count"] - 1)
+    return pd.DataFrame({"away": x["away"], "date": x["date"], "delta": x["attendance"] - base})
+
+
 def building_bests():
     """(personId, building) -> (games, best) through last season, all game types."""
     r = pd.read_csv(os.path.join(ROOT, "output", "player_arena_records_2007.csv"), encoding="utf-8-sig",
@@ -138,7 +150,7 @@ def building_bests():
     return {k: (int(v.games), int(v.best)) for k, v in agg.iterrows()}
 
 
-def night_notes(date, se, g, p, cap, bests):
+def night_notes(date, se, g, p, cap, bests, road_deltas):
     night = g[g["date"] == date]
     earlier = g[g["date"] < date]
     att = night[night["attendance"].fillna(0) > 0]
@@ -176,12 +188,12 @@ def night_notes(date, se, g, p, cap, bests):
                 "Best road draw of the night: the {t}, with {att} at {a}. The {h} have averaged {b} in their other home games.",
                 "The {h} had {att} at {a} for the {t}, {d} more than their average in other home games this season.",
                 "{a} drew {att} for the {t}. The {h}{hs} other home games this season have averaged {b}.",
-                "Biggest jump over a home average: {att} at {a} for the {t}, up {d} on the {h}{hs} average in their other home games this season ({b})."
+                "Biggest jump over a home average: {att} at {a} for the {t}, up {d} on the {h}{hs} average in their other home games this season ({b}).",
                 "{att} came out at {a} for the {t}, compared with the {b} the {h} have averaged in their other home games.",
                 "The {t} pushed attendance at {a} to {att}, {d} above the {h}{hs} average in their other home games ({b}).",
             ], date, "draw").format(**v)
             img = {"t": r["away"]}
-            featured = {"k": "draw", "t": text, "img": img}
+            featured = {"k": "draw", "t": text, "img": img, "b": r["building"]}
             notes.append(featured)
 
     # 2. biggest crowd of the night
@@ -224,7 +236,7 @@ def night_notes(date, se, g, p, cap, bests):
         games, best = g0 + g1, max(b0, b1)
         if games >= HIGH_MIN_PRIOR_GAMES and s["points"] > best:
             highs.append((int(s["points"]), pid, f"{s['firstName']} {s['lastName']}".strip(), s["building"], games, best))
-    for i, (pts, pid, name, b, games, best) in enumerate(sorted(highs, reverse=True)[:3]):
+    for i, (pts, pid, name, b, games, best) in enumerate(sorted(highs, reverse=True)[:1]):  # one at most: this is an attendance page
         n = {"k": "high", "img": {"p": pid}, "t": pick([
             "{p} scored {pts} at {a}, his most there in {g1} games (previous best: {best}).",
             "{p} had never scored more than {best} at {a} in {g} games. This time he had {pts}.",
@@ -238,8 +250,6 @@ def night_notes(date, se, g, p, cap, bests):
                                          diff=pts - best)}
         n["pts"] = pts
         notes.append(n)
-        if featured is None:
-            featured = n
 
     # 4. furthest below its average
     if len(dd) >= 2:
@@ -256,6 +266,48 @@ def night_notes(date, se, g, p, cap, bests):
                 "{a} came in {d} below the {h}{hs} average for their other home games ({b}), with {att} for the {t}.",
             ], date, "low").format(att=fmt(r["attendance"]), a=A(r["building"]), t=T(r["away"]),
                                    d=fmt(-r["delta"]), b=fmt(r["base"]), h=T(r["home"]), hs=poss(r["home"]))})
+
+    # 4b. smallest crowd of the night (a different building from the light-crowd note)
+    low_r = dd.sort_values("delta").iloc[0] if len(dd) >= 2 else None
+    low_b = low_r["building"] if low_r is not None and low_r["delta"] < 0 else None
+    if len(df) >= 3:
+        r = df.sort_values("attendance").iloc[0]
+        draw_b = next((n["b"] for n in notes if n["k"] == "draw"), None)
+        if r["building"] not in (low_b, draw_b):
+            where = A(r["building"]) if isinstance(r["building"], str) else r["arenaName"]
+            notes.append({"k": "quiet", "img": {"t": r["home"]}, "t": pick([
+                "Smallest crowd of the night: {att} at {a} for the {t} at the {h}.",
+                "The lightest house was at {a}, where {att} saw the {h} host the {t}.",
+                "{a} had the night's smallest crowd, {att} for the {t} at the {h}.",
+                "Fewest fans in one building: {att} at {a}, for the {t} at the {h}.",
+                "The {h} drew {att} at {a} against the {t}, the smallest crowd of the night.",
+                "At the other end of the list: {att} at {a} for the {t} at the {h}.",
+                "Bottom of the night's attendance: the {t} at the {h}, {att} at {a}.",
+                "The {t} at the {h} drew the night's smallest crowd, {att} at {a}.",
+            ], date, "quiet").format(att=fmt(r["attendance"]), a=where, t=T(r["away"]), h=T(r["home"]))})
+
+    # 4c. a building's biggest crowd of the season (not the night's biggest, which says so itself)
+    top_b = df.sort_values("attendance", ascending=False).iloc[0]["building"]
+    sh = []
+    for _, r in df.iterrows():
+        if not isinstance(r["building"], str) or r["building"] == top_b:
+            continue
+        prev = earlier[(earlier["building"] == r["building"]) & (earlier["attendance"].fillna(0) > 0)]
+        if len(prev) >= MIN_BASELINE_GAMES and r["attendance"] > prev["attendance"].max():
+            sh.append((r["attendance"] - prev["attendance"].max(), r, int(prev["attendance"].max()), len(prev)))
+    if sh:
+        _, r, prev, n = max(sh, key=lambda x: x[0])
+        notes.append({"k": "seasonhigh", "img": {"t": r["home"]}, "t": pick([
+            "{a} had its biggest crowd of the season, {att} for the {t}. The previous high there was {prev}.",
+            "New season high at {a}: {att} for the {t} at the {h}, up from {prev}.",
+            "The {h} drew {att} for the {t}, their best home crowd of the season (previous high: {prev}).",
+            "{att} at {a} for the {t}, the most the {h} have drawn at home this season. The old mark was {prev}.",
+            "Season-high crowd for the {h}: {att} at {a}, with the {t} in town (previous high: {prev}).",
+            "The {t} brought out the {h}{hs} biggest home crowd so far, {att} at {a} (previous high: {prev}).",
+            "{a} beat its season high with {att} for the {t}. The best before that was {prev}.",
+            "Through {n} home games the {h} had topped out at {prev}. The {t} drew {att} at {a}.",
+        ], date, "seasonhigh").format(att=fmt(r["attendance"]), a=A(r["building"]), t=T(r["away"]), h=T(r["home"]),
+                                      hs=poss(r["home"]), prev=fmt(prev), n=n)})
 
     # 5. sellouts and sellout runs
     sold = [r for _, r in df.iterrows() if isinstance(r["building"], str) and r["building"] in cap
@@ -306,6 +358,30 @@ def night_notes(date, se, g, p, cap, bests):
                              "{a} has been full for all {k} of its games this season."], date, "run").format(a=A(b), k=n)
         notes.append({"k": "sellouts", "t": t, "img": {"a": slugify(max(runs)[1])} if runs else None})
 
+    # 5b. the season's best road draw so far, when the leader changes (and on Mondays)
+    def road_leader(upto):
+        x = road_deltas[road_deltas["date"] <= upto]
+        agg = x.groupby("away")["delta"].agg(["mean", "count"])
+        agg = agg[agg["count"] >= ROAD_MIN_GAMES]
+        if agg.empty:
+            return None
+        t = agg["mean"].idxmax()
+        return t, float(agg.loc[t, "mean"]), int(agg.loc[t, "count"])
+    lead = road_leader(date)
+    prev_dates = sorted(d for d in g.loc[g["attendance"].fillna(0) > 0, "date"].unique() if d < date)
+    before = road_leader(prev_dates[-1]) if prev_dates else None
+    if lead and lead[1] > 0 and (not before or before[0] != lead[0] or pd.Timestamp(date).weekday() == 0):
+        notes.append({"k": "road", "img": {"t": lead[0]}, "t": pick([
+            "Best road draw so far this season: the {t}, with {d} more fans per game than their hosts usually get ({n} road games).",
+            "Through {n} road games, the {t} have drawn {d} more fans per game than their hosts average.",
+            "The {t} lead the league as a road draw: {d} fans per game above their hosts' average, over {n} road games.",
+            "The {t} are the top road draw of the season, adding {d} fans per game to their hosts' average ({n} games).",
+            "Road draw leaders: the {t}, {d} fans per game above what their hosts average, after {n} road games.",
+            "On the road, the {t} have lifted home crowds by {d} a game this season ({n} games).",
+            "Home teams draw {d} more per game when the {t} visit, the most in the league ({n} road games).",
+            "The {t} now lead the league in road draw: {d} extra fans per game across {n} road games.",
+        ], date, "road").format(t=T(lead[0]), d=fmt(lead[1]), n=lead[2])})
+
     # 6. league pace
     season_att = g[(g["date"] <= date) & (g["gameType"] == "Regular Season") & (g["attendance"].fillna(0) > 0)]
     if len(season_att) >= 30:
@@ -336,14 +412,21 @@ def night_notes(date, se, g, p, cap, bests):
     # Lead with whatever stands out most, so the top of the page isn't the same
     # kind of note every morning: the league's biggest crowd of the season, then
     # a 35-point building best, then the night's biggest road draw.
+    # The headline is always about crowds: the league's biggest crowd of the season when there is
+    # one, otherwise it rotates by date among the night's attendance notes so the top of the page
+    # (and the "Earlier nights" list) doesn't lead with the same kind of note every day.
     crowd_n = next((n for n in notes if n["k"] == "crowd"), None)
-    high_n = next((n for n in notes if n["k"] == "high" and n.get("pts", 0) >= 35), None)
     if crowd_n and "biggest NBA crowd of the season" in crowd_n["t"]:
         featured = crowd_n
-    elif high_n:
-        featured = high_n
+    else:
+        lead = [n for n in notes if n["k"] in ("draw", "crowd", "seasonhigh", "road")]
+        if lead:
+            featured = lead[pd.Timestamp(date).toordinal() % len(lead)]
     for n in notes:
         n.pop("pts", None)
+        n.pop("b", None)
+    order = ["draw", "crowd", "seasonhigh", "road", "low", "quiet", "sellouts", "high", "pace"]
+    notes.sort(key=lambda n: order.index(n["k"]) if n["k"] in order else len(order))
 
     counts = {"games": int(len(night)), "fans": int(att["attendance"].sum()), "sellouts": len(sold)}
     return {"date": date, "label": ordinal_day(date), "counts": counts,
@@ -360,10 +443,11 @@ def main():
     se, g, p = got
     cap = capacities(se, g)
     bests = building_bests()
+    road_deltas = road_draw_deltas(g)
     dates = sorted({d for d in g.loc[g["attendance"].fillna(0) > 0, "date"]}, reverse=True)
     nights = []
     for d in dates[:NIGHTS_KEPT]:
-        n = night_notes(d, se, g, p, cap, bests)
+        n = night_notes(d, se, g, p, cap, bests, road_deltas)
         if n:
             nights.append(n)
     # only the latest night keeps every note; earlier nights keep their headline
