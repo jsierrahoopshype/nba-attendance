@@ -5,7 +5,7 @@ From the season in progress (data/live/<season>/) it writes docs/data/notes.json
 with the latest game night's notes plus one-line summaries of the nights before:
 
   * the biggest road draw of the night (visiting team's crowd vs. that arena's
-    own average this season, leave-one-out) and who led the visitors in scoring;
+    other home games this season, named as such in the text) and who led the visitors in scoring;
   * the biggest crowd of the night, flagged when it's the arena's or the
     league's biggest of the season;
   * the crowd furthest below its arena's average;
@@ -78,6 +78,11 @@ def A(building):
 
 def T(team):
     return f"[[t:{team}]]"
+
+
+def poss(team):
+    """The apostrophe after a team name: the Kings' / the Heat's."""
+    return "'" if str(team).endswith("s") else "'s"
 
 
 def load():
@@ -165,14 +170,17 @@ def night_notes(date, se, g, p, cap, bests):
         r = dd.sort_values("delta", ascending=False).iloc[0]
         if r["delta"] > 0:
             ts = top_scorer(r["gameId"], r["awayteamId"])
+            # The comparison is always named in full: the home team's OTHER home games this season
+            # (leave-one-out), so it never reads as the season average sites like ESPN show, which
+            # include tonight. No "packed": that word is for a building close to full.
             v = dict(t=T(r["away"]), a=A(r["building"]), d=fmt(r["delta"]), att=fmt(r["attendance"]),
-                     b=fmt(r["base"]), s=season_label(se))
+                     b=fmt(r["base"]), h=T(r["home"]), hs=poss(r["home"]))
             text = pick([
-                "The {t} drew {d} more fans than usual at {a}: {att}, against a {s} average of {b} there.",
-                "{a} had {d} more people in the seats than on a normal night when the {t} came to town ({att}, against a {b} average).",
-                "Nobody moved the turnstiles like the {t}. {att} showed up at {a}, {d} above what the building usually draws this season.",
-                "The {t} packed {a} with {att}, {d} over its {s} average.",
-                "{att} fans came out at {a} for the {t}, {d} more than the building's usual {b} this season.",
+                "The {t} drew {att} to {a}, {d} more than the {h}{hs} other home games this season have averaged ({b}).",
+                "{a} had {att} in the seats for the {t}. The {h}{hs} other home games this season have averaged {b}, so that's {d} more.",
+                "Nobody moved the turnstiles like the {t}: {att} at {a}, {d} above the {h}{hs} average for their other home games this season.",
+                "{att} fans came out at {a} for the {t}, {d} more than the {h} have drawn on an average night there this season ({b} in their other home games).",
+                "The {t} were the night's best road draw: {att} at {a}, against {b} for the {h}{hs} other home games this season.",
             ], date, "draw").format(**v)
             img = {"t": r["away"]}
             if ts:
@@ -238,12 +246,12 @@ def night_notes(date, se, g, p, cap, bests):
         r = dd.sort_values("delta").iloc[0]
         if r["delta"] < 0:
             notes.append({"k": "low", "img": {"t": r["home"]}, "t": pick([
-                "Lightest crowd relative to normal: {att} at {a} for the {t}, {d} under its {s} average.",
-                "{a} came in {d} below its usual crowd for the {t} ({att}).",
-                "The {t} didn't move the needle at {a}: {att}, {d} short of the building's average this season.",
-                "Quietest building compared with its norm: {a}, with {att} for the {t}, {d} under average.",
+                "Lightest crowd relative to normal: {att} at {a} for the {t}, {d} under what the {h}{hs} other home games this season have averaged ({b}).",
+                "{a} drew {att} for the {t}, {d} below the {h}{hs} average for their other home games this season.",
+                "The {t} didn't move the needle at {a}: {att}, {d} short of the {h}{hs} other home games this season ({b} on average).",
+                "Quietest building compared with its norm: {a}, with {att} for the {t}. The {h} average {b} in their other home games this season.",
             ], date, "low").format(att=fmt(r["attendance"]), a=A(r["building"]), t=T(r["away"]),
-                                   d=fmt(-r["delta"]), s=season_label(se))})
+                                   d=fmt(-r["delta"]), b=fmt(r["base"]), h=T(r["home"]), hs=poss(r["home"]))})
 
     # 5. sellouts and sellout runs
     sold = [r for _, r in df.iterrows() if isinstance(r["building"], str) and r["building"] in cap
