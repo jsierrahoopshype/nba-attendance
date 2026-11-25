@@ -9,7 +9,7 @@ with the latest game night's notes plus one-line summaries of the nights before:
   * the biggest crowd of the night, flagged when it's the arena's or the
     league's biggest of the season;
   * the crowd furthest below its arena's average;
-  * players who scored more in a building than ever before there (from the full
+  * players who scored more in a road building than ever before there (from the full
     history in output/ plus this season's earlier games);
   * sellouts, and arenas that have sold out every game this season;
   * the league's average crowd so far vs. last season.
@@ -211,9 +211,12 @@ def night_notes(date, se, g, p, cap, bests):
     ep = p[p["gameId"].isin(earlier["gameId"])].merge(earlier[["gameId", "building"]], on="gameId")
     for (pid, b), sub in ep.groupby(["personId", "building"]):
         seen_live[(int(pid), b)] = [len(sub), int(sub["points"].max())]
-    np_ = p[p["gameId"].isin(night["gameId"])].merge(night[["gameId", "building"]], on="gameId")
+    np_ = p[p["gameId"].isin(night["gameId"])].merge(night[["gameId", "building", "hometeamId"]], on="gameId")
     for _, s in np_[np_["points"] >= HIGH_MIN_POINTS].iterrows():
         if not isinstance(s["building"], str):
+            continue
+        # Road buildings only: a best in a player's own home arena is just his best home night.
+        if s["playerteamId"] == s["hometeamId"]:
             continue
         pid = int(s["personId"])
         g0, b0 = bests.get((pid, s["building"]), (0, 0))
