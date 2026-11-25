@@ -90,6 +90,7 @@ def main():
     p = p.merge(g[["gameId", "_se"]], on="gameId", how="left")
 
     summary = []
+    changed = False
     for se, gs in g.groupby("_se"):
         gs = gs.drop(columns="_se").sort_values(["gameDate", "gameId"])
         ps = p[p["_se"] == se].drop(columns="_se").sort_values(["gameDate", "gameId", "personId"])
@@ -103,6 +104,12 @@ def main():
                 + ("" if (a or b) else " (no change)"))
         print(line)
         summary.append(line)
+        changed = changed or bool(a or b)
+    # Scheduled runs check Kaggle every couple of hours; with nothing new they stop here.
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as f:
+            f.write(f"changed={'true' if changed else 'false'}\n")
     gh = os.environ.get("GITHUB_STEP_SUMMARY")
     if gh:
         with open(gh, "a", encoding="utf-8") as f:
