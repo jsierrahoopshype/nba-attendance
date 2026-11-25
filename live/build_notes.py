@@ -201,7 +201,7 @@ def night_notes(date, se, g, p, cap, bests):
         "Top attendance of the night: the {aw} at the {h}, {att} at {w}.{tail}",
         "The {h} hosted the {aw} in front of {att} at {w}, the night's largest crowd.{tail}",
         "Most fans in one building: {att} at {w}, for the {aw} at the {h}.{tail}",
-        "{att} watched the {aw} at the {h} at {w}, more than any other game.{tail}",
+        "{att} were at {w} for the {aw} against the {h}, more than at any other game.{tail}",
         "{w} led the night with {att} for the {aw} at the {h}.{tail}",
     ], date, "crowd").format(att=fmt(r["attendance"]), w=where, aw=T(r["away"]), h=T(r["home"]), tail=tail)})
 
